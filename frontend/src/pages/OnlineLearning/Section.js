@@ -305,9 +305,9 @@ class Section extends Component {
             <Row className="align-items-center">
               <Col md={(this.state.attributes.length === 0 ? "12" : "5" )}>
                 <div className="section-title">
-                  <h2 className="title">NFT Alternative Text</h2>
+                  <h2 className="title">NFT Rewards for Burn</h2>
                   <p className="text-primary mb-4">
-                    {(this.state.attributes.length === 0 ? "Generated Alternative Text Will appear Below" : "View Generated Alternative Text Below")}
+                    {(this.state.attributes.length === 0 ? "Your burn reward amount will appear Below" : "View NFT Burn Rewards Below")}
                     
                   </p>
                   <Alert
