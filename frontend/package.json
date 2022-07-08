@@ -1,0 +1,77 @@
+{
+  "name": "burnance",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Burnance",
+  "author": "The Burnance Team",
+  "homepage": "https://burnance.io/",
+  "dependencies": {
+    "@iconscout/react-unicons": "^1.1.6",
+    "aos": "^2.3.4",
+    "availity-reactstrap-validation": "^2.7.1",
+    "aws-api-gateway-client": "^0.3.7",
+    "aws4": "^1.11.0",
+    "axios": "^0.27.2",
+    "bootstrap": "^5.0.0-beta2",
+    "copy-to-clipboard": "^3.3.1",
+    "dateformat": "^5.0.3",
+    "feather-icons-react": "^0.4.3",
+    "helmet": "^5.0.2",
+    "jwt-decode": "^3.1.2",
+    "lodash": "^4.17.21",
+    "node-sass": "^6.0.0",
+    "npm": "^7.13.0",
+    "number-counter": "^1.0.3",
+    "react": "^17.0.2",
+    "react-background-slider": "^2.0.0",
+    "react-countdown-now": "^2.1.2",
+    "react-countup": "^4.3.3",
+    "react-datepicker": "^3.8.0",
+    "react-dom": "^17.0.2",
+    "react-fade-in": "^2.0.1",
+    "react-flatpickr": "^3.10.7",
+    "react-ga": "^3.3.0",
+    "react-image-lightbox": "^5.1.1",
+    "react-modal-video": "^1.2.6",
+    "react-parallax": "^3.3.0",
+    "react-player": "^2.9.0",
+    "react-router-dom": "^5.2.0",
+    "react-sandbox-editor": "^1.0.3",
+    "react-scripts": "^4.0.0",
+    "react-scroll-up-button": "^1.6.4",
+    "react-slick": "^0.28.1",
+    "react-star-ratings": "^2.3.0",
+    "react-text-rotator": "^1.1.0",
+    "react-typist": "^2.0.5",
+    "reactstrap": "^8.9.0",
+    "slick-carousel": "^1.8.1",
+    "sweetalert2": "^11.4.10",
+    "url-parse": "^1.5.10",
+    "uuid": "^8.3.2",
+    "webpack": "4.44.2"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "gulp-sass": "^3.2.1"
+  }
+}
