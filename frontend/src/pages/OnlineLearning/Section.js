@@ -14,7 +14,7 @@ import {
 } from "reactstrap";
 import { Link } from "react-router-dom";
 import copy from 'copy-to-clipboard';
-import hero from "../../assets/images/nfts/Doggy-0745.png";
+import logodark from "../../assets/images/burnance_logo.png";
 import {Event} from "../../common/gaUtils";
 const endpoint = require('../../common/endpoint');
 const parse = require('url-parse')
@@ -31,7 +31,7 @@ class Section extends Component {
       isOpen: false,
       isOpenCopy: false,
       nftAltText: "",
-      nftImg: hero,
+      nftImg: logodark,
       assetUrl: "",
       message: "",
       loading: false,
@@ -212,7 +212,7 @@ class Section extends Component {
                   <Row className="align-items-center">
                     <Col lg={8} md={6} xs={12}>
                       <div className="title-heading">
-                        <Alert
+                        {/* <Alert
                           style={{backgroundColor: "#D43900"}}
                           className="alert-pills shadow"
                           role="alert"
@@ -220,7 +220,7 @@ class Section extends Component {
                           <span className="content">
                             BETA
                           </span>
-                        </Alert>
+                        </Alert> */}
 
                         <h1 className="heading mb-3">
                           <span className="text" style={{color: "#1F3A93"}}>Liquidity </span> 
@@ -228,9 +228,6 @@ class Section extends Component {
                           </h1>
                         <p className="para-desc text">
                         Burn your Sh!t NFTs and get rewarded with (BRC) Burn Coin, or (ETH) Ethereum.
-                        </p>
-                        <p className="para-desc text">
-                         The burn address is: <b style={{fontSize: '12px'}}>0x000000000000000000000000000000000000dEaD</b>
                         </p>
                         <div className="subcribe-form mt-4 pt-2">
                         <Alert

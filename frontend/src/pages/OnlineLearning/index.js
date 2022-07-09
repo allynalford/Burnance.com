@@ -8,7 +8,7 @@ import {initGA, PageView} from "../../common/gaUtils";
 class Index extends Component {
   componentDidMount() {
     document.body.classList = "";
-    document.title = "Burnance";
+    document.title = "NFT Liquidity Provider";
     window.addEventListener("scroll", this.scrollNavigation, true);
     initGA();
     PageView();

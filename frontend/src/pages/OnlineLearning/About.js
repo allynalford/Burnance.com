@@ -35,8 +35,8 @@ class About extends Component {
         <Container>
           {/* render Section title */}
           <SectionTitle
-            title="How NFT Alternative Text Generator Works"
-            desc="Using the latest AI technology, our solution analyzes your NFTs to produce high-quality descriptive alternative text"
+            title="How Burnance works for your NFT's"
+            desc="Burnance provides you with liquidity for NFT's you hold by purchasing them from you."
           />
           <Row className="align-items-center">
             <Col lg={6} md={12}>
@@ -143,7 +143,7 @@ class About extends Component {
                 </div>
 
                 <div className="section-title mb-4 pb-2">
-                  <h3 className="title mb-4">What Does Alternative Text for NFTs do?</h3>
+                  <h3 className="title mb-4">How does providing liquidity help with your NFT's.</h3>
                   <p className="text para-desc">
                   Alternative text is critical for digital assets like photos and artwork. 
                   It gives access to people with visual and specific cognitive disabilities by 

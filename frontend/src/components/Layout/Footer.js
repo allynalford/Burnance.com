@@ -8,7 +8,7 @@ import FeatherIcon from "feather-icons-react";
 
 
 //Import Images
-import logodark from "../../assets/images/Tenably-Labs-logo.png";
+import logodark from "../../assets/images/burnance_logo.png";
 
 class Footer extends Component {
   constructor(props) {
@@ -40,8 +40,8 @@ class Footer extends Component {
                 <Link to="/" className="logo-footer">
                   <img
                     src={logodark}
-                    height="59"
-                    alt="Tenably Labs NFT Alternative Text"
+                    height="118"
+                    alt="Burnance Logo"
                   />
                 </Link>
                 <ul
@@ -51,7 +51,7 @@ class Footer extends Component {
                       : 'list-unstyled social-icon foot-social-icon mb-0 mt-4'
                   }
                 >
-                  <li className="list-inline-item me-1">
+                  {/* <li className="list-inline-item me-1">
                     <a
                       aria-label="Tenably Labs Facebook"
                       target={'_new'}
@@ -76,12 +76,12 @@ class Footer extends Component {
                         className="fea icon-sm fea-social"
                       />
                     </a>
-                  </li>
+                  </li> */}
                   <li className="list-inline-item me-1">
                     <a
-                      aria-label="Tenably Labs twitter"
+                      aria-label="burnance twitter"
                       target={'_new'}
-                      href="https://twitter.com/TenablyLabs"
+                      href="https://twitter.com/burnance"
                       className="rounded"
                     >
                       <FeatherIcon
@@ -90,7 +90,7 @@ class Footer extends Component {
                       />
                     </a>
                   </li>
-                  <li className="list-inline-item me-1">
+                  {/* <li className="list-inline-item me-1">
                     <a
                       aria-label="Tenably Labs linkedin"
                       target={'_new'}
@@ -102,11 +102,11 @@ class Footer extends Component {
                         className="fea icon-sm fea-social"
                       />
                     </a>
-                  </li>
+                  </li> */}
                 </ul>
               </Col>
 
-              <Col
+              {/* <Col
                 lg="2"
                 md="4"
                 xs="12"
@@ -142,9 +142,9 @@ class Footer extends Component {
                     </li>
                   ))}
                 </ul>
-              </Col>
+              </Col> */}
 
-              <Col
+              {/* <Col
                 lg="3"
                 md="4"
                 xs="12"
@@ -184,7 +184,7 @@ class Footer extends Component {
                     </li>
                   ))}
                 </ul>
-              </Col>
+              </Col> */}
             </Row>
           </Container>
         </footer>
@@ -193,7 +193,7 @@ class Footer extends Component {
             <Row className="align-items-center">
               <Col sm="6">
                 <div className="text-sm-start">
-                  <p className="mb-0">2022 Tenably Labs, Inc.</p>
+                  <p className="mb-0">2022 Burnance</p>
                 </div>
               </Col>
             </Row>

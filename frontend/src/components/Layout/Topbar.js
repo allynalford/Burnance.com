@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import { withRouter } from "react-router";
 import {Container} from "reactstrap";
-import logodark from "../../assets/images/Tenably-Labs-logo.png";
 
 class Topbar extends Component {
   constructor(props) {
@@ -13,7 +12,6 @@ class Topbar extends Component {
       navLinks: [
         //Note : each child and nested child must have unique id
         { id: 1, title: "Home", link: "/" },
-        { id: 2, title: "Tenably", link: "https://www.Tenably.app", external: true },
         ],
       wishlistModal: false,
       dropdownIsOpen: false,
@@ -118,7 +116,7 @@ class Topbar extends Component {
 
         <header id="topnav" className="defaultscroll sticky">
           <Container>
-            <div>
+            {/* <div>
 
               {this.props.hasDarkTopBar ? (
                 <a className="logo" href="index.html">
@@ -134,7 +132,7 @@ class Topbar extends Component {
                   <img src={logodark} height="59" className="logo-dark-mode" alt="Tenably Labs NFT Alternative Text" />
                 </a>
               }
-            </div>
+            </div> */}
 
 
             <div className="menu-extras">
