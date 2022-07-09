@@ -222,15 +222,12 @@ class Section extends Component {
                           </span>
                         </Alert>
 
-                        <h1 className="heading mb-3">
-                          <span className="text" style={{color: "#1F3A93"}}>Liquidity </span> 
-                           for your <span className="text" style={{color: '#1E824C'}}>Worthless NFT's</span>
-                          </h1>
+                        <h1 className="heading mb-3"><span className="text" style={{color: "#1F3A93"}}>NFT</span> Burn for <span className="text" style={{color: '#1E824C'}}>Rewards</span></h1>
                         <p className="para-desc text">
-                        Burn your Sh!t NFTs and get rewarded with (BRC) Burn Coin, or (ETH) Ethereum.
+                        Burn your Sh!t NFTs and get rewarded with (BRC) Burn Coin.
                         </p>
                         <p className="para-desc text">
-                         The burn address is: <b style={{fontSize: '12px'}}>0x000000000000000000000000000000000000dEaD</b>
+                         The burn address is: <b>0x000000000000000000000000000000000000dEaD</b>
                         </p>
                         <div className="subcribe-form mt-4 pt-2">
                         <Alert
@@ -244,22 +241,22 @@ class Section extends Component {
                             <FormGroup>
                               <Row>
                                 <Col md="12">
-                                <Label className="form-label" for="email">
-                                  Enter your E-Mail address to be notified.
+                                <Label className="form-label" for="assetUrl">
+                                  Enter the NFT url from OpenSea, Rarible or Looksrare
                                 </Label>
                                 </Col>
                                 <Col md="12">
                                   <Input
-                                  size={100}
+                                  size={1024}
                                   type="text"
-                                  id="email"
-                                  name="email"
-                                  aria-label="Email address"
-                                  placeholder="test@burnance.io"
-                                  value={this.state.email}
+                                  id="assetUrl"
+                                  name="assetUrl"
+                                  aria-label="NFT Marketplace URL"
+                                  placeholder="https://opensea.io/assets/{address}/{tokenId}"
+                                  value={this.state.assetUrl}
                                   disabled={this.state.loading}
                                   onChange={e => {
-                                    this.setState({ email: e.target.value })
+                                    this.setState({ assetUrl: e.target.value })
                                   }}
                                 /></Col>
                                 <Col md="12" style={{ marginBottom: '35px', marginTop: '5px' }}>
@@ -272,7 +269,7 @@ class Section extends Component {
                                       e.preventDefault();
                                       this.getNFT();
                                     }}>
-                                   Get Ready to Burn
+                                    Burn NFT
                                   </Link></Col>
                               </Row>
                             </FormGroup>

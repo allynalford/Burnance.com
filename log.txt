@@ -1,0 +1,38 @@
+2022-07-08T15:55:12.867Z [INFO]: # Cloning repository: git@github.com:allynalford/Burnance.com.git
+2022-07-08T15:55:16.375Z [INFO]: Cloning into 'Burnance.com'...
+2022-07-08T15:55:16.470Z [INFO]: # Checking for Git submodules at: /codebuild/output/src810205700/src/Burnance.com/.gitmodules
+2022-07-08T15:55:16.495Z [INFO]: # Retrieving environment cache...
+2022-07-08T15:55:17.004Z [INFO]: # Retrieved environment cache
+2022-07-08T15:55:17.004Z [INFO]: ---- Setting Up SSM Secrets ----
+2022-07-08T15:55:17.004Z [INFO]: SSM params {"Path":"/amplify/d25wqswb96g3e6/main/","WithDecryption":true}
+2022-07-08T15:55:17.032Z [WARNING]: !Failed to set up process.env.secrets
+2022-07-08T15:55:17.036Z [INFO]: No live updates for this build run
+2022-07-08T15:55:17.041Z [INFO]: # Retrieving cache...
+2022-07-08T15:55:17.085Z [INFO]: # Extracting cache...
+2022-07-08T15:55:17.093Z [INFO]: # Extraction completed
+2022-07-08T15:56:06.087Z [INFO]: ## Starting Backend Build
+                                 ## Checking for associated backend environment...
+                                 ## No backend environment association found, continuing...
+                                 ## Completed Backend Build
+2022-07-08T15:56:06.090Z [INFO]: ## Starting Frontend Build
+2022-07-08T15:56:06.091Z [INFO]: # Starting phase: preBuild
+                                 # Executing command: npm ci
+2022-07-08T15:56:12.504Z [WARNING]: npm
+2022-07-08T15:56:12.506Z [WARNING]: ERR! code ENOENT
+                                    npm ERR! syscall open
+                                    npm ERR! path /codebuild/output/src810205700/src/Burnance.com/package.json
+                                    npm ERR! errno -2
+2022-07-08T15:56:12.507Z [WARNING]: npm ERR! enoent ENOENT: no such file or directory, open '/codebuild/output/src810205700/src/Burnance.com/package.json'
+                                    npm ERR! enoent This is related to npm not being able to find a file.
+                                    npm
+2022-07-08T15:56:12.509Z [WARNING]: ERR! enoent
+2022-07-08T15:56:12.515Z [WARNING]: 
+2022-07-08T15:56:12.515Z [WARNING]: npm ERR! A complete log of this run can be found in:
+                                    npm ERR!     /root/.npm/_logs/2022-07-08T15_56_12_508Z-debug.log
+2022-07-08T15:56:12.515Z [HELP]: Outputting the npm debug log
+                                 [object Promise]
+2022-07-08T15:56:12.519Z [ERROR]: !!! Build failed
+2022-07-08T15:56:12.519Z [ERROR]: !!! Non-Zero Exit Code detected
+2022-07-08T15:56:12.519Z [INFO]: # Starting environment caching...
+2022-07-08T15:56:12.520Z [INFO]: # Environment caching completed
+Terminating logging...
