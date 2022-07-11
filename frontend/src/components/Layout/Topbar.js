@@ -134,6 +134,17 @@ class Topbar extends Component {
               }
             </div> */}
 
+              <div className="buy-button">
+                    {/* <Link
+                      to="//1.envato.market/landrickreactjs"
+                      target="_blank"
+                      className="btn btn-pills btn-primary"
+                    >
+                      Buy Now
+                    </Link> */}
+                    <Button>Connect Wallet</Button>
+                  </div>
+
 
             <div className="menu-extras">
               <div className="menu-item">
@@ -367,9 +378,6 @@ class Topbar extends Component {
                   )
                 )}
               </ul>
-            </div>
-            <div>
-            <Button>Connect Wallet</Button>
             </div>
           </Container>
         </header>
