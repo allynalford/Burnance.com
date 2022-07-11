@@ -1,0 +1,36 @@
+{
+    "id": "z1togz2hcjrkpp5treip",
+    "status": "active",
+    "email": "john@acme.com",
+    "first_name": "John",
+    "last_name": "Doe",
+    "address1": "123 Main St.",
+    "address2": "Suite 200",
+    "city": "Los Angeles",
+    "state": "CA",
+    "zip": "90210",
+    "country": "US",
+    "phone": "555-555-5555",
+    "eu_consent": "granted",
+    "time_zone": "America/Los_Angeles",
+    "utc_offset": -440,
+    "visitor_uuid": "sa8f7sdf78sdsdahf788d7asf8sd",
+    "custom_fields": {
+      "shirt_size": "Medium"
+    },
+    "tags": ["Customer", "SEO"],
+    "ip_address": "111.111.111.11",
+    "user_agent": "Chrome/36.0.1985.143",
+    "original_referrer": "http://www.getdrip.com",
+    "landing_url": "https://www.getdrip.com/docs/rest-api",
+    "prospect": true,
+    "lead_score": 72,
+    "lifetime_value": 10000,
+    "created_at": "2013-06-21T10:31:58Z",
+    "href": "https://api.getdrip.com/v2/9999999/subscribers/12345",
+    "user_id": "12345",
+    "base_lead_score": 30,
+    "links": {
+      "account": "9999999"
+    }
+  }

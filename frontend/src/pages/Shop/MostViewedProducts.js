@@ -3,7 +3,6 @@ import { Container, Row, Col, Card, CardBody, Button } from "reactstrap";
 import { Link } from "react-router-dom";
 import FeatherIcon from "feather-icons-react";
 
-
 //Import Images
 import product1 from "../../assets/images/nft/coolbirds_wtf_636.png";
 import product2 from "../../assets/images/nft/Loopy_Donut_8952.png";
@@ -31,91 +30,86 @@ class MostViewedProducts extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      ethereumAddress: "",
+      ethereumAddress: '',
       walletConnected: false,
       products: [
         {
           id: 1,
           image: product1,
           imgOverlay: product1,
-          name: "Branded T-Shirt",
-          price: "16.00",
-          oldPrice: "21.00",
+          name: 'Branded T-Shirt',
+          price: '16.00',
+          oldPrice: '21.00',
           isNew: true,
           isFeatured: true,
-          isSale: true
+          isSale: true,
         },
         {
           id: 2,
           image: product2,
           imgOverlay: product2,
-          name: "Shopping Bag",
-          price: "21.00",
-          oldPrice: "25.00",
+          name: 'Shopping Bag',
+          price: '21.00',
+          oldPrice: '25.00',
         },
         {
           id: 3,
           image: product3,
           imgOverlay: product3,
-          name: "Elegent Watch",
-          price: "5.00",
-          desc: "30% off",
-          isSale: true
+          name: 'Elegent Watch',
+          price: '5.00',
+          desc: '30% off',
+          isSale: true,
         },
         {
           id: 4,
           image: product4,
           imgOverlay: product4,
-          name: "Casual Shoes",
-          price: "18.00",
-          oldPrice: "22.00",
+          name: 'Casual Shoes',
+          price: '18.00',
+          oldPrice: '22.00',
         },
         {
           id: 5,
           image: product5,
           imgOverlay: product5,
-          name: "Earphones",
-          price: "3.00",
-          isSale: true
+          name: 'Earphones',
+          price: '3.00',
+          isSale: true,
         },
         {
           id: 6,
           image: product6,
           imgOverlay: product6,
-          name: "Elegent Mug",
-          price: "4.50",
-          oldPrice: "6.50",
+          name: 'Elegent Mug',
+          price: '4.50',
+          oldPrice: '6.50',
         },
         {
           id: 7,
           image: product7,
           imgOverlay: prodtctOverlay7,
-          name: "Sony Headphones",
-          price: "9.99",
-          desc: "20% off",
+          name: 'Sony Headphones',
+          price: '9.99',
+          desc: '20% off',
         },
         {
           id: 8,
           image: product8,
           imgOverlay: prodtctOverlay8,
-          name: "Wooden Stools",
-          price: "22.00",
-          oldPrice: "25.00",
+          name: 'Wooden Stools',
+          price: '22.00',
+          oldPrice: '25.00',
         },
       ],
     };
   }
 
   componentDidMount() {
-    if (window.ethereum) {
-      // Do something
-      window.ethereum.request({ method: 'eth_requestAccounts' }).then((ethereumAddress) => {
-        this.setState({ethereumAddress, walletConnected: true});
-      });
-    } else {
-      alert('install metamask extension!!');
-    }
-  }
+    console.log(this.props)
+  };
+
+
 
   render() {
     return (
@@ -124,10 +118,8 @@ class MostViewedProducts extends Component {
           <Row>
             <Col xs={12}>
               <h5 className="mb-0">Your NFT's</h5>
-              <p>Address: {this.state.ethereumAddress}</p>
             </Col>
           </Row>
-
           <Row>
             {this.state.products.map((product, key) => (
               <Col key={key} lg={3} md={6} xs={12} className="mt-4 pt-2">
@@ -144,10 +136,24 @@ class MostViewedProducts extends Component {
                       </li>
                     )}
                     {product.isFeatured && (
-                      <li><Link to="#" className="badge badge-link rounded-pill bg-success">Featured</Link></li>
+                      <li>
+                        <Link
+                          to="#"
+                          className="badge badge-link rounded-pill bg-success"
+                        >
+                          Featured
+                        </Link>
+                      </li>
                     )}
                     {product.isSale && (
-                      <li><Link to="#" className="badge badge-link rounded-pill bg-warning">Sale</Link></li>
+                      <li>
+                        <Link
+                          to="#"
+                          className="badge badge-link rounded-pill bg-warning"
+                        >
+                          Sale
+                        </Link>
+                      </li>
                     )}
                   </ul>
                   <ul className="shop-image position-relative overflow-hidden rounded shadow">
@@ -210,7 +216,7 @@ class MostViewedProducts extends Component {
                     </Link>
                     <div className="d-flex justify-content-between mt-1">
                       <h6 className="text-muted small fst-italic mb-0 mt-1">
-                        ${product.price}{" "}
+                        ${product.price}{' '}
                         {product.oldPrice ? (
                           <del className="text-danger ms-2">
                             ${product.oldPrice}
@@ -240,9 +246,7 @@ class MostViewedProducts extends Component {
                         </li>
                       </ul>
                     </div>
-                    <Button>
-                      Burn NFT
-                    </Button>
+                    <Button>Burn NFT</Button>
                   </CardBody>
                 </Card>
               </Col>

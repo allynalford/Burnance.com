@@ -1,0 +1,147 @@
+service: burnance
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: ${opt:region, 'us-east-1'}
+  stage: ${opt:stage, 'dev'} 
+  memorySize: 128
+  timeout: 30
+  deploymentBucket:
+    name: service.burnance.nodejs.lambdas.${self:provider.stage}
+  environment:
+    STAGE:  ${opt:stage,'dev'}
+    REGION: ${opt:region, self:provider.region}
+    ACCOUNTID: ${file(config.${self:provider.stage}.json):AWS_ACT_ID}  
+    USER_AGENT: ${file(config.${self:provider.stage}.json):USER_AGENT}
+    CDN_BUCKET: ${file(config.${self:provider.stage}.json):CDN_BUCKET}
+    ETHERSCAN_API_URL: ${file(config.${self:provider.stage}.json):ETHERSCAN_API_URL}
+    API_KEY_TOKEN: ${file(config.${self:provider.stage}.json):API_KEY_TOKEN}
+    ETHERSCAN_ABI_PARAMS: ${file(config.${self:provider.stage}.json):ETHERSCAN_ABI_PARAMS}
+    OPEN: ${file(config.${self:provider.stage}.json):OPEN}
+    SLACK_API_WAITLIST_WEBHOOK: ${file(config.${self:provider.stage}.json):SLACK_API_WAITLIST_WEBHOOK}
+    DRIP: ${file(config.${self:provider.stage}.json):DRIP}
+    DRIP_ID: ${file(config.${self:provider.stage}.json):DRIP_ID}
+    S3_DRIP_CDN_BUCKET: ${file(config.${self:provider.stage}.json):S3_DRIP_CDN_BUCKET}
+    DYNAMODB_TABLE_CONTRACT_ABI: ${self:service}-${opt:stage, self:provider.stage}-contract-abi
+    DYNAMODB_TABLE_NFT_METADATA: ${self:service}-${opt:stage, self:provider.stage}-nfts-metadata
+    NODE: ${file(config.${self:provider.stage}.json):NODE}
+    KEY: ${file(config.${self:provider.stage}.json):KEY}
+  iamRoleStatements:  
+    - Effect: "Allow"
+      Action:
+        - s3:PutObject
+        - s3:GetObject
+        - s3:DeleteObject
+      Resource: "arn:aws:s3:::${file(config.${self:provider.stage}.json):CDN_BUCKET}/*"
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: 
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE_NFT_METADATA}"
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE_CONTRACT_ABI}"
+package:
+  individually: false
+  exclude:
+  - layers/**
+  - layer/**
+  - node_modules/puppeteer/.local-chromium/**
+  - node_modules/puppeteer/**
+  - chrome-aws-lambda/**
+  - node_modules/chrome-aws-lambda/**
+functions: 
+  viewNFTAltText:
+    handler: actions.view
+    memorySize: 128 # optional, in MB, default is 1024
+    timeout: 30 # optional, in seconds, default is 6
+    events:
+      - http:
+          path: view/alttext
+          method: post
+          authorizer: aws_iam
+          cors: true
+  addDripSub:
+    handler: drip/dripUtils.addSubscriber
+    memorySize: 128 # optional, in MB, default is 1024
+    timeout: 30 # optional, in seconds, default is 6
+    events:
+      - http:
+          path: drip/add/subscriber
+          method: post
+          authorizer: aws_iam
+          cors: true
+  authorizer:
+    handler: hooks/authorizer.handler   
+resources:
+  Resources:
+    Bucket:
+     Type: AWS::S3::Bucket
+     Properties:
+       BucketName: ${self:provider.environment.CDN_BUCKET} 
+    GatewayResponse:
+      Type: 'AWS::ApiGateway::GatewayResponse'
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.WWW-Authenticate: "'Basic'"
+        ResponseType: UNAUTHORIZED
+        RestApiId:
+          Ref: 'ApiGatewayRestApi'
+        StatusCode: '401'
+    NFTMetaDataDynamoDBTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: chain
+            AttributeType: S
+          -  
+            AttributeName: contractAddressTokenId
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: chain
+            KeyType: HASH
+          -
+            AttributeName: contractAddressTokenId
+            KeyType: RANGE  
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.environment.DYNAMODB_TABLE_NFT_METADATA} 
+    ContractABIDynamoDBTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: chain
+            AttributeType: S
+          -  
+            AttributeName: contractAddress
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: chain
+            KeyType: HASH
+          -
+            AttributeName: contractAddress
+            KeyType: RANGE  
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.environment.DYNAMODB_TABLE_CONTRACT_ABI}    
+custom:
+  tableThroughput: 1
+  prune:
+    automatic: true
+    number: 5   
+plugins:
+  - serverless-offline
+  - serverless-pseudo-parameters
+  - serverless-prune-plugin

@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import { withRouter } from "react-router";
 import {Container} from "reactstrap";
+import { ethers } from "ethers";
 
 class Topbar extends Component {
   constructor(props) {
@@ -9,6 +10,7 @@ class Topbar extends Component {
     this.state = {
       ethereumAddress: "",
       walletConnected: false,
+      ethBalance: 0,
       isOpen: false,
       dropdownOpenShop: false,
       navLinks: [
@@ -25,6 +27,7 @@ class Topbar extends Component {
     this.toggleWishlistModal.bind(this);
     this.toggleDropdownIsOpen.bind(this);
     this.connectWallet.bind(this);
+    this.getEthBalance.bind(this);
   }
 
   toggleWishlistModal = () => {
@@ -62,22 +65,44 @@ class Topbar extends Component {
       this.activateParentDropdown(matchingMenuItem);
     }
 
+    if(window.ethereum && window.ethereum._state.isConnected && typeof window.ethereum._state.accounts[0] !== "undefined"){
+      console.log("connected",window.ethereum._state);
+      this.setState({ethereumAddress: window.ethereum._state.accounts[0], walletConnected: true});
+      this.getEthBalance(window.ethereum._state.accounts[0]);
+    }
+
 
   }
 
   connectWallet = () => {
     if (window.ethereum) {
       // Do something
-
       window.ethereum.request({ method: 'eth_requestAccounts' }).then((ethereumAddress) => {
-        // Return the address of the wallet
-        console.log('ethereumAddress: ',ethereumAddress);
         this.setState({ethereumAddress, walletConnected: true});
+        this.getEthBalance(ethereumAddress);
       });
     } else {
       alert('install metamask extension!!');
     }
   };
+
+  getEthBalance = (address)=>{
+    console.log(address)
+    if(window.ethereum){
+      window.ethereum.request({
+        method:'eth_getBalance', 
+        params: [address, 'latest']
+    }).then(balance => {
+        // Return string value to convert it into int balance
+        console.log(balance) 
+          
+        // Yarn add ethers for using ethers utils or
+        // npm install ethers
+        console.log(ethers.utils.formatEther(balance))
+        // Format the string into main latest balance
+    })
+    }
+  }
 
   activateParentDropdown = (item) => {
     const parent = item.parentElement;

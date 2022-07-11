@@ -1,0 +1,14 @@
+{
+    "event": "subscriber.updated_custom_field",
+    "data": {
+      "account_id": "9999999",
+      "subscriber": {},
+      "properties": {
+        "identifier": "first_name",
+        "value": "John",
+        "previous_value": "",
+        "source": "drip"
+      }
+    },
+    "occurred_at": "2013-06-21T10:31:58Z"
+  }

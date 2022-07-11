@@ -1,8 +1,5 @@
 import React, { Component } from "react";
-
-//Import Components
 import MostViewedProducts from "./MostViewedProducts";
-
 import { Link } from "react-router-dom";
 import {
   Container,
@@ -11,34 +8,106 @@ import {
   Card,
   CardBody,
 } from "reactstrap";
-
 //Import Icons
 import FeatherIcon from "feather-icons-react";
-
 //Import Images
 import imgbg from "../../assets/images/account/bg.png";
 import profile from "../../assets/images/client/05.jpg";
+import { ethers } from "ethers";
 
-
+var timer;
 
 class Index extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      ethereumAddress: '',
+      walletConnected: false,
+      ethBalance: '',
+    };
+
+    this.getEthBalance.bind(this);
+    this.startTimer.bind(this);
+    this.checkConnection.bind(this);
+  }
+
   componentDidMount() {
-    document.body.classList = "";
-    window.addEventListener("scroll", this.scrollNavigation, true);
+    document.body.classList = '';
+    window.addEventListener('scroll', this.scrollNavigation, true);
+
+    if (window.ethereum) {
+      if (window.ethereum._state.isConnected && typeof window.ethereum._state.accounts[0] !== "undefined") {
+        this.setState({
+          ethereumAddress: window.ethereum._state.accounts[0],
+          walletConnected: true,
+        });
+        this.getEthBalance(window.ethereum._state.accounts[0]);
+      }else{
+        console.log("Not Connected")
+        this.startTimer();
+      }
+    } else {
+      alert('install metamask extension!!');
+    }
   }
 
   // Make sure to remove the DOM listener when the component is unmounted.
   componentWillUnmount() {
-    window.removeEventListener("scroll", this.scrollNavigation, true);
+    window.removeEventListener('scroll', this.scrollNavigation, true);
   }
+
+  startTimer = () => {
+    console.log('starting timer');
+
+    timer = setInterval(this.checkConnection, 15000);
+  };
+
+  checkConnection = () =>{
+    if (window.ethereum) {
+      console.log("Running connection Check")
+      if (window.ethereum._state.isConnected && typeof window.ethereum._state.accounts[0] !== "undefined") {
+        console.log("Connected")
+        this.setState({
+          ethereumAddress: window.ethereum._state.accounts[0],
+          walletConnected: true,
+        });
+        this.getEthBalance(window.ethereum._state.accounts[0]);
+        clearInterval(timer);
+        console.log('stopping timer');
+      }else{
+        console.log("Not connected");
+      }
+    }
+  }
+
+
+  getEthBalance = (address) => {
+    if (window.ethereum) {
+      window.ethereum
+        .request({
+          method: 'eth_getBalance',
+          params: [address, 'latest'],
+        })
+        .then((balance) => {
+          // Return string value to convert it into int balance
+          //console.log(balance)
+
+          // Yarn add ethers for using ethers utils or
+          // npm install ethers
+          //console.log(ethers.utils.formatEther(balance))
+          this.setState({ ethBalance: ethers.utils.formatEther(balance) });
+          // Format the string into main latest balance
+        });
+    }
+  };
 
   scrollNavigation = () => {
     var doc = document.documentElement;
     var top = (window.pageYOffset || doc.scrollTop) - (doc.clientTop || 0);
     if (top > 80) {
-      document.getElementById("topnav").classList.add("nav-sticky");
+      document.getElementById('topnav').classList.add('nav-sticky');
     } else {
-      document.getElementById("topnav").classList.remove("nav-sticky");
+      document.getElementById('topnav').classList.remove('nav-sticky');
     }
   };
 
@@ -59,7 +128,7 @@ class Index extends Component {
               <Col lg="12">
                 <Card
                   className="public-profile border-0 rounded shadow"
-                  style={{ zIndex: "1" }}
+                  style={{ zIndex: '1' }}
                 >
                   <CardBody>
                     <Row className="align-items-center">
@@ -77,7 +146,9 @@ class Index extends Component {
                             md="7"
                             className="text-md-start text-center mt-4 mt-sm-0"
                           >
-                            <h3 className="title mb-0">Krista Joseph</h3>
+                            <h3 className="title mb-0">
+                              {this.state.ethereumAddress}
+                            </h3>
                             <small className="text-muted h6 me-2">
                               Web Developer
                             </small>
@@ -151,7 +222,7 @@ class Index extends Component {
           </Container>
         </section>
         <section className="section">
-          <MostViewedProducts />
+          <MostViewedProducts ethereumAddress={this.state.ethereumAddress} />
 
           {/* <TopCategories />
 

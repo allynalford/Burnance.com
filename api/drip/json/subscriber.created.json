@@ -1,0 +1,8 @@
+{
+    "event": "subscriber.created",
+    "data": {
+      "account_id": "9999999",
+      "subscriber": { }
+    },
+    "occurred_at": "2013-06-21T10:31:58Z"
+  }

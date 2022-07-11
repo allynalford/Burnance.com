@@ -1,0 +1,11 @@
+{
+    "event": "subscriber.applied_tag",
+    "data": {
+      "account_id": "9999999",
+      "subscriber": {},
+      "properties": {
+        "tag": "Customer"
+      }
+    },
+    "occurred_at": "2013-06-21T10:31:58Z"
+  }
