@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import { withRouter } from "react-router";
-import {Container} from "reactstrap";
+import {Container, Button} from "reactstrap";
 
 class Topbar extends Component {
   constructor(props) {
@@ -367,6 +367,9 @@ class Topbar extends Component {
                   )
                 )}
               </ul>
+            </div>
+            <div>
+            <Button>Connect Wallet</Button>
             </div>
           </Container>
         </header>
