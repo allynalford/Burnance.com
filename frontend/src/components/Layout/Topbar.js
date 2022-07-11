@@ -1,12 +1,14 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import { withRouter } from "react-router";
-import {Container, Button} from "reactstrap";
+import {Container} from "reactstrap";
 
 class Topbar extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      ethereumAddress: "",
+      walletConnected: false,
       isOpen: false,
       dropdownOpenShop: false,
       navLinks: [
@@ -22,6 +24,7 @@ class Topbar extends Component {
     this.toggleDropdownShop.bind(this);
     this.toggleWishlistModal.bind(this);
     this.toggleDropdownIsOpen.bind(this);
+    this.connectWallet.bind(this);
   }
 
   toggleWishlistModal = () => {
@@ -58,7 +61,23 @@ class Topbar extends Component {
     if (matchingMenuItem) {
       this.activateParentDropdown(matchingMenuItem);
     }
+
+
   }
+
+  connectWallet = () => {
+    if (window.ethereum) {
+      // Do something
+
+      window.ethereum.request({ method: 'eth_requestAccounts' }).then((ethereumAddress) => {
+        // Return the address of the wallet
+        console.log('ethereumAddress: ',ethereumAddress);
+        this.setState({ethereumAddress, walletConnected: true});
+      });
+    } else {
+      alert('install metamask extension!!');
+    }
+  };
 
   activateParentDropdown = (item) => {
     const parent = item.parentElement;
@@ -141,8 +160,11 @@ class Topbar extends Component {
                       className="btn btn-pills"
                       style={{ backgroundColor: '#ff914d'}}
                       onClick={e => {
-                        console.log(e.target.value)
-                      }}>Connect Wallet
+                        e.preventDefault();
+                        if(this.state.walletConnected === false){
+                          this.connectWallet();
+                        }
+                      }}>{(this.state.walletConnected && this.state.ethereumAddress !== "" ? "Connected" : "Connect Wallet")}
                     </Link>
                     {/* <Button style={{backgroundColor: '#D47500'}}>Connect Wallet</Button> */}
                   </div>

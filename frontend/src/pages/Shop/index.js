@@ -2,9 +2,6 @@ import React, { Component } from "react";
 
 //Import Components
 import MostViewedProducts from "./MostViewedProducts";
-import TopCategories from "./TopCategories";
-import PopularProducts from "./PopularProducts";
-import Cta from "./Cta";
 
 import { Link } from "react-router-dom";
 import {

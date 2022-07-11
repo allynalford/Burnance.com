@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import { Container, Row, Col, Card, CardBody, Button } from "reactstrap";
 import { Link } from "react-router-dom";
-
 import FeatherIcon from "feather-icons-react";
+
 
 //Import Images
 import product1 from "../../assets/images/nft/coolbirds_wtf_636.png";
@@ -14,19 +14,25 @@ import product6 from "../../assets/images/nft/0xPunk_2647.png";
 import product7 from "../../assets/images/nft/Loopy_Cup_10804.png";
 import product8 from "../../assets/images/nft/Crookz_7602.jpg";
 
-import prodtctOverlay1 from "../../assets/images/shop/product/s-1.jpg";
-import prodtctOverlay2 from "../../assets/images/shop/product/s-2.jpg";
-import prodtctOverlay3 from "../../assets/images/shop/product/s-3.jpg";
-import prodtctOverlay4 from "../../assets/images/shop/product/s-4.jpg";
-import prodtctOverlay5 from "../../assets/images/shop/product/s-5.jpg";
-import prodtctOverlay6 from "../../assets/images/shop/product/s-6.jpg";
+
 import prodtctOverlay7 from "../../assets/images/shop/product/s-7.jpg";
 import prodtctOverlay8 from "../../assets/images/shop/product/s-8.jpg";
+
+
+//import ethers from "ethers"
+// import { NftProvider} from "use-nft";
+// let ethers = require("ethers");
+// let provider = new ethers.getDefaultProvider();
+
+// // We are using the "ethers" fetcher here.
+// const fetcher = ["ethers", { ethers, provider }]
 
 class MostViewedProducts extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      ethereumAddress: "",
+      walletConnected: false,
       products: [
         {
           id: 1,
@@ -100,6 +106,17 @@ class MostViewedProducts extends Component {
     };
   }
 
+  componentDidMount() {
+    if (window.ethereum) {
+      // Do something
+      window.ethereum.request({ method: 'eth_requestAccounts' }).then((ethereumAddress) => {
+        this.setState({ethereumAddress, walletConnected: true});
+      });
+    } else {
+      alert('install metamask extension!!');
+    }
+  }
+
   render() {
     return (
       <React.Fragment>
@@ -107,6 +124,7 @@ class MostViewedProducts extends Component {
           <Row>
             <Col xs={12}>
               <h5 className="mb-0">Your NFT's</h5>
+              <p>Address: {this.state.ethereumAddress}</p>
             </Col>
           </Row>
 

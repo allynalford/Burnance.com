@@ -2,7 +2,6 @@ import React, { Component } from "react";
 //Import Components
 import Section from "./Section";
 import About from "./About";
-import Cta from "./Cta";
 import FAQ from "./Faqs";
 import {initGA, PageView} from "../../common/gaUtils";
 class Index extends Component {
