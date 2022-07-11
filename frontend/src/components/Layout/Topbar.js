@@ -135,14 +135,16 @@ class Topbar extends Component {
             </div> */}
 
               <div className="buy-button">
-                    {/* <Link
-                      to="//1.envato.market/landrickreactjs"
+                    <Link
+                      to="#"
                       target="_blank"
-                      className="btn btn-pills btn-primary"
-                    >
-                      Buy Now
-                    </Link> */}
-                    <Button>Connect Wallet</Button>
+                      className="btn btn-pills"
+                      style={{ backgroundColor: '#ff914d'}}
+                      onClick={e => {
+                        console.log(e.target.value)
+                      }}>Connect Wallet
+                    </Link>
+                    {/* <Button style={{backgroundColor: '#D47500'}}>Connect Wallet</Button> */}
                   </div>
 
 
