@@ -263,7 +263,7 @@ class Section extends Component {
                                   <Link
                                     to="#"
                                     className="btn mouse-down"
-                                    style={{ marginRight: '10px', backgroundColor: '#CF000F', color: 'white' }}
+                                    style={{ marginRight: '10px', backgroundColor: '#ff914d', color: 'white' }}
                                     disabled={this.state.loading}
                                     onClick={e => {
                                       e.preventDefault();

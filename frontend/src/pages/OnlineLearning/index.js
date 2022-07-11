@@ -39,7 +39,7 @@ class Index extends Component {
           <About />
 
           <FAQ />
-          <Cta />
+          {/* <Cta /> */}
 
         </section>
       </React.Fragment>
