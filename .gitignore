@@ -1,0 +1,25 @@
+# Logs
+logs
+*.log
+
+*_credentials.csv
+
+# dependencies
+/node_modules
+
+# testing
+/coverage
+
+# production
+/build
+/documentation
+
+# misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+new_user_credentials (1).csv
+frontend_prod_credentials (1).csv
+frontend_credentials (1).csv

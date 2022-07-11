@@ -108,28 +108,28 @@ resources:
           ReadCapacityUnits: 2
           WriteCapacityUnits: 2
         TableName: ${self:provider.environment.DYNAMODB_TABLE_NFT_METADATA} 
-    # ContractABIDynamoDBTable:
-    #   Type: 'AWS::DynamoDB::Table'
-    #   DeletionPolicy: Retain
-    #   Properties:
-    #     AttributeDefinitions:
-    #       -
-    #         AttributeName: chain
-    #         AttributeType: S
-    #       -  
-    #         AttributeName: contractAddress
-    #         AttributeType: S
-    #     KeySchema:
-    #       -
-    #         AttributeName: chain
-    #         KeyType: HASH
-    #       -
-    #         AttributeName: contractAddress
-    #         KeyType: RANGE  
-    #     ProvisionedThroughput:
-    #       ReadCapacityUnits: 1
-    #       WriteCapacityUnits: 1
-    #     TableName: ${self:provider.environment.DYNAMODB_TABLE_CONTRACT_ABI}    
+    ContractABIDynamoDBTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: chain
+            AttributeType: S
+          -  
+            AttributeName: contractAddress
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: chain
+            KeyType: HASH
+          -
+            AttributeName: contractAddress
+            KeyType: RANGE  
+        ProvisionedThroughput:
+          ReadCapacityUnits: 2
+          WriteCapacityUnits: 2
+        TableName: ${self:provider.environment.DYNAMODB_TABLE_CONTRACT_ABI}    
 custom:
   tableThroughput: 1
   prune:
