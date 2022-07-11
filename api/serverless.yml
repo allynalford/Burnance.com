@@ -1,5 +1,6 @@
 service: burnance
 provider:
+  profile: allyn-burnance
   name: aws
   runtime: nodejs12.x
   region: ${opt:region, 'us-east-1'}
@@ -47,21 +48,14 @@ provider:
         - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE_CONTRACT_ABI}"
 package:
   individually: false
-  exclude:
-  - layers/**
-  - layer/**
-  - node_modules/puppeteer/.local-chromium/**
-  - node_modules/puppeteer/**
-  - chrome-aws-lambda/**
-  - node_modules/chrome-aws-lambda/**
 functions: 
-  viewNFTAltText:
+  viewNFT:
     handler: actions.view
     memorySize: 128 # optional, in MB, default is 1024
     timeout: 30 # optional, in seconds, default is 6
     events:
       - http:
-          path: view/alttext
+          path: view/nft
           method: post
           authorizer: aws_iam
           cors: true
@@ -98,44 +92,44 @@ resources:
       Properties:
         AttributeDefinitions:
           -
-            AttributeName: chain
+            AttributeName: chainContractAddress
             AttributeType: S
           -  
-            AttributeName: contractAddressTokenId
+            AttributeName: tokenId
             AttributeType: S
         KeySchema:
           -
-            AttributeName: chain
+            AttributeName: chainContractAddress
             KeyType: HASH
           -
-            AttributeName: contractAddressTokenId
+            AttributeName: tokenId
             KeyType: RANGE  
         ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
+          ReadCapacityUnits: 2
+          WriteCapacityUnits: 2
         TableName: ${self:provider.environment.DYNAMODB_TABLE_NFT_METADATA} 
-    ContractABIDynamoDBTable:
-      Type: 'AWS::DynamoDB::Table'
-      DeletionPolicy: Retain
-      Properties:
-        AttributeDefinitions:
-          -
-            AttributeName: chain
-            AttributeType: S
-          -  
-            AttributeName: contractAddress
-            AttributeType: S
-        KeySchema:
-          -
-            AttributeName: chain
-            KeyType: HASH
-          -
-            AttributeName: contractAddress
-            KeyType: RANGE  
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-        TableName: ${self:provider.environment.DYNAMODB_TABLE_CONTRACT_ABI}    
+    # ContractABIDynamoDBTable:
+    #   Type: 'AWS::DynamoDB::Table'
+    #   DeletionPolicy: Retain
+    #   Properties:
+    #     AttributeDefinitions:
+    #       -
+    #         AttributeName: chain
+    #         AttributeType: S
+    #       -  
+    #         AttributeName: contractAddress
+    #         AttributeType: S
+    #     KeySchema:
+    #       -
+    #         AttributeName: chain
+    #         KeyType: HASH
+    #       -
+    #         AttributeName: contractAddress
+    #         KeyType: RANGE  
+    #     ProvisionedThroughput:
+    #       ReadCapacityUnits: 1
+    #       WriteCapacityUnits: 1
+    #     TableName: ${self:provider.environment.DYNAMODB_TABLE_CONTRACT_ABI}    
 custom:
   tableThroughput: 1
   prune:
@@ -143,5 +137,4 @@ custom:
     number: 5   
 plugins:
   - serverless-offline
-  - serverless-pseudo-parameters
   - serverless-prune-plugin

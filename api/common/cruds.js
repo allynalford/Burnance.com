@@ -11,12 +11,12 @@ module.exports._getNFT = async (contractAddress, tokenId, chain) => {
         return await dynamo.qetFromDB({
             TableName: process.env.DYNAMODB_TABLE_NFT_METADATA,
             Key: {
-                chain,
-                contractAddressTokenId: contractAddress + '/' + tokenId
+                chainContractAddress: chain + '-' + contractAddress,
+                tokenId
             }
         });
     } catch (e) {
-        console.error(e);
+        console.error('module.exports._getNFT',e);
         log.error(err);
         throw err;
     }
@@ -73,8 +73,8 @@ module.exports._deleteNFT = async (contractAddress, tokenId, chain) =>{
         return await dynamo.deleteItemFromDB({
             TableName: process.env.DYNAMODB_TABLE_NFT_METADATA,
             Key: {
-                chain,
-                contractAddressTokenId: contractAddress + tokenId
+                chainContractAddress: chain + '-' + contractAddress,
+                tokenId
             }
         });
     } catch (e) {
@@ -90,7 +90,7 @@ module.exports._deleteABI = async (contractAddress, chain) =>{
             TableName: process.env.DYNAMODB_TABLE_CONTRACT_ABI,
             Key: {
                 chain,
-                contractAddressTokenId: contractAddress + tokenId
+                contractAddress
             }
         });
     } catch (e) {

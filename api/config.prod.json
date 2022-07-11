@@ -2,7 +2,7 @@
 "NODE_ENV" : "prod",
 "STAGE": "prod",
 "DOMAIN":"*",
-"AWS_ACT_ID": "177038571739",
+"AWS_ACT_ID": "297677912558",
 "REACT_APP_SLACK_WEBHOOK": "https://hooks.slack.com/services/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",
 "CDN_BUCKET": "nft.burnance.io",
 "USER_AGENT" : "nft.burnance.io",

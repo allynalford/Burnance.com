@@ -4,7 +4,9 @@
   "description": "Burnance API",
   "main": "index.js",
   "scripts": {
-    "test": "sls offline"
+    "test": "SET AWS_PROFILE=allyn-burnance serverless offline | sls offline --aws-profile allyn-burnance",
+    "deploy": "sls deploy --stage dev --aws-profile allyn-burnance",
+    "deplyprod": "sls deploy --stage prod --aws-profile allyn-burnance"
   },
   "author": "Allyn j. Alford",
   "license": "ISC",
@@ -26,7 +28,6 @@
   "devDependencies": {
     "serverless": "^2.69.1",
     "serverless-offline": "^7.1.0",
-    "serverless-prune-plugin": "^1.6.1",
-    "serverless-pseudo-parameters": "^2.6.1"
+    "serverless-prune-plugin": "^1.6.1"
   }
 }

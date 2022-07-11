@@ -1,0 +1,1004 @@
+{
+  "service": {
+    "service": "burnance",
+    "serviceObject": {
+      "name": "burnance"
+    },
+    "provider": {
+      "profile": "allyn-burnance",
+      "name": "aws",
+      "runtime": "nodejs12.x",
+      "region": "us-east-1",
+      "stage": "dev",
+      "memorySize": 128,
+      "timeout": 30,
+      "deploymentBucket": "service.burnance.nodejs.lambdas.dev",
+      "environment": {
+        "STAGE": "dev",
+        "REGION": "us-east-1",
+        "ACCOUNTID": "297677912558",
+        "USER_AGENT": "dev.nft.burnance.io",
+        "CDN_BUCKET": "dev.nft.burnance.io",
+        "ETHERSCAN_API_URL": "https://api.etherscan.io/api",
+        "API_KEY_TOKEN": "WWY6WGBKZCG5U8JEY2RNTXT1YWMMER6SPN",
+        "ETHERSCAN_ABI_PARAMS": "module=contract&action=getabi",
+        "OPEN": "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",
+        "SLACK_API_WAITLIST_WEBHOOK": "https://hooks.slack.com/services/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",
+        "DRIP": "d19af8d64382261d9cbd9762fdd07356",
+        "DRIP_ID": "4947055",
+        "S3_DRIP_CDN_BUCKET": "events.nft.burnance.io",
+        "DYNAMODB_TABLE_CONTRACT_ABI": "burnance-dev-contract-abi",
+        "DYNAMODB_TABLE_NFT_METADATA": "burnance-dev-nfts-metadata",
+        "NODE": "wss://mainnet.infura.io/ws/v3/5d683ea6270a44d4996ad65529057982",
+        "KEY": "adfb72ce9754e3cbc1e79e44a8e20804cebd3c4a347605c6a3462a8de05b8783"
+      },
+      "iamRoleStatements": [
+        {
+          "Effect": "Allow",
+          "Action": [
+            "s3:PutObject",
+            "s3:GetObject",
+            "s3:DeleteObject"
+          ],
+          "Resource": "arn:aws:s3:::dev.nft.burnance.io/*"
+        },
+        {
+          "Effect": "Allow",
+          "Action": [
+            "dynamodb:DescribeTable",
+            "dynamodb:Query",
+            "dynamodb:Scan",
+            "dynamodb:GetItem",
+            "dynamodb:PutItem",
+            "dynamodb:UpdateItem",
+            "dynamodb:DeleteItem"
+          ],
+          "Resource": [
+            "arn:aws:dynamodb:us-east-1:*:table/burnance-dev-nfts-metadata",
+            "arn:aws:dynamodb:us-east-1:*:table/burnance-dev-contract-abi"
+          ]
+        }
+      ],
+      "versionFunctions": true,
+      "deploymentBucketObject": {
+        "name": "service.burnance.nodejs.lambdas.dev"
+      },
+      "compiledCloudFormationTemplate": {
+        "AWSTemplateFormatVersion": "2010-09-09",
+        "Description": "The AWS CloudFormation template for this Serverless application",
+        "Resources": {
+          "ViewNFTLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/burnance-dev-viewNFT"
+            }
+          },
+          "AddDripSubLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/burnance-dev-addDripSub"
+            }
+          },
+          "AuthorizerLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/burnance-dev-authorizer"
+            }
+          },
+          "IamRoleLambdaExecution": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+              "AssumeRolePolicyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [
+                  {
+                    "Effect": "Allow",
+                    "Principal": {
+                      "Service": [
+                        "lambda.amazonaws.com"
+                      ]
+                    },
+                    "Action": [
+                      "sts:AssumeRole"
+                    ]
+                  }
+                ]
+              },
+              "Policies": [
+                {
+                  "PolicyName": {
+                    "Fn::Join": [
+                      "-",
+                      [
+                        "burnance",
+                        "dev",
+                        "lambda"
+                      ]
+                    ]
+                  },
+                  "PolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                      {
+                        "Effect": "Allow",
+                        "Action": [
+                          "logs:CreateLogStream",
+                          "logs:CreateLogGroup"
+                        ],
+                        "Resource": [
+                          {
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/burnance-dev*:*"
+                          }
+                        ]
+                      },
+                      {
+                        "Effect": "Allow",
+                        "Action": [
+                          "logs:PutLogEvents"
+                        ],
+                        "Resource": [
+                          {
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/burnance-dev*:*:*"
+                          }
+                        ]
+                      },
+                      {
+                        "$ref": "$[\"service\"][\"provider\"][\"iamRoleStatements\"][0]"
+                      },
+                      {
+                        "$ref": "$[\"service\"][\"provider\"][\"iamRoleStatements\"][1]"
+                      }
+                    ]
+                  }
+                }
+              ],
+              "Path": "/",
+              "RoleName": {
+                "Fn::Join": [
+                  "-",
+                  [
+                    "burnance",
+                    "dev",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    "lambdaRole"
+                  ]
+                ]
+              }
+            }
+          },
+          "ViewNFTLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": "service.burnance.nodejs.lambdas.dev",
+                "S3Key": "serverless/burnance/dev/1657576849739-2022-07-11T22:00:49.739Z/burnance.zip"
+              },
+              "Handler": "actions.view",
+              "Runtime": "nodejs12.x",
+              "FunctionName": "burnance-dev-viewNFT",
+              "MemorySize": 128,
+              "Timeout": 30,
+              "Environment": {
+                "Variables": {
+                  "STAGE": "dev",
+                  "REGION": "us-east-1",
+                  "ACCOUNTID": "297677912558",
+                  "USER_AGENT": "dev.nft.burnance.io",
+                  "CDN_BUCKET": "dev.nft.burnance.io",
+                  "ETHERSCAN_API_URL": "https://api.etherscan.io/api",
+                  "API_KEY_TOKEN": "WWY6WGBKZCG5U8JEY2RNTXT1YWMMER6SPN",
+                  "ETHERSCAN_ABI_PARAMS": "module=contract&action=getabi",
+                  "OPEN": "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",
+                  "SLACK_API_WAITLIST_WEBHOOK": "https://hooks.slack.com/services/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",
+                  "DRIP": "d19af8d64382261d9cbd9762fdd07356",
+                  "DRIP_ID": "4947055",
+                  "S3_DRIP_CDN_BUCKET": "events.nft.burnance.io",
+                  "DYNAMODB_TABLE_CONTRACT_ABI": "burnance-dev-contract-abi",
+                  "DYNAMODB_TABLE_NFT_METADATA": "burnance-dev-nfts-metadata",
+                  "NODE": "wss://mainnet.infura.io/ws/v3/5d683ea6270a44d4996ad65529057982",
+                  "KEY": "adfb72ce9754e3cbc1e79e44a8e20804cebd3c4a347605c6a3462a8de05b8783"
+                }
+              },
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              }
+            },
+            "DependsOn": [
+              "ViewNFTLogGroup"
+            ]
+          },
+          "AddDripSubLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": "service.burnance.nodejs.lambdas.dev",
+                "S3Key": "serverless/burnance/dev/1657576849739-2022-07-11T22:00:49.739Z/burnance.zip"
+              },
+              "Handler": "drip/dripUtils.addSubscriber",
+              "Runtime": "nodejs12.x",
+              "FunctionName": "burnance-dev-addDripSub",
+              "MemorySize": 128,
+              "Timeout": 30,
+              "Environment": {
+                "Variables": {
+                  "STAGE": "dev",
+                  "REGION": "us-east-1",
+                  "ACCOUNTID": "297677912558",
+                  "USER_AGENT": "dev.nft.burnance.io",
+                  "CDN_BUCKET": "dev.nft.burnance.io",
+                  "ETHERSCAN_API_URL": "https://api.etherscan.io/api",
+                  "API_KEY_TOKEN": "WWY6WGBKZCG5U8JEY2RNTXT1YWMMER6SPN",
+                  "ETHERSCAN_ABI_PARAMS": "module=contract&action=getabi",
+                  "OPEN": "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",
+                  "SLACK_API_WAITLIST_WEBHOOK": "https://hooks.slack.com/services/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",
+                  "DRIP": "d19af8d64382261d9cbd9762fdd07356",
+                  "DRIP_ID": "4947055",
+                  "S3_DRIP_CDN_BUCKET": "events.nft.burnance.io",
+                  "DYNAMODB_TABLE_CONTRACT_ABI": "burnance-dev-contract-abi",
+                  "DYNAMODB_TABLE_NFT_METADATA": "burnance-dev-nfts-metadata",
+                  "NODE": "wss://mainnet.infura.io/ws/v3/5d683ea6270a44d4996ad65529057982",
+                  "KEY": "adfb72ce9754e3cbc1e79e44a8e20804cebd3c4a347605c6a3462a8de05b8783"
+                }
+              },
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              }
+            },
+            "DependsOn": [
+              "AddDripSubLogGroup"
+            ]
+          },
+          "AuthorizerLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": "service.burnance.nodejs.lambdas.dev",
+                "S3Key": "serverless/burnance/dev/1657576849739-2022-07-11T22:00:49.739Z/burnance.zip"
+              },
+              "Handler": "hooks/authorizer.handler",
+              "Runtime": "nodejs12.x",
+              "FunctionName": "burnance-dev-authorizer",
+              "MemorySize": 128,
+              "Timeout": 30,
+              "Environment": {
+                "Variables": {
+                  "STAGE": "dev",
+                  "REGION": "us-east-1",
+                  "ACCOUNTID": "297677912558",
+                  "USER_AGENT": "dev.nft.burnance.io",
+                  "CDN_BUCKET": "dev.nft.burnance.io",
+                  "ETHERSCAN_API_URL": "https://api.etherscan.io/api",
+                  "API_KEY_TOKEN": "WWY6WGBKZCG5U8JEY2RNTXT1YWMMER6SPN",
+                  "ETHERSCAN_ABI_PARAMS": "module=contract&action=getabi",
+                  "OPEN": "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",
+                  "SLACK_API_WAITLIST_WEBHOOK": "https://hooks.slack.com/services/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",
+                  "DRIP": "d19af8d64382261d9cbd9762fdd07356",
+                  "DRIP_ID": "4947055",
+                  "S3_DRIP_CDN_BUCKET": "events.nft.burnance.io",
+                  "DYNAMODB_TABLE_CONTRACT_ABI": "burnance-dev-contract-abi",
+                  "DYNAMODB_TABLE_NFT_METADATA": "burnance-dev-nfts-metadata",
+                  "NODE": "wss://mainnet.infura.io/ws/v3/5d683ea6270a44d4996ad65529057982",
+                  "KEY": "adfb72ce9754e3cbc1e79e44a8e20804cebd3c4a347605c6a3462a8de05b8783"
+                }
+              },
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              }
+            },
+            "DependsOn": [
+              "AuthorizerLogGroup"
+            ]
+          },
+          "AuthorizerLambdaVersionfB9GFwfcDYhLmuEGe56wv1U4cnsTEkQgSMkYucwVIoQ": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "AuthorizerLambdaFunction"
+              },
+              "CodeSha256": "vgmXPlIdtC2lR81h3M8al/LTIhEch+Lfcf2OLRivEZM="
+            }
+          },
+          "AddDripSubLambdaVersionpkiqOsHcmQuBrMRknR09vMvIoAtmTJPZhrv7jWtejs": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "AddDripSubLambdaFunction"
+              },
+              "CodeSha256": "vgmXPlIdtC2lR81h3M8al/LTIhEch+Lfcf2OLRivEZM="
+            }
+          },
+          "ViewNFTLambdaVersionZNjHQVroDi7GjRE1y3xnAUlMR1LGETxpdeqpRoLc34k": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "ViewNFTLambdaFunction"
+              },
+              "CodeSha256": "vgmXPlIdtC2lR81h3M8al/LTIhEch+Lfcf2OLRivEZM="
+            }
+          },
+          "ApiGatewayRestApi": {
+            "Type": "AWS::ApiGateway::RestApi",
+            "Properties": {
+              "Name": "dev-burnance",
+              "EndpointConfiguration": {
+                "Types": [
+                  "EDGE"
+                ]
+              },
+              "Policy": ""
+            }
+          },
+          "ApiGatewayResourceView": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Fn::GetAtt": [
+                  "ApiGatewayRestApi",
+                  "RootResourceId"
+                ]
+              },
+              "PathPart": "view",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayResourceViewNft": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Ref": "ApiGatewayResourceView"
+              },
+              "PathPart": "nft",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayResourceDrip": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Fn::GetAtt": [
+                  "ApiGatewayRestApi",
+                  "RootResourceId"
+                ]
+              },
+              "PathPart": "drip",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayResourceDripAdd": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Ref": "ApiGatewayResourceDrip"
+              },
+              "PathPart": "add",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayResourceDripAddSubscriber": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Ref": "ApiGatewayResourceDripAdd"
+              },
+              "PathPart": "subscriber",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayMethodViewNftOptions": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "AuthorizationType": "NONE",
+              "HttpMethod": "OPTIONS",
+              "MethodResponses": [
+                {
+                  "StatusCode": "200",
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": true,
+                    "method.response.header.Access-Control-Allow-Headers": true,
+                    "method.response.header.Access-Control-Allow-Methods": true
+                  },
+                  "ResponseModels": {}
+                }
+              ],
+              "RequestParameters": {},
+              "Integration": {
+                "Type": "MOCK",
+                "RequestTemplates": {
+                  "application/json": "{statusCode:200}"
+                },
+                "ContentHandling": "CONVERT_TO_TEXT",
+                "IntegrationResponses": [
+                  {
+                    "StatusCode": "200",
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": "'*'",
+                      "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                      "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,POST'"
+                    },
+                    "ResponseTemplates": {
+                      "application/json": ""
+                    }
+                  }
+                ]
+              },
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceViewNft"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayMethodDripAddSubscriberOptions": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "AuthorizationType": "NONE",
+              "HttpMethod": "OPTIONS",
+              "MethodResponses": [
+                {
+                  "StatusCode": "200",
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": true,
+                    "method.response.header.Access-Control-Allow-Headers": true,
+                    "method.response.header.Access-Control-Allow-Methods": true
+                  },
+                  "ResponseModels": {}
+                }
+              ],
+              "RequestParameters": {},
+              "Integration": {
+                "Type": "MOCK",
+                "RequestTemplates": {
+                  "application/json": "{statusCode:200}"
+                },
+                "ContentHandling": "CONVERT_TO_TEXT",
+                "IntegrationResponses": [
+                  {
+                    "StatusCode": "200",
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": "'*'",
+                      "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                      "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,POST'"
+                    },
+                    "ResponseTemplates": {
+                      "application/json": ""
+                    }
+                  }
+                ]
+              },
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceDripAddSubscriber"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayMethodViewNftPost": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "HttpMethod": "POST",
+              "RequestParameters": {},
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceViewNft"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "ApiKeyRequired": false,
+              "AuthorizationType": "AWS_IAM",
+              "Integration": {
+                "IntegrationHttpMethod": "POST",
+                "Type": "AWS_PROXY",
+                "Uri": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":lambda:path/2015-03-31/functions/",
+                      {
+                        "Fn::GetAtt": [
+                          "ViewNFTLambdaFunction",
+                          "Arn"
+                        ]
+                      },
+                      "/invocations"
+                    ]
+                  ]
+                }
+              },
+              "MethodResponses": []
+            },
+            "DependsOn": [
+              "ViewNFTLambdaPermissionApiGateway"
+            ]
+          },
+          "ApiGatewayMethodDripAddSubscriberPost": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "HttpMethod": "POST",
+              "RequestParameters": {},
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceDripAddSubscriber"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "ApiKeyRequired": false,
+              "AuthorizationType": "AWS_IAM",
+              "Integration": {
+                "IntegrationHttpMethod": "POST",
+                "Type": "AWS_PROXY",
+                "Uri": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":lambda:path/2015-03-31/functions/",
+                      {
+                        "Fn::GetAtt": [
+                          "AddDripSubLambdaFunction",
+                          "Arn"
+                        ]
+                      },
+                      "/invocations"
+                    ]
+                  ]
+                }
+              },
+              "MethodResponses": []
+            },
+            "DependsOn": [
+              "AddDripSubLambdaPermissionApiGateway"
+            ]
+          },
+          "ApiGatewayDeployment1657576836317": {
+            "Type": "AWS::ApiGateway::Deployment",
+            "Properties": {
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "StageName": "dev"
+            },
+            "DependsOn": [
+              "ApiGatewayMethodViewNftOptions",
+              "ApiGatewayMethodDripAddSubscriberOptions",
+              "ApiGatewayMethodViewNftPost",
+              "ApiGatewayMethodDripAddSubscriberPost"
+            ]
+          },
+          "ViewNFTLambdaPermissionApiGateway": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "ViewNFTLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "ApiGatewayRestApi"
+                    },
+                    "/*/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "AddDripSubLambdaPermissionApiGateway": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "AddDripSubLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "ApiGatewayRestApi"
+                    },
+                    "/*/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "Bucket": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+              "BucketName": "dev.nft.burnance.io"
+            }
+          },
+          "GatewayResponse": {
+            "Type": "AWS::ApiGateway::GatewayResponse",
+            "Properties": {
+              "ResponseParameters": {
+                "gatewayresponse.header.WWW-Authenticate": "'Basic'"
+              },
+              "ResponseType": "UNAUTHORIZED",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "StatusCode": "401"
+            }
+          },
+          "NFTMetaDataDynamoDBTable": {
+            "Type": "AWS::DynamoDB::Table",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "AttributeDefinitions": [
+                {
+                  "AttributeName": "chainContractAddress",
+                  "AttributeType": "S"
+                },
+                {
+                  "AttributeName": "tokenId",
+                  "AttributeType": "S"
+                }
+              ],
+              "KeySchema": [
+                {
+                  "AttributeName": "chainContractAddress",
+                  "KeyType": "HASH"
+                },
+                {
+                  "AttributeName": "tokenId",
+                  "KeyType": "RANGE"
+                }
+              ],
+              "ProvisionedThroughput": {
+                "ReadCapacityUnits": 2,
+                "WriteCapacityUnits": 2
+              },
+              "TableName": "burnance-dev-nfts-metadata"
+            }
+          }
+        },
+        "Outputs": {
+          "ServerlessDeploymentBucketName": {
+            "Value": "service.burnance.nodejs.lambdas.dev",
+            "Export": {
+              "Name": "sls-burnance-dev-ServerlessDeploymentBucketName"
+            }
+          },
+          "AuthorizerLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "AuthorizerLambdaVersionfB9GFwfcDYhLmuEGe56wv1U4cnsTEkQgSMkYucwVIoQ"
+            },
+            "Export": {
+              "Name": "sls-burnance-dev-AuthorizerLambdaFunctionQualifiedArn"
+            }
+          },
+          "AddDripSubLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "AddDripSubLambdaVersionpkiqOsHcmQuBrMRknR09vMvIoAtmTJPZhrv7jWtejs"
+            },
+            "Export": {
+              "Name": "sls-burnance-dev-AddDripSubLambdaFunctionQualifiedArn"
+            }
+          },
+          "ViewNFTLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "ViewNFTLambdaVersionZNjHQVroDi7GjRE1y3xnAUlMR1LGETxpdeqpRoLc34k"
+            },
+            "Export": {
+              "Name": "sls-burnance-dev-ViewNFTLambdaFunctionQualifiedArn"
+            }
+          },
+          "ServiceEndpoint": {
+            "Description": "URL of the service endpoint",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  "https://",
+                  {
+                    "Ref": "ApiGatewayRestApi"
+                  },
+                  ".execute-api.",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  ".",
+                  {
+                    "Ref": "AWS::URLSuffix"
+                  },
+                  "/dev"
+                ]
+              ]
+            },
+            "Export": {
+              "Name": "sls-burnance-dev-ServiceEndpoint"
+            }
+          }
+        }
+      },
+      "vpc": {}
+    },
+    "custom": {
+      "tableThroughput": 1,
+      "prune": {
+        "automatic": true,
+        "number": 5
+      }
+    },
+    "plugins": [
+      "serverless-offline",
+      "serverless-prune-plugin"
+    ],
+    "pluginsData": {},
+    "functions": {
+      "viewNFT": {
+        "handler": "actions.view",
+        "memorySize": 128,
+        "timeout": 30,
+        "events": [
+          {
+            "http": {
+              "path": "view/nft",
+              "method": "post",
+              "authorizer": {
+                "type": "AWS_IAM",
+                "managedExternally": false,
+                "identitySource": "method.request.header.Authorization"
+              },
+              "cors": {
+                "origin": "*",
+                "methods": [
+                  "OPTIONS",
+                  "POST"
+                ],
+                "headers": [
+                  "Content-Type",
+                  "X-Amz-Date",
+                  "Authorization",
+                  "X-Api-Key",
+                  "X-Amz-Security-Token",
+                  "X-Amz-User-Agent"
+                ],
+                "allowCredentials": false
+              },
+              "integration": "AWS_PROXY"
+            }
+          }
+        ],
+        "name": "burnance-dev-viewNFT",
+        "package": {},
+        "memory": 128,
+        "runtime": "nodejs12.x",
+        "vpc": {},
+        "versionLogicalId": "ViewNFTLambdaVersionZNjHQVroDi7GjRE1y3xnAUlMR1LGETxpdeqpRoLc34k"
+      },
+      "addDripSub": {
+        "handler": "drip/dripUtils.addSubscriber",
+        "memorySize": 128,
+        "timeout": 30,
+        "events": [
+          {
+            "http": {
+              "path": "drip/add/subscriber",
+              "method": "post",
+              "authorizer": {
+                "type": "AWS_IAM",
+                "managedExternally": false,
+                "identitySource": "method.request.header.Authorization"
+              },
+              "cors": {
+                "origin": "*",
+                "methods": [
+                  "OPTIONS",
+                  "POST"
+                ],
+                "headers": [
+                  "Content-Type",
+                  "X-Amz-Date",
+                  "Authorization",
+                  "X-Api-Key",
+                  "X-Amz-Security-Token",
+                  "X-Amz-User-Agent"
+                ],
+                "allowCredentials": false
+              },
+              "integration": "AWS_PROXY"
+            }
+          }
+        ],
+        "name": "burnance-dev-addDripSub",
+        "package": {},
+        "memory": 128,
+        "runtime": "nodejs12.x",
+        "vpc": {},
+        "versionLogicalId": "AddDripSubLambdaVersionpkiqOsHcmQuBrMRknR09vMvIoAtmTJPZhrv7jWtejs"
+      },
+      "authorizer": {
+        "handler": "hooks/authorizer.handler",
+        "events": [],
+        "name": "burnance-dev-authorizer",
+        "package": {},
+        "memory": 128,
+        "timeout": 30,
+        "runtime": "nodejs12.x",
+        "vpc": {},
+        "versionLogicalId": "AuthorizerLambdaVersionfB9GFwfcDYhLmuEGe56wv1U4cnsTEkQgSMkYucwVIoQ"
+      }
+    },
+    "resources": {
+      "Resources": {
+        "Bucket": {
+          "Type": "AWS::S3::Bucket",
+          "Properties": {
+            "BucketName": "dev.nft.burnance.io"
+          }
+        },
+        "GatewayResponse": {
+          "Type": "AWS::ApiGateway::GatewayResponse",
+          "Properties": {
+            "ResponseParameters": {
+              "gatewayresponse.header.WWW-Authenticate": "'Basic'"
+            },
+            "ResponseType": "UNAUTHORIZED",
+            "RestApiId": {
+              "Ref": "ApiGatewayRestApi"
+            },
+            "StatusCode": "401"
+          }
+        },
+        "NFTMetaDataDynamoDBTable": {
+          "Type": "AWS::DynamoDB::Table",
+          "DeletionPolicy": "Retain",
+          "Properties": {
+            "AttributeDefinitions": [
+              {
+                "AttributeName": "chainContractAddress",
+                "AttributeType": "S"
+              },
+              {
+                "AttributeName": "tokenId",
+                "AttributeType": "S"
+              }
+            ],
+            "KeySchema": [
+              {
+                "AttributeName": "chainContractAddress",
+                "KeyType": "HASH"
+              },
+              {
+                "AttributeName": "tokenId",
+                "KeyType": "RANGE"
+              }
+            ],
+            "ProvisionedThroughput": {
+              "ReadCapacityUnits": 2,
+              "WriteCapacityUnits": 2
+            },
+            "TableName": "burnance-dev-nfts-metadata"
+          }
+        }
+      },
+      "Outputs": {}
+    },
+    "configValidationMode": "warn",
+    "serviceFilename": "serverless.yml",
+    "initialServerlessConfig": {
+      "service": {
+        "$ref": "$[\"service\"][\"serviceObject\"]"
+      },
+      "provider": {
+        "$ref": "$[\"service\"][\"provider\"]"
+      },
+      "package": {
+        "individually": false,
+        "exclude": [
+          "layers/**",
+          "layer/**",
+          "node_modules/puppeteer/.local-chromium/**",
+          "node_modules/puppeteer/**",
+          "chrome-aws-lambda/**",
+          "node_modules/chrome-aws-lambda/**"
+        ],
+        "deploymentBucket": "service.burnance.nodejs.lambdas.dev",
+        "artifact": "C:\\Users\\Allyn Alford\\Documents\\Burnance.com\\api\\.serverless\\burnance.zip",
+        "artifactDirectoryName": "serverless/burnance/dev/1657576849739-2022-07-11T22:00:49.739Z"
+      },
+      "functions": {
+        "$ref": "$[\"service\"][\"functions\"]"
+      },
+      "resources": {
+        "$ref": "$[\"service\"][\"resources\"]"
+      },
+      "custom": {
+        "$ref": "$[\"service\"][\"custom\"]"
+      },
+      "plugins": {
+        "$ref": "$[\"service\"][\"plugins\"]"
+      }
+    },
+    "layers": {},
+    "isDashboardMonitoringPreconfigured": false,
+    "artifact": "C:\\Users\\Allyn Alford\\Documents\\Burnance.com\\api\\.serverless\\burnance.zip"
+  },
+  "package": {
+    "individually": false,
+    "artifactDirectoryName": "serverless/burnance/dev/1657576849739-2022-07-11T22:00:49.739Z",
+    "artifact": "burnance.zip"
+  }
+}

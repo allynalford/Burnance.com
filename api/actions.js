@@ -40,8 +40,6 @@ module.exports.view = async (event) => {
             throw new Error("tokenId is undefined");
         if (typeof chain === "undefined")
             throw new Error("chain is undefined");
-        if (typeof domain === "undefined")
-            throw new Error("domain is undefined");
     } catch (e) {
         console.error(e);
         return responses.respond(
@@ -61,7 +59,7 @@ module.exports.view = async (event) => {
         //Check if we have it, if so return it fast
         if (typeof NFT !== "undefined") {
             return responses.respond(
-                { error: false, success: true, dt, altText: NFT.altText, metadata: NFT.nftMetaData },
+                { error: false, success: true, dt, metadata: NFT.nftMetaData },
                 200
             );
         }
@@ -76,6 +74,8 @@ module.exports.view = async (event) => {
         } else {
             //If not grab it from the service
             abiResp = await etherScan._getContractAbi(contractAddress);
+
+            
 
             //Make sure it's not blank
             if (typeof abiResp === "undefined") {
@@ -92,15 +92,17 @@ module.exports.view = async (event) => {
 
             //Grab the results array
             ABI = abiResp.result;
-            console.log('ABI', ABI instanceof Array);
+            //console.log('ABI', ABI)
+            console.log('ABI is an Array', Array.isArray(ABI));
             //Make sure it's not blank
-            if (typeof ABI === "undefined" | ABI.length === 0 | ABI instanceof Array !== true) {
+            if (typeof ABI === "undefined" | ABI.length === 0) {
 
                 console.info("ABI is empty");
                 return responses.respond({
                     error: false,
                     success: false,
                     dt,
+                    abiResp,
                     message: "Could not retrieve NFT"
                 },
                     200);
@@ -178,10 +180,10 @@ module.exports.view = async (event) => {
 
         //Save the NFT so we can respond faster
         await cruds._saveNFT({
-            contractAddressTokenId: contractAddress + '/' + tokenId,
+            chainContractAddress: chain + '-' + contractAddress,
+            tokenId,
             chain,
             contractAddress,
-            tokenId,
             nftuuid: uuid.v4(),
             imageUrl: nftMetaData.imageUrl,
             nftMetaData,
@@ -192,6 +194,7 @@ module.exports.view = async (event) => {
             updatedAt: timestamp,
             createdDateGMT: dateformat(new Date(), "isoUtcDateTime")
         });
+
 
         //Push the basic explorer URLs only for the response
         metaData.push({ text: 'address', href: `https://etherscan.io/address/${contractAddress}` });
