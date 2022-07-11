@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Container, Row, Col, Card, CardBody, Button } from "reactstrap";
+import { Container, Row, Col, Card, CardBody } from "reactstrap";
 import { Link } from "react-router-dom";
 
 import FeatherIcon from "feather-icons-react";
@@ -10,9 +10,9 @@ import product2 from "../../assets/images/nft/Loopy_Donut_8952.png";
 import product3 from "../../assets/images/nft/MeowForce_2232.png";
 import product4 from "../../assets/images/nft/samuki_1893.jpg";
 import product5 from "../../assets/images/nft/Xolo_915.png";
-import product6 from "../../assets/images/nft/0xPunk_2647.png";
-import product7 from "../../assets/images/nft/Loopy_Cup_10804.png";
-import product8 from "../../assets/images/nft/Crookz_7602.jpg";
+import product6 from "../../assets/images/shop/product/s6.jpg";
+import product7 from "../../assets/images/shop/product/s7.jpg";
+import product8 from "../../assets/images/shop/product/s8.jpg";
 
 import prodtctOverlay1 from "../../assets/images/shop/product/s-1.jpg";
 import prodtctOverlay2 from "../../assets/images/shop/product/s-2.jpg";
@@ -23,7 +23,7 @@ import prodtctOverlay6 from "../../assets/images/shop/product/s-6.jpg";
 import prodtctOverlay7 from "../../assets/images/shop/product/s-7.jpg";
 import prodtctOverlay8 from "../../assets/images/shop/product/s-8.jpg";
 
-class MostViewedProducts extends Component {
+class Asset extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -31,7 +31,7 @@ class MostViewedProducts extends Component {
         {
           id: 1,
           image: product1,
-          imgOverlay: product1,
+          imgOverlay: prodtctOverlay1,
           name: "Branded T-Shirt",
           price: "16.00",
           oldPrice: "21.00",
@@ -42,7 +42,7 @@ class MostViewedProducts extends Component {
         {
           id: 2,
           image: product2,
-          imgOverlay: product2,
+          imgOverlay: prodtctOverlay2,
           name: "Shopping Bag",
           price: "21.00",
           oldPrice: "25.00",
@@ -50,7 +50,7 @@ class MostViewedProducts extends Component {
         {
           id: 3,
           image: product3,
-          imgOverlay: product3,
+          imgOverlay: prodtctOverlay3,
           name: "Elegent Watch",
           price: "5.00",
           desc: "30% off",
@@ -59,7 +59,7 @@ class MostViewedProducts extends Component {
         {
           id: 4,
           image: product4,
-          imgOverlay: product4,
+          imgOverlay: prodtctOverlay4,
           name: "Casual Shoes",
           price: "18.00",
           oldPrice: "22.00",
@@ -67,7 +67,7 @@ class MostViewedProducts extends Component {
         {
           id: 5,
           image: product5,
-          imgOverlay: product5,
+          imgOverlay: prodtctOverlay5,
           name: "Earphones",
           price: "3.00",
           isSale: true
@@ -75,7 +75,7 @@ class MostViewedProducts extends Component {
         {
           id: 6,
           image: product6,
-          imgOverlay: product6,
+          imgOverlay: prodtctOverlay6,
           name: "Elegent Mug",
           price: "4.50",
           oldPrice: "6.50",
@@ -106,7 +106,7 @@ class MostViewedProducts extends Component {
         <Container>
           <Row>
             <Col xs={12}>
-              <h5 className="mb-0">Your NFT's</h5>
+              <h5 className="mb-0">Most Viewed Products</h5>
             </Col>
           </Row>
 
@@ -222,9 +222,6 @@ class MostViewedProducts extends Component {
                         </li>
                       </ul>
                     </div>
-                    <Button>
-                      Burn NFT
-                    </Button>
                   </CardBody>
                 </Card>
               </Col>
@@ -236,4 +233,4 @@ class MostViewedProducts extends Component {
   }
 }
 
-export default MostViewedProducts;
+export default Asset;

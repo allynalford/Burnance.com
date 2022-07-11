@@ -11,6 +11,7 @@ import React from "react";
 //const Blog = React.lazy(() => import("./pages/Blog/index"));
 const OnlineLearning = React.lazy(() => import("./pages/OnlineLearning/index"));
 const PageError = React.lazy(() => import("./pages/Pages/Special/PageError"));
+const Shop = React.lazy(() => import("./pages/Shop/index"));
 
 const routes = [
   
@@ -24,6 +25,9 @@ const routes = [
   //{ path: "/components", component: Components, isTopbarDark: true },
   //{ path: "/documentation", component: Documentation, isTopbarDark: true },
   //{ path: "/widget", component: Widget, isTopbarDark: true },
+
+  { path: "/profile", component: Shop, isTopbarDark: true },
+
 
   //Index Main
   { path: "/index", component: OnlineLearning, isTopbarDark: true },

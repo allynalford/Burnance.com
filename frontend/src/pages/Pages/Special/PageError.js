@@ -35,14 +35,6 @@ class PageError extends Component {
                 <div className="text-capitalize text-dark mb-4 error-page">
                   Page Not Found
                 </div>
-                <p className="text-muted para-desc mx-auto">
-                  Start working with{" "}
-                  <span className="text-primary fw-bold">
-                    Landrick
-                  </span>{" "}
-                  that can provide everything you need to generate awareness,
-                  drive traffic, connect.
-                </p>
               </Col>
             </Row>
 
