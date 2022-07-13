@@ -4,7 +4,55 @@
 "use strict";
 const ethers = require("ethers");
 const endpoint = require('../common/endpoint');
-module.exports._getContractAbi = async (contractAddress) => {
+
+
+
+/**
+ * get an Ethereum price by start and end date
+ *
+ * @author Allyn j. Alford <Allyn@tenablylabs.com>
+ * @async
+ * @function _tokenNftTx
+ * @param {String} contractAddress - Array representing a Store Action
+ * @return {Promise<Array>} Response Array for next step to process.
+ */
+ module.exports._tokenNftTx = async (contractaddress, address) => {
+    try {
+        const response = await endpoint._get(`${process.env.ETHERSCAN_API_URL}?module=account&action=tokennfttx$contractaddress=${contractaddress}&address=${address}&sort=asc&apikey=${process.env.API_KEY_TOKEN}`);
+        return response.data;
+    } catch (e) {
+        console.error(e);
+    }
+};
+
+/**
+ * get an Ethereum price by start and end date
+ *
+ * @author Allyn j. Alford <Allyn@tenablylabs.com>
+ * @async
+ * @function _ethDailyPrice
+ * @param {String} contractAddress - Array representing a Store Action
+ * @return {Promise<Array>} Response Array for next step to process.
+ */
+module.exports._ethDailyPrice = async (startdate, enddate) => {
+    try {
+        const response = await endpoint._get(`${process.env.ETHERSCAN_API_URL}?module=stats&action=ethdailyprice$startdate=${startdate}&enddate=${enddate}&sort=asc&apikey=${process.env.API_KEY_TOKEN}`);
+        return response.data;
+    } catch (e) {
+        console.error(e);
+    }
+};
+
+/**
+ * get an Ethereum Contract ABI by contract address
+ *
+ * @author Allyn j. Alford <Allyn@tenablylabs.com>
+ * @async
+ * @function _getContractAbi
+ * @param {String} contractAddress - Array representing a Store Action
+ * @return {Promise<Array>} Response Array for next step to process.
+ */
+ module.exports._getContractAbi = async (contractAddress) => {
     try {
         const response = await endpoint._get(`${process.env.ETHERSCAN_API_URL}?${process.env.ETHERSCAN_ABI_PARAMS}&address=${contractAddress}&apikey=${process.env.API_KEY_TOKEN}`);
         return response.data;
