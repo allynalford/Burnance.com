@@ -313,11 +313,7 @@ class Faqs extends Component {
                       <Collapse isOpen={this.state.col3}>
                         <CardBody>
                           <p className="text mb-0 faq-ans">
-                            Sometimes people with visual impairments will use
-                            alternative text to help them understand what the
-                            image is depicting. Regular consumers might also
-                            want to browse the web without images for a more
-                            text-based experience.
+                           ......
                           </p>
                         </CardBody>
                       </Collapse>
@@ -351,8 +347,7 @@ class Faqs extends Component {
                       <Collapse isOpen={this.state.col4}>
                         <CardBody>
                           <p className="text mb-0 faq-ans">
-                            NFT stands for non-fungible token. One cannot copy
-                            an NFT, making it one-of-a-kind and secure.
+                            .....
                           </p>
                         </CardBody>
                       </Collapse>
@@ -386,10 +381,7 @@ class Faqs extends Component {
                       <Collapse isOpen={this.state.col5}>
                         <CardBody>
                           <p className="text mb-0 faq-ans">
-                            Alternative text allows users with disabilities to
-                            understand what the NFT is with a detailed
-                            description of the image that can be read by screen
-                            readers.
+                            ......
                           </p>
                         </CardBody>
                       </Collapse>
@@ -424,10 +416,7 @@ class Faqs extends Component {
                       <Collapse isOpen={this.state.col6}>
                         <CardBody>
                           <p className="text mb-0 faq-ans">
-                            Our NFT Alternative Text Generator is free for users
-                            looking to generate alternative text for their NFTs.
-                            We do offer a paid API integration, you can contact
-                            our team to get a quote.
+                            ......
                           </p>
                         </CardBody>
                       </Collapse>
@@ -461,8 +450,7 @@ class Faqs extends Component {
                       <Collapse isOpen={this.state.col7}>
                         <CardBody>
                           <p className="text mb-0 faq-ans">
-                            We use deep learning technology to review your image
-                            and create alternative text using GPT-3.
+                           .......
                           </p>
                         </CardBody>
                       </Collapse>

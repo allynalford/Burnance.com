@@ -153,12 +153,12 @@ class About extends Component {
                   </p>
                 </div>
 
-                <div className="mt-4 pt-2">
+                {/* <div className="mt-4 pt-2">
                   <a href={"#waitlist"}
                     className="btn btn-warning m-1">
                     Use the API
                   </a>
-                </div>
+                </div> */}
               </div>
             </Col>
           </Row>
