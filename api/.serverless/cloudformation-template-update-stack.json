@@ -124,7 +124,7 @@
       "Properties": {
         "Code": {
           "S3Bucket": "service.burnance.nodejs.lambdas.prod",
-          "S3Key": "serverless/burnance/prod/1657849784442-2022-07-15T01:49:44.442Z/burnance.zip"
+          "S3Key": "serverless/burnance/prod/1657850744964-2022-07-15T02:05:44.964Z/burnance.zip"
         },
         "Handler": "actions.view",
         "Runtime": "nodejs12.x",
@@ -171,7 +171,7 @@
       "Properties": {
         "Code": {
           "S3Bucket": "service.burnance.nodejs.lambdas.prod",
-          "S3Key": "serverless/burnance/prod/1657849784442-2022-07-15T01:49:44.442Z/burnance.zip"
+          "S3Key": "serverless/burnance/prod/1657850744964-2022-07-15T02:05:44.964Z/burnance.zip"
         },
         "Handler": "waitlist/handler.add",
         "Runtime": "nodejs12.x",
@@ -481,7 +481,7 @@
         "AddToWaitlistLambdaPermissionApiGateway"
       ]
     },
-    "ApiGatewayDeployment1657849773819": {
+    "ApiGatewayDeployment1657850736540": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
         "RestApiId": {
@@ -589,7 +589,7 @@
         "StatusCode": "401"
       }
     },
-    "WalletNFTDynamoDBTable": {
+    "WalletDynamoDBTable": {
       "Type": "AWS::DynamoDB::Table",
       "DeletionPolicy": "Retain",
       "Properties": {
@@ -599,11 +599,7 @@
             "AttributeType": "S"
           },
           {
-            "AttributeName": "contractAddressTokenId",
-            "AttributeType": "S"
-          },
-          {
-            "AttributeName": "owner",
+            "AttributeName": "address",
             "AttributeType": "S"
           }
         ],
@@ -613,42 +609,15 @@
             "KeyType": "HASH"
           },
           {
-            "AttributeName": "contractAddressTokenId",
+            "AttributeName": "address",
             "KeyType": "RANGE"
-          }
-        ],
-        "GlobalSecondaryIndexes": [
-          {
-            "IndexName": "InstanceIdIndex",
-            "KeySchema": [
-              {
-                "AttributeName": "owner",
-                "KeyType": "HASH"
-              },
-              {
-                "AttributeName": "contractAddressTokenId",
-                "KeyType": "RANGE"
-              }
-            ],
-            "Projection": {
-              "NonKeyAttributes": [
-                "tokenId",
-                "status",
-                "createdatetime"
-              ],
-              "ProjectionType": "INCLUDE"
-            },
-            "ProvisionedThroughput": {
-              "ReadCapacityUnits": 1,
-              "WriteCapacityUnits": 1
-            }
           }
         ],
         "ProvisionedThroughput": {
           "ReadCapacityUnits": 1,
           "WriteCapacityUnits": 1
         },
-        "TableName": "burnance-prod-wallet-nft"
+        "TableName": "burnance-prod-wallet"
       }
     }
   },

@@ -118,7 +118,7 @@ class Section extends Component {
                            for your <span className="text" style={{color: '#1E824C'}}>Worthless NFT's</span>
                           </h1>
                         <p className="para-desc text">
-                        Burn your Sh!t NFTs and get rewarded with (BRC) Burn Coin, or (ETH) Ethereum.
+                        Burn your Sh!t NFTs and get PAID in (ETH) Ethereum.
                         </p>
                         <div className="subcribe-form mt-4 pt-2">
                         <Alert
