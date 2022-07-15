@@ -66,6 +66,11 @@ class Section extends Component {
 
   async addToWaitList(e) {
 
+    if(this.state.emailaddress === ""){
+      this.fireMsg("Email Missing", `Please enter your email address`, "ERROR");
+      return
+    }
+
     this.setState({loading: true})
  
     Event("WAITLIST", "Wait List SignUp", "Waitlist Addition")

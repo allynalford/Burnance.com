@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { withRouter } from "react-router";
 import {Container} from "reactstrap";
 import { ethers } from "ethers";
+import {Event, initGA} from "../../common/gaUtils";
 
 class Topbar extends Component {
   constructor(props) {
@@ -71,18 +72,22 @@ class Topbar extends Component {
       this.getEthBalance(window.ethereum._state.accounts[0]);
     }
 
+    initGA();
 
   }
 
   connectWallet = () => {
+    Event("connectWallet", "Connection Request", "connect")
     if (window.ethereum) {
       // Do something
       window.ethereum.request({ method: 'eth_requestAccounts' }).then((ethereumAddress) => {
         this.setState({ethereumAddress, walletConnected: true});
         this.getEthBalance(ethereumAddress);
+        Event("connectWallet", "Connection Made", "connected")
       });
     } else {
       alert('install metamask extension!!');
+      Event("connectWallet", "MetaMask", "missing")
     }
   };
 
