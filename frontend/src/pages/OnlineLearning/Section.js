@@ -119,27 +119,35 @@ class Section extends Component {
                         </Alert> */}
 
                         <h1 className="heading mb-3">
-                          <span className="text" style={{color: "#1F3A93"}}>Liquidity </span> 
-                           for your <span className="text" style={{color: '#1E824C'}}>Worthless NFT's</span>
-                          </h1>
+                          <span className="text" style={{ color: '#1F3A93' }}>
+                            Liquidity{' '}
+                          </span>
+                          for your{' '}
+                          <span className="text" style={{ color: '#1E824C' }}>
+                            Worthless NFT's
+                          </span>
+                        </h1>
                         <p className="para-desc text">
-                        Burn your Sh!t NFTs and get PAID in (ETH) Ethereum.
+                          Burn your Sh!t NFTs and get PAID in (ETH) Ethereum.
                         </p>
                         <div className="subcribe-form mt-4 pt-2">
-                        <Alert
-                          isOpen={this.state.isOpen}
-                          toggle={() => this.setState({ isOpen: false })}
-                          color="warning"
-                        >
-                         {this.state.message}
-                        </Alert>
-                         <AvForm onSubmit={this.addToWaitList} className="ms-0">
+                          <Alert
+                            isOpen={this.state.isOpen}
+                            toggle={() => this.setState({ isOpen: false })}
+                            color="warning"
+                          >
+                            {this.state.message}
+                          </Alert>
+                          <AvForm
+                            onSubmit={this.addToWaitList}
+                            className="ms-0"
+                          >
                             <FormGroup>
                               <Row>
                                 <Col md="12">
-                                <Label className="form-label" for="email">
-                                  Enter your E-Mail address to be notified.
-                                </Label>
+                                  <Label className="form-label" for="email">
+                                    Enter your E-Mail address to be notified.
+                                  </Label>
                                 </Col>
                                 <Col md="12">
                                   <AvField
@@ -150,29 +158,48 @@ class Section extends Component {
                                     placeholder="Enter Email"
                                     required
                                     value={this.state.emailaddress}
-                                    onChange={(e) => this.setState({emailaddress: e.target.value})}
+                                    onChange={(e) =>
+                                      this.setState({
+                                        emailaddress: e.target.value,
+                                      })
+                                    }
                                     errorMessage="E-Mail is not valid!"
                                     validate={{
                                       required: {
                                         value: true,
-                                        errorMessage: "Please enter your email",
+                                        errorMessage: 'Please enter your email',
                                       },
                                       email: true,
-                                      maxLength: { value: 180 }
+                                      maxLength: { value: 180 },
                                     }}
-                                  /></Col>
-                                <Col md="12" style={{ marginBottom: '35px', marginTop: '5px' }}>
+                                  />
+                                </Col>
+                                <Col
+                                  md="12"
+                                  style={{
+                                    marginBottom: '35px',
+                                    marginTop: '5px',
+                                  }}
+                                >
                                   <Link
                                     to="#"
                                     className="btn mouse-down"
-                                    style={{ marginRight: '10px', backgroundColor: '#ff914d', color: 'white' }}
+                                    style={{
+                                      marginRight: '10px',
+                                      backgroundColor: '#ff914d',
+                                      color: 'white',
+                                    }}
                                     disabled={this.state.loading}
-                                    onClick={e => {
+                                    onClick={(e) => {
                                       e.preventDefault();
                                       this.getNFT();
-                                    }}>
-                                   {(this.state.loading === true ? "Adding to list" : "Get Ready to Burn")}
-                                  </Link></Col>
+                                    }}
+                                  >
+                                    {this.state.loading === true
+                                      ? 'Adding to list'
+                                      : 'Get Ready to Burn'}
+                                  </Link>
+                                </Col>
                               </Row>
                             </FormGroup>
                           </AvForm>
@@ -192,10 +219,9 @@ class Section extends Component {
                           className="rounded img-fluid mx-auto d-block"
                           alt={this.state.nftAltText}
                         />
-                        {(this.state.loading === true ? <div className="play-icon">
-                          {this.Loader()}
-                        </div> : null)}
-                        
+                        {this.state.loading === true ? (
+                          <div className="play-icon">{this.Loader()}</div>
+                        ) : null}
                       </div>
                     </Col>
                   </Row>
@@ -203,53 +229,61 @@ class Section extends Component {
               </Row>
             </div>
           </Container>
-          <Container style={{marginTop: "50px"}}>
+          <Container style={{ marginTop: '50px' }}>
             <Row className="align-items-center">
-              <Col md={(this.state.attributes.length === 0 ? "12" : "5" )}>
+              <Col md={this.state.attributes.length === 0 ? '12' : '5'}>
                 <div className="section-title">
                   <h2 className="title">NFT Rewards for Burn</h2>
-                  <p className="text-primary mb-4">
-                    {(this.state.attributes.length === 0 ? "Your burn reward amount will appear Below" : "View NFT Burn Rewards Below")}
-                    
+                  <p className="text mb-4">
+                    The Worst Thing About Having Useless Crypto Assets: The Tax
+                    Man Cometh We've all been there. You invest in what you
+                    think is the next big thing, only to watch it flounder and
+                    become completely worthless. And if your investment is in a
+                    cryptocurrency, the situation is even worse. Not only are
+                    you out the money you invested, but you may also be on the
+                    hook for taxes on the "gains" you never realized.
+                  </p>
+                  <p className="text mb-4">
+                    But there is a silver lining. If you can find a liquidity
+                    provider that is willing to purchase your worthless crypto
+                    assets, you can trigger a tax event that will allow you to
+                    deduct your losses. This can be a huge relief, especially if
+                    you've lost a significant amount of money on your
+                    investment.
+                  </p>
+                  <p className="text mb-4">
+                    Of course, finding a liquidity provider can be difficult.
+                    They are not always easy to find, and even when you do find
+                    one, they may not be willing to purchase your assets. But it
+                    is worth looking into, as it can be a lifesaver come tax
+                    time.
                   </p>
                   <Alert
                     isOpen={this.state.isOpenCopy}
                     toggle={() => this.setState({ isOpenCopy: false })}
                     color="success"
                   >
-                    {"Alternative Text Copied to Clipboard"}
+                    {'Alternative Text Copied to Clipboard'}
                   </Alert>
-                  <p className="text mb-0">
-                    {this.state.nftAltText}
-                  </p>
-                  {(this.state.attributes.length === 0 ? null : <div className="mt-4">
-                    <a href={"#waitlist"} 
-                      style={{marginRight: '10px', backgroundColor: '#D43900', color: 'white'}}
-                      className="btn mouse-down">
-                      Use the API
-                    </a>
-                    <a href={this.state.assetUrl} target="_new" className="btn btn-primary mouse-down">
-                       View on {this.state.marketPlace}
-                    </a>
-                    <Link style={{marginLeft: '10px', backgroundColor: '#1E824C', color: 'white'}} to={"#"} onClick={this.copyTo} className="btn mouse-down">
-                       Copy
-                    </Link>
-                  </div>)}
                 </div>
               </Col>
-              {(this.state.attributes.length === 0 ? null : <Col md="7" className="mt-4 mt-sm-0 pt-2 pt-sm-0">
-                <div className="ms-md-4">
-                  <Row>
-                  {this.state.attributes.map(trait => {
-                    return (
-                    <Col md="4">
-                      <p className="title text"><b>{trait.trait_type}</b> : {trait.value}</p>
-                    </Col>
-                    )
-                  })}
-                  </Row>
-                </div>
-              </Col> )} 
+              {this.state.attributes.length === 0 ? null : (
+                <Col md="7" className="mt-4 mt-sm-0 pt-2 pt-sm-0">
+                  <div className="ms-md-4">
+                    <Row>
+                      {this.state.attributes.map((trait) => {
+                        return (
+                          <Col md="4">
+                            <p className="title text">
+                              <b>{trait.trait_type}</b> : {trait.value}
+                            </p>
+                          </Col>
+                        );
+                      })}
+                    </Row>
+                  </div>
+                </Col>
+              )}
             </Row>
           </Container>
         </section>

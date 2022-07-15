@@ -145,11 +145,15 @@ class About extends Component {
                 <div className="section-title mb-4 pb-2">
                   <h3 className="title mb-4">How does providing liquidity help with your NFT's.</h3>
                   <p className="text para-desc">
-                  Alternative text is critical for digital assets like photos and artwork. 
-                  It gives access to people with visual and specific cognitive disabilities by 
-                  describing the function, appearance, and context of an image or graphic they cannot see. 
-                  If someone is willing to spend hundreds or thousands in currency, they should have the 
-                  full details of what they are buying, whether they are disabled or not.
+                  The current state of the crypto market is such that many assets have become nearly worthless,
+                   with little to no liquidity value. This is a direct result of the market crash that occurred in 
+                   early 2018, when the prices of nearly all assets fell sharply. While some have recovered since then,
+                    many have not, and remain near their all-time lows. This has led to a situation where many investors are 
+                    stuck with assets that are essentially worthless, and have no way to sell them without taking an enormous loss.
+                  </p>
+                  <p className="text para-desc">
+                  If you have worthless crypto assets, a liquidity provider can purchase them to trigger tax events. This can help you minimize your tax liability and potentially get a refund.
+                  It's not fun having worthless crypto assets. The only thing that can trigger a tax event is finding a liquidity provider that is willing to purchase them.
                   </p>
                 </div>
 
