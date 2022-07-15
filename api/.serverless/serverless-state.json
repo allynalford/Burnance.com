@@ -29,6 +29,9 @@
         "S3_DRIP_CDN_BUCKET": "events.nft.burnance.io",
         "DYNAMODB_TABLE_CONTRACT_ABI": "burnance-prod-contract-abi",
         "DYNAMODB_TABLE_NFT_METADATA": "burnance-prod-nfts-metadata",
+        "DYNAMODB_TABLE_WAITLIST": "burnance-prod-waitlist",
+        "DYNAMODB_TABLE_WALLET": "burnance-prod-wallet",
+        "DYNAMODB_TABLE_WALLET_NFT": "burnance-prod-wallet-nft",
         "NODE": "wss://mainnet.infura.io/ws/v3/4168ad1b2f574ec1a6944fcb1d4d906c",
         "KEY": "adfb72ce9754e3cbc1e79e44a8e20804cebd3c4a347605c6a3462a8de05b8783"
       },
@@ -55,7 +58,10 @@
           ],
           "Resource": [
             "arn:aws:dynamodb:us-east-1:*:table/burnance-prod-nfts-metadata",
-            "arn:aws:dynamodb:us-east-1:*:table/burnance-prod-contract-abi"
+            "arn:aws:dynamodb:us-east-1:*:table/burnance-prod-contract-abi",
+            "arn:aws:dynamodb:us-east-1:*:table/burnance-prod-waitlist",
+            "arn:aws:dynamodb:us-east-1:*:table/burnance-prod-wallet",
+            "arn:aws:dynamodb:us-east-1:*:table/burnance-prod-wallet-nft"
           ]
         }
       ],
@@ -73,16 +79,10 @@
               "LogGroupName": "/aws/lambda/burnance-prod-viewNFT"
             }
           },
-          "AddDripSubLogGroup": {
+          "AddToWaitlistLogGroup": {
             "Type": "AWS::Logs::LogGroup",
             "Properties": {
-              "LogGroupName": "/aws/lambda/burnance-prod-addDripSub"
-            }
-          },
-          "AuthorizerLogGroup": {
-            "Type": "AWS::Logs::LogGroup",
-            "Properties": {
-              "LogGroupName": "/aws/lambda/burnance-prod-authorizer"
+              "LogGroupName": "/aws/lambda/burnance-prod-addToWaitlist"
             }
           },
           "IamRoleLambdaExecution": {
@@ -173,7 +173,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "service.burnance.nodejs.lambdas.prod",
-                "S3Key": "serverless/burnance/prod/1657582414217-2022-07-11T23:33:34.217Z/burnance.zip"
+                "S3Key": "serverless/burnance/prod/1657849784442-2022-07-15T01:49:44.442Z/burnance.zip"
               },
               "Handler": "actions.view",
               "Runtime": "nodejs12.x",
@@ -197,6 +197,9 @@
                   "S3_DRIP_CDN_BUCKET": "events.nft.burnance.io",
                   "DYNAMODB_TABLE_CONTRACT_ABI": "burnance-prod-contract-abi",
                   "DYNAMODB_TABLE_NFT_METADATA": "burnance-prod-nfts-metadata",
+                  "DYNAMODB_TABLE_WAITLIST": "burnance-prod-waitlist",
+                  "DYNAMODB_TABLE_WALLET": "burnance-prod-wallet",
+                  "DYNAMODB_TABLE_WALLET_NFT": "burnance-prod-wallet-nft",
                   "NODE": "wss://mainnet.infura.io/ws/v3/4168ad1b2f574ec1a6944fcb1d4d906c",
                   "KEY": "adfb72ce9754e3cbc1e79e44a8e20804cebd3c4a347605c6a3462a8de05b8783"
                 }
@@ -212,16 +215,16 @@
               "ViewNFTLogGroup"
             ]
           },
-          "AddDripSubLambdaFunction": {
+          "AddToWaitlistLambdaFunction": {
             "Type": "AWS::Lambda::Function",
             "Properties": {
               "Code": {
                 "S3Bucket": "service.burnance.nodejs.lambdas.prod",
-                "S3Key": "serverless/burnance/prod/1657582414217-2022-07-11T23:33:34.217Z/burnance.zip"
+                "S3Key": "serverless/burnance/prod/1657849784442-2022-07-15T01:49:44.442Z/burnance.zip"
               },
-              "Handler": "drip/dripUtils.addSubscriber",
+              "Handler": "waitlist/handler.add",
               "Runtime": "nodejs12.x",
-              "FunctionName": "burnance-prod-addDripSub",
+              "FunctionName": "burnance-prod-addToWaitlist",
               "MemorySize": 128,
               "Timeout": 30,
               "Environment": {
@@ -241,6 +244,9 @@
                   "S3_DRIP_CDN_BUCKET": "events.nft.burnance.io",
                   "DYNAMODB_TABLE_CONTRACT_ABI": "burnance-prod-contract-abi",
                   "DYNAMODB_TABLE_NFT_METADATA": "burnance-prod-nfts-metadata",
+                  "DYNAMODB_TABLE_WAITLIST": "burnance-prod-waitlist",
+                  "DYNAMODB_TABLE_WALLET": "burnance-prod-wallet",
+                  "DYNAMODB_TABLE_WALLET_NFT": "burnance-prod-wallet-nft",
                   "NODE": "wss://mainnet.infura.io/ws/v3/4168ad1b2f574ec1a6944fcb1d4d906c",
                   "KEY": "adfb72ce9754e3cbc1e79e44a8e20804cebd3c4a347605c6a3462a8de05b8783"
                 }
@@ -253,81 +259,27 @@
               }
             },
             "DependsOn": [
-              "AddDripSubLogGroup"
+              "AddToWaitlistLogGroup"
             ]
           },
-          "AuthorizerLambdaFunction": {
-            "Type": "AWS::Lambda::Function",
-            "Properties": {
-              "Code": {
-                "S3Bucket": "service.burnance.nodejs.lambdas.prod",
-                "S3Key": "serverless/burnance/prod/1657582414217-2022-07-11T23:33:34.217Z/burnance.zip"
-              },
-              "Handler": "hooks/authorizer.handler",
-              "Runtime": "nodejs12.x",
-              "FunctionName": "burnance-prod-authorizer",
-              "MemorySize": 128,
-              "Timeout": 30,
-              "Environment": {
-                "Variables": {
-                  "STAGE": "prod",
-                  "REGION": "us-east-1",
-                  "ACCOUNTID": "297677912558",
-                  "USER_AGENT": "nft.burnance.io",
-                  "CDN_BUCKET": "nft.burnance.io",
-                  "ETHERSCAN_API_URL": "https://api.etherscan.io/api",
-                  "API_KEY_TOKEN": "JC6KEHKVTY3ITGM8AUQRBXR9ZRF57SFA7C",
-                  "ETHERSCAN_ABI_PARAMS": "module=contract&action=getabi",
-                  "OPEN": "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",
-                  "SLACK_API_WAITLIST_WEBHOOK": "https://hooks.slack.com/services/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",
-                  "DRIP": "d19af8d64382261d9cbd9762fdd07356",
-                  "DRIP_ID": "4947055",
-                  "S3_DRIP_CDN_BUCKET": "events.nft.burnance.io",
-                  "DYNAMODB_TABLE_CONTRACT_ABI": "burnance-prod-contract-abi",
-                  "DYNAMODB_TABLE_NFT_METADATA": "burnance-prod-nfts-metadata",
-                  "NODE": "wss://mainnet.infura.io/ws/v3/4168ad1b2f574ec1a6944fcb1d4d906c",
-                  "KEY": "adfb72ce9754e3cbc1e79e44a8e20804cebd3c4a347605c6a3462a8de05b8783"
-                }
-              },
-              "Role": {
-                "Fn::GetAtt": [
-                  "IamRoleLambdaExecution",
-                  "Arn"
-                ]
-              }
-            },
-            "DependsOn": [
-              "AuthorizerLogGroup"
-            ]
-          },
-          "AddDripSubLambdaVersionw7Mv6REEPEkF0Y6o5Fallkjqxn2hjshL7gr8BczQ": {
+          "AddToWaitlistLambdaVersione0NpZaMIFX1LYjI4SXzY6Mc3YbUzGEJEy8SvEgOKc": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
-                "Ref": "AddDripSubLambdaFunction"
+                "Ref": "AddToWaitlistLambdaFunction"
               },
-              "CodeSha256": "QF1rWQ4ZvtbuOh063iS4rkQ1RoRYSWes3/F+vbitJ9Y="
+              "CodeSha256": "fuv6SqmMzqi0vSWkGdIYUApswmSBHdkfUrsfkAvko6Q="
             }
           },
-          "ViewNFTLambdaVersiontq9iMrmYR3FvY93INBh09PLA5Urx7QWpT49Jk8Pecg": {
+          "ViewNFTLambdaVersion6syO0LFy76QFnxDLpQWdssPqVY7IoTxPCAIT65AI": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "ViewNFTLambdaFunction"
               },
-              "CodeSha256": "QF1rWQ4ZvtbuOh063iS4rkQ1RoRYSWes3/F+vbitJ9Y="
-            }
-          },
-          "AuthorizerLambdaVersionUu3UNQOK2CygQF70mGyWrRwrpPAdiv4BHu8PGcQwA": {
-            "Type": "AWS::Lambda::Version",
-            "DeletionPolicy": "Retain",
-            "Properties": {
-              "FunctionName": {
-                "Ref": "AuthorizerLambdaFunction"
-              },
-              "CodeSha256": "QF1rWQ4ZvtbuOh063iS4rkQ1RoRYSWes3/F+vbitJ9Y="
+              "CodeSha256": "fuv6SqmMzqi0vSWkGdIYUApswmSBHdkfUrsfkAvko6Q="
             }
           },
           "ApiGatewayRestApi": {
@@ -369,7 +321,7 @@
               }
             }
           },
-          "ApiGatewayResourceDrip": {
+          "ApiGatewayResourceWaitlist": {
             "Type": "AWS::ApiGateway::Resource",
             "Properties": {
               "ParentId": {
@@ -378,31 +330,19 @@
                   "RootResourceId"
                 ]
               },
-              "PathPart": "drip",
+              "PathPart": "waitlist",
               "RestApiId": {
                 "Ref": "ApiGatewayRestApi"
               }
             }
           },
-          "ApiGatewayResourceDripAdd": {
+          "ApiGatewayResourceWaitlistAdd": {
             "Type": "AWS::ApiGateway::Resource",
             "Properties": {
               "ParentId": {
-                "Ref": "ApiGatewayResourceDrip"
+                "Ref": "ApiGatewayResourceWaitlist"
               },
               "PathPart": "add",
-              "RestApiId": {
-                "Ref": "ApiGatewayRestApi"
-              }
-            }
-          },
-          "ApiGatewayResourceDripAddSubscriber": {
-            "Type": "AWS::ApiGateway::Resource",
-            "Properties": {
-              "ParentId": {
-                "Ref": "ApiGatewayResourceDripAdd"
-              },
-              "PathPart": "subscriber",
               "RestApiId": {
                 "Ref": "ApiGatewayRestApi"
               }
@@ -453,7 +393,7 @@
               }
             }
           },
-          "ApiGatewayMethodDripAddSubscriberOptions": {
+          "ApiGatewayMethodWaitlistAddOptions": {
             "Type": "AWS::ApiGateway::Method",
             "Properties": {
               "AuthorizationType": "NONE",
@@ -491,7 +431,7 @@
                 ]
               },
               "ResourceId": {
-                "Ref": "ApiGatewayResourceDripAddSubscriber"
+                "Ref": "ApiGatewayResourceWaitlistAdd"
               },
               "RestApiId": {
                 "Ref": "ApiGatewayRestApi"
@@ -544,13 +484,13 @@
               "ViewNFTLambdaPermissionApiGateway"
             ]
           },
-          "ApiGatewayMethodDripAddSubscriberPost": {
+          "ApiGatewayMethodWaitlistAddPost": {
             "Type": "AWS::ApiGateway::Method",
             "Properties": {
               "HttpMethod": "POST",
               "RequestParameters": {},
               "ResourceId": {
-                "Ref": "ApiGatewayResourceDripAddSubscriber"
+                "Ref": "ApiGatewayResourceWaitlistAdd"
               },
               "RestApiId": {
                 "Ref": "ApiGatewayRestApi"
@@ -575,7 +515,7 @@
                       ":lambda:path/2015-03-31/functions/",
                       {
                         "Fn::GetAtt": [
-                          "AddDripSubLambdaFunction",
+                          "AddToWaitlistLambdaFunction",
                           "Arn"
                         ]
                       },
@@ -587,10 +527,10 @@
               "MethodResponses": []
             },
             "DependsOn": [
-              "AddDripSubLambdaPermissionApiGateway"
+              "AddToWaitlistLambdaPermissionApiGateway"
             ]
           },
-          "ApiGatewayDeployment1657582402860": {
+          "ApiGatewayDeployment1657849773819": {
             "Type": "AWS::ApiGateway::Deployment",
             "Properties": {
               "RestApiId": {
@@ -600,9 +540,9 @@
             },
             "DependsOn": [
               "ApiGatewayMethodViewNftOptions",
-              "ApiGatewayMethodDripAddSubscriberOptions",
+              "ApiGatewayMethodWaitlistAddOptions",
               "ApiGatewayMethodViewNftPost",
-              "ApiGatewayMethodDripAddSubscriberPost"
+              "ApiGatewayMethodWaitlistAddPost"
             ]
           },
           "ViewNFTLambdaPermissionApiGateway": {
@@ -642,12 +582,12 @@
               }
             }
           },
-          "AddDripSubLambdaPermissionApiGateway": {
+          "AddToWaitlistLambdaPermissionApiGateway": {
             "Type": "AWS::Lambda::Permission",
             "Properties": {
               "FunctionName": {
                 "Fn::GetAtt": [
-                  "AddDripSubLambdaFunction",
+                  "AddToWaitlistLambdaFunction",
                   "Arn"
                 ]
               },
@@ -698,38 +638,7 @@
               "StatusCode": "401"
             }
           },
-          "NFTMetaDataDynamoDBTable": {
-            "Type": "AWS::DynamoDB::Table",
-            "DeletionPolicy": "Retain",
-            "Properties": {
-              "AttributeDefinitions": [
-                {
-                  "AttributeName": "chainContractAddress",
-                  "AttributeType": "S"
-                },
-                {
-                  "AttributeName": "tokenId",
-                  "AttributeType": "S"
-                }
-              ],
-              "KeySchema": [
-                {
-                  "AttributeName": "chainContractAddress",
-                  "KeyType": "HASH"
-                },
-                {
-                  "AttributeName": "tokenId",
-                  "KeyType": "RANGE"
-                }
-              ],
-              "ProvisionedThroughput": {
-                "ReadCapacityUnits": 2,
-                "WriteCapacityUnits": 2
-              },
-              "TableName": "burnance-prod-nfts-metadata"
-            }
-          },
-          "ContractABIDynamoDBTable": {
+          "WalletNFTDynamoDBTable": {
             "Type": "AWS::DynamoDB::Table",
             "DeletionPolicy": "Retain",
             "Properties": {
@@ -739,7 +648,11 @@
                   "AttributeType": "S"
                 },
                 {
-                  "AttributeName": "contractAddress",
+                  "AttributeName": "contractAddressTokenId",
+                  "AttributeType": "S"
+                },
+                {
+                  "AttributeName": "owner",
                   "AttributeType": "S"
                 }
               ],
@@ -749,15 +662,42 @@
                   "KeyType": "HASH"
                 },
                 {
-                  "AttributeName": "contractAddress",
+                  "AttributeName": "contractAddressTokenId",
                   "KeyType": "RANGE"
                 }
               ],
+              "GlobalSecondaryIndexes": [
+                {
+                  "IndexName": "InstanceIdIndex",
+                  "KeySchema": [
+                    {
+                      "AttributeName": "owner",
+                      "KeyType": "HASH"
+                    },
+                    {
+                      "AttributeName": "contractAddressTokenId",
+                      "KeyType": "RANGE"
+                    }
+                  ],
+                  "Projection": {
+                    "NonKeyAttributes": [
+                      "tokenId",
+                      "status",
+                      "createdatetime"
+                    ],
+                    "ProjectionType": "INCLUDE"
+                  },
+                  "ProvisionedThroughput": {
+                    "ReadCapacityUnits": 1,
+                    "WriteCapacityUnits": 1
+                  }
+                }
+              ],
               "ProvisionedThroughput": {
-                "ReadCapacityUnits": 2,
-                "WriteCapacityUnits": 2
+                "ReadCapacityUnits": 1,
+                "WriteCapacityUnits": 1
               },
-              "TableName": "burnance-prod-contract-abi"
+              "TableName": "burnance-prod-wallet-nft"
             }
           }
         },
@@ -768,31 +708,22 @@
               "Name": "sls-burnance-prod-ServerlessDeploymentBucketName"
             }
           },
-          "AddDripSubLambdaFunctionQualifiedArn": {
+          "AddToWaitlistLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "AddDripSubLambdaVersionw7Mv6REEPEkF0Y6o5Fallkjqxn2hjshL7gr8BczQ"
+              "Ref": "AddToWaitlistLambdaVersione0NpZaMIFX1LYjI4SXzY6Mc3YbUzGEJEy8SvEgOKc"
             },
             "Export": {
-              "Name": "sls-burnance-prod-AddDripSubLambdaFunctionQualifiedArn"
+              "Name": "sls-burnance-prod-AddToWaitlistLambdaFunctionQualifiedArn"
             }
           },
           "ViewNFTLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "ViewNFTLambdaVersiontq9iMrmYR3FvY93INBh09PLA5Urx7QWpT49Jk8Pecg"
+              "Ref": "ViewNFTLambdaVersion6syO0LFy76QFnxDLpQWdssPqVY7IoTxPCAIT65AI"
             },
             "Export": {
               "Name": "sls-burnance-prod-ViewNFTLambdaFunctionQualifiedArn"
-            }
-          },
-          "AuthorizerLambdaFunctionQualifiedArn": {
-            "Description": "Current Lambda function version",
-            "Value": {
-              "Ref": "AuthorizerLambdaVersionUu3UNQOK2CygQF70mGyWrRwrpPAdiv4BHu8PGcQwA"
-            },
-            "Export": {
-              "Name": "sls-burnance-prod-AuthorizerLambdaFunctionQualifiedArn"
             }
           },
           "ServiceEndpoint": {
@@ -877,16 +808,16 @@
         "memory": 128,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "ViewNFTLambdaVersiontq9iMrmYR3FvY93INBh09PLA5Urx7QWpT49Jk8Pecg"
+        "versionLogicalId": "ViewNFTLambdaVersion6syO0LFy76QFnxDLpQWdssPqVY7IoTxPCAIT65AI"
       },
-      "addDripSub": {
-        "handler": "drip/dripUtils.addSubscriber",
+      "addToWaitlist": {
+        "handler": "waitlist/handler.add",
         "memorySize": 128,
         "timeout": 30,
         "events": [
           {
             "http": {
-              "path": "drip/add/subscriber",
+              "path": "waitlist/add",
               "method": "post",
               "authorizer": {
                 "type": "AWS_IAM",
@@ -913,23 +844,12 @@
             }
           }
         ],
-        "name": "burnance-prod-addDripSub",
+        "name": "burnance-prod-addToWaitlist",
         "package": {},
         "memory": 128,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "AddDripSubLambdaVersionw7Mv6REEPEkF0Y6o5Fallkjqxn2hjshL7gr8BczQ"
-      },
-      "authorizer": {
-        "handler": "hooks/authorizer.handler",
-        "events": [],
-        "name": "burnance-prod-authorizer",
-        "package": {},
-        "memory": 128,
-        "timeout": 30,
-        "runtime": "nodejs12.x",
-        "vpc": {},
-        "versionLogicalId": "AuthorizerLambdaVersionUu3UNQOK2CygQF70mGyWrRwrpPAdiv4BHu8PGcQwA"
+        "versionLogicalId": "AddToWaitlistLambdaVersione0NpZaMIFX1LYjI4SXzY6Mc3YbUzGEJEy8SvEgOKc"
       }
     },
     "resources": {
@@ -953,38 +873,7 @@
             "StatusCode": "401"
           }
         },
-        "NFTMetaDataDynamoDBTable": {
-          "Type": "AWS::DynamoDB::Table",
-          "DeletionPolicy": "Retain",
-          "Properties": {
-            "AttributeDefinitions": [
-              {
-                "AttributeName": "chainContractAddress",
-                "AttributeType": "S"
-              },
-              {
-                "AttributeName": "tokenId",
-                "AttributeType": "S"
-              }
-            ],
-            "KeySchema": [
-              {
-                "AttributeName": "chainContractAddress",
-                "KeyType": "HASH"
-              },
-              {
-                "AttributeName": "tokenId",
-                "KeyType": "RANGE"
-              }
-            ],
-            "ProvisionedThroughput": {
-              "ReadCapacityUnits": 2,
-              "WriteCapacityUnits": 2
-            },
-            "TableName": "burnance-prod-nfts-metadata"
-          }
-        },
-        "ContractABIDynamoDBTable": {
+        "WalletNFTDynamoDBTable": {
           "Type": "AWS::DynamoDB::Table",
           "DeletionPolicy": "Retain",
           "Properties": {
@@ -994,7 +883,11 @@
                 "AttributeType": "S"
               },
               {
-                "AttributeName": "contractAddress",
+                "AttributeName": "contractAddressTokenId",
+                "AttributeType": "S"
+              },
+              {
+                "AttributeName": "owner",
                 "AttributeType": "S"
               }
             ],
@@ -1004,15 +897,42 @@
                 "KeyType": "HASH"
               },
               {
-                "AttributeName": "contractAddress",
+                "AttributeName": "contractAddressTokenId",
                 "KeyType": "RANGE"
               }
             ],
+            "GlobalSecondaryIndexes": [
+              {
+                "IndexName": "InstanceIdIndex",
+                "KeySchema": [
+                  {
+                    "AttributeName": "owner",
+                    "KeyType": "HASH"
+                  },
+                  {
+                    "AttributeName": "contractAddressTokenId",
+                    "KeyType": "RANGE"
+                  }
+                ],
+                "Projection": {
+                  "NonKeyAttributes": [
+                    "tokenId",
+                    "status",
+                    "createdatetime"
+                  ],
+                  "ProjectionType": "INCLUDE"
+                },
+                "ProvisionedThroughput": {
+                  "ReadCapacityUnits": 1,
+                  "WriteCapacityUnits": 1
+                }
+              }
+            ],
             "ProvisionedThroughput": {
-              "ReadCapacityUnits": 2,
-              "WriteCapacityUnits": 2
+              "ReadCapacityUnits": 1,
+              "WriteCapacityUnits": 1
             },
-            "TableName": "burnance-prod-contract-abi"
+            "TableName": "burnance-prod-wallet-nft"
           }
         }
       },
@@ -1031,7 +951,7 @@
         "individually": false,
         "deploymentBucket": "service.burnance.nodejs.lambdas.prod",
         "artifact": "C:\\Users\\Allyn Alford\\Documents\\Burnance.com\\api\\.serverless\\burnance.zip",
-        "artifactDirectoryName": "serverless/burnance/prod/1657582414217-2022-07-11T23:33:34.217Z"
+        "artifactDirectoryName": "serverless/burnance/prod/1657849784442-2022-07-15T01:49:44.442Z"
       },
       "functions": {
         "$ref": "$[\"service\"][\"functions\"]"
@@ -1052,7 +972,7 @@
   },
   "package": {
     "individually": false,
-    "artifactDirectoryName": "serverless/burnance/prod/1657582414217-2022-07-11T23:33:34.217Z",
+    "artifactDirectoryName": "serverless/burnance/prod/1657849784442-2022-07-15T01:49:44.442Z",
     "artifact": "burnance.zip"
   }
 }

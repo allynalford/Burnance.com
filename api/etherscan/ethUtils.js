@@ -8,12 +8,13 @@ const endpoint = require('../common/endpoint');
 
 
 /**
- * get an Ethereum price by start and end date
+ * get an Ethereum token transactions by Contract address and wallet address
  *
  * @author Allyn j. Alford <Allyn@tenablylabs.com>
  * @async
  * @function _tokenNftTx
- * @param {String} contractAddress - Array representing a Store Action
+ * @param {String} contractAddress - ethereum contract address
+ * @param {String} address - ethereum wallet address
  * @return {Promise<Array>} Response Array for next step to process.
  */
  module.exports._tokenNftTx = async (contractaddress, address) => {
@@ -31,7 +32,8 @@ const endpoint = require('../common/endpoint');
  * @author Allyn j. Alford <Allyn@tenablylabs.com>
  * @async
  * @function _ethDailyPrice
- * @param {String} contractAddress - Array representing a Store Action
+ * @param {String} startdate - start date
+ * @param {String} enddate - end date
  * @return {Promise<Array>} Response Array for next step to process.
  */
 module.exports._ethDailyPrice = async (startdate, enddate) => {

@@ -8,16 +8,14 @@ import {
   Col,
   Alert,
   FormGroup,
-  Form,
-  Input,
   Label
 } from "reactstrap";
 import { Link } from "react-router-dom";
-import copy from 'copy-to-clipboard';
 import logodark from "../../assets/images/burnance_logo.png";
-import {Event} from "../../common/gaUtils";
+import {initGA, PageView, Event} from "../../common/gaUtils";
+import { getUser } from "../../common/config";
+import { AvForm, AvField } from 'availity-reactstrap-validation';
 const endpoint = require('../../common/endpoint');
-const parse = require('url-parse')
 const Swal = require('sweetalert2');
 
 class Section extends Component {
@@ -36,24 +34,24 @@ class Section extends Component {
       message: "",
       loading: false,
       attributes: [],
-      openSeaUrl: "https://www.sandbox.game/en/model-viewer/e98b590e-a130-437d-9a14-6d9fd7bd3411/"
+      openSeaUrl: "https://www.sandbox.game/en/model-viewer/e98b590e-a130-437d-9a14-6d9fd7bd3411/",
+      emailaddress: ""
     };
     this.openModal = this.openModal.bind(this);
-    this.getNFT = this.getNFT.bind(this);
-    this.copyTo = this.copyTo.bind(this);
+    this.getNFT = this.addToWaitList.bind(this);
     this.fireMsg = this.fireMsg.bind(this);
   }
+
+  componentDidMount() {
+    window.addEventListener("scroll", this.scrollNavigation, true);
+    initGA();
+    PageView();
+}
 
   openModal() {
     window.open(this.state.openSeaUrl, "_new");
   }
 
-  copyTo(e) {
-    e.preventDefault();
-    copy(this.state.nftAltText);
-    this.setState({isOpenCopy: true});
-    setTimeout(this.setState({isOpenCopy: false}), 50000);
-  }
 
   fireMsg(title, text, icon){
     Swal.fire({
@@ -66,126 +64,19 @@ class Section extends Component {
     })
   }
 
-  async getNFT() {
-  
-    this.setState({ loading: true, isOpen: false });
+  async addToWaitList(e) {
 
-    try {
-      const url = parse(this.state.assetUrl, true);
-      let contractAddress, tokenId, marketUrl, marketPlace;
-      Event("AltTextRequest", "Request", "NFT Alt Text", url);
+    this.setState({loading: true})
+ 
+    Event("WAITLIST", "Wait List SignUp", "Waitlist Addition")
 
-      if (typeof url !== "undefined") {
+    //Make the call
+    const resp = await endpoint._post(getUser().addWaitlistApiUrl, {emailaddress: this.state.emailaddress, chain: "ethereum"});
 
-  
-
-
-        //Check if the domain is in the valid list
-        if (this.validDomains.includes(url.host) !== true) {
-          //Throw error response
-          this.setState({ message: "We currently only support OpenSea, Rarible and Looks Rare urls", isOpen: true, loading: false });
-          Event("AltTextRequest", "Request Error", "Failed", "We currently only support OpenSea, Rarible and Looks Rare urls");
-          return false;
-        }
-
-        //https://opensea.io/assets/0x2106c00ac7da0a3430ae667879139e832307aeaa/7257
-        //https://rarible.com/token/0x2106C00Ac7dA0A3430aE667879139E832307AeAa:7257?tab=details
-        //https://looksrare.org/collections/0x2106C00Ac7dA0A3430aE667879139E832307AeAa/7257
-        const pathnameList = url.pathname.split('/');
-
-        if(url.host === this.validDomains[0]){
-
-          contractAddress = pathnameList[2];
-          tokenId = pathnameList[3];
-          marketUrl = `https://${this.validDomains[0]}/${this.validPathStarts[0]}/${contractAddress}/${tokenId}`;
-          marketPlace = url.host;
-          if (url.pathname.startsWith("/" + this.validPathStarts[0]) === false) {
-            //Throw error response
-            this.setState({ message: "Invalid Opensea Assets URL", isOpen: true, loading: false });
-            Event("AltTextRequest", "Request Error", "Failed", "Invalid Asset URL");
-            return false;
-          }
-
-
-        }else if(url.host === this.validDomains[1]){
-          const contractAddressToken = pathnameList[2].split(":");
-          contractAddress = contractAddressToken[0];
-          tokenId = contractAddressToken[1];
-          marketUrl = `https://${this.validDomains[1]}/${this.validPathStarts[1]}:${contractAddress}/${tokenId}?tab=details`;
-          marketPlace = url.host;
-          if (url.pathname.startsWith("/" + this.validPathStarts[1]) === false) {
-            //Throw error response
-            this.setState({ message: "Invalid Rarible token URL", isOpen: true, loading: false });
-            Event("AltTextRequest", "Request Error", "Failed", "Invalid Asset URL");
-            return false;
-          }
-
-        }else{
-          contractAddress = pathnameList[2];
-          tokenId = pathnameList[3];
-          marketUrl = `https://${this.validDomains[2]}/${this.validPathStarts[2]}/${contractAddress}/${tokenId}`;
-          marketPlace = url.host;
-          if (url.pathname.startsWith("/" + this.validPathStarts[2]) === false) {
-            //Throw error response
-            this.setState({ message: "Invalid Looksrare collections URL", isOpen: true, loading: false });
-            Event("AltTextRequest", "Request Error", "Failed", "Invalid Asset URL");
-            return false;
-          }
-        }
-
-
-        if (typeof contractAddress === "undefined") {
-          //Throw error response
-          this.setState({ message: "Invalid Asset URL", isOpen: true, loading: false });
-          Event("AltTextRequest", "Request Error", "Failed", "Invalid Asset URL");
-          return false;
-        }
-
-        if (typeof tokenId === "undefined") {
-          //Throw error response
-          this.setState({ message: "Invalid Asset URL: No Token ID", isOpen: true, loading: false });
-          Event("AltTextRequest", "Request Error", "Failed", "Invalid Asset URL: No Token ID");
-          return false;
-        }
-
-        if (contractAddress.length !== 42) {
-          //Throw error response
-          this.setState({ message: "Invalid Asset URL: Invalid contract address", isOpen: true, loading: false });
-          Event("AltTextRequest", "Request Error", "Failed", "Invalid Asset URL: Invalid contract address");
-          return false;
-        }
-
-
-
-        const resp = await endpoint._post(`${process.env.REACT_APP_BASE_API_URL}/nft/view/alttext`,
-          { domain: url.host, chain: "Ethereum", contractAddress, tokenId });
-
-          if(resp.data.success === false){
-            this.setState({ message: resp.data.message, isOpen: true, loading: false });
-            //this.fireMsg("Trouble", resp.data.message, 'error');
-            Event("AltTextRequest", "Request Error", "Failed", resp.data.message);
-            return false;
-          }else{
-            Event("AltTextRequest", "Request", "Success", url);
-            this.setState({
-              nftImg: resp.data.altText.image,
-              nftAltText: resp.data.altText.text,
-              attributes: resp.data.metadata.attributes,
-              openSeaUrl: marketUrl,
-              marketPlace,
-              loading: false
-            });
-          }
-      }else{
-        this.setState({ message: "Invalid Asset URL", isOpen: true, loading: false });
-        Event("AltTextRequest", "Request Error", "Failed", "Invalid Asset URL");
-      }
-    } catch (e) {
-      console.error(e);
-      this.setState({ loading: false });
+    if(typeof resp.data !== "undefined" && resp.data.success === true){
+      this.setState({loading: false, emailaddress: ''});
+      this.fireMsg("Your on the list", `Your email address ${this.state.emailaddress} has been added. Thank you for signing up to be notified about our launch...`, "INFO")
     }
-
-
   }
 
   Loader = () => {
@@ -237,7 +128,7 @@ class Section extends Component {
                         >
                          {this.state.message}
                         </Alert>
-                          <Form className="ms-0">
+                         <AvForm onSubmit={this.addToWaitList} className="ms-0">
                             <FormGroup>
                               <Row>
                                 <Col md="12">
@@ -246,19 +137,25 @@ class Section extends Component {
                                 </Label>
                                 </Col>
                                 <Col md="12">
-                                  <Input
-                                  size={100}
-                                  type="text"
-                                  id="email"
-                                  name="email"
-                                  aria-label="Email address"
-                                  placeholder="test@burnance.io"
-                                  value={this.state.email}
-                                  disabled={this.state.loading}
-                                  onChange={e => {
-                                    this.setState({ email: e.target.value })
-                                  }}
-                                /></Col>
+                                  <AvField
+                                    type="email"
+                                    aria-label="Enter your Email address"
+                                    name="email"
+                                    id="email"
+                                    placeholder="Enter Email"
+                                    required
+                                    value={this.state.emailaddress}
+                                    onChange={(e) => this.setState({emailaddress: e.target.value})}
+                                    errorMessage="E-Mail is not valid!"
+                                    validate={{
+                                      required: {
+                                        value: true,
+                                        errorMessage: "Please enter your email",
+                                      },
+                                      email: true,
+                                      maxLength: { value: 180 }
+                                    }}
+                                  /></Col>
                                 <Col md="12" style={{ marginBottom: '35px', marginTop: '5px' }}>
                                   <Link
                                     to="#"
@@ -269,11 +166,11 @@ class Section extends Component {
                                       e.preventDefault();
                                       this.getNFT();
                                     }}>
-                                   Get Ready to Burn
+                                   {(this.state.loading === true ? "Adding to list" : "Get Ready to Burn")}
                                   </Link></Col>
                               </Row>
                             </FormGroup>
-                          </Form>
+                          </AvForm>
                         </div>
                       </div>
                     </Col>

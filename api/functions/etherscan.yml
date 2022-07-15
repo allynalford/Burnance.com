@@ -1,0 +1,10 @@
+  viewNFT:
+    handler: actions.view
+    memorySize: 128 # optional, in MB, default is 1024
+    timeout: 30 # optional, in seconds, default is 6
+    events:
+      - http:
+          path: view/nft
+          method: post
+          authorizer: aws_iam
+          cors: true
