@@ -9,7 +9,7 @@ const _ = require('lodash');
 const dateformat = require("dateformat");
 
 module.exports.tokenNftTx = async (event) => {
-  let req, address, contractaddress, tokenId;
+  let req, address, contractaddress, tokenId, cost;
 
   try {
     //Logging
@@ -43,55 +43,63 @@ module.exports.tokenNftTx = async (event) => {
   }
 
   try {
+
+    //Check if the data already exists
+     let tokenNftTx = await etherscan._getNftTxs(address, contractaddress + tokenId);
+
+     if(typeof tokenNftTx === "undefined"){
     
     //Grab the NFT transactions
-     const tokenNftTx = await etherscan._tokenNftTx(contractaddress, address);
+    tokenNftTx = await etherscan._tokenNftTx(contractaddress, address);
 
-     //Get the transaction date
-     const date = new Date(tokenNftTx.result[0].timeStamp * 1000);
+    //Get the transaction date
+    const date = new Date(tokenNftTx.result[0].timeStamp * 1000);
 
-     //Calculate the dates for the price
-     const startAndStop = dateformat(date, "yyyy-mm-dd");
+    //Calculate the dates for the price
+    const startAndStop = dateformat(date, "yyyy-mm-dd");
 
-     //Create a web3 object to convert data
-     var Web3 = require('web3');
-     //add provider to it
-     var web3 = new Web3(process.env.QUICK_NODE_HTTP);
+    //Create a web3 object to convert data
+    var Web3 = require('web3');
+    //add provider to it
+    var web3 = new Web3(process.env.QUICK_NODE_HTTP);
 
-     //var bntokens = web3.utils.toBN(tokens)
-    //  gas: '166946',
-    //   gasPrice: '38831702910',
-    //   gasUsed: '157175',
-    //   cumulativeGasUsed: '11333662',
+    //var bntokens = web3.utils.toBN(tokens)
+   //  gas: '166946',
+   //   gasPrice: '38831702910',
+   //   gasUsed: '157175',
+   //   cumulativeGasUsed: '11333662',
 
-    //Grab all the transactions based on the hash
-    const txs = await etherscan._txListInternal(tokenNftTx.result[0].hash);
-   
-    //Loop thru the transactions and add up the values
-    let value = 0;
-    for(const tx of txs.result){
-        //Add all the values togethers
-        value = (Number(value) + Number(tx.value));//First the value
-        value = (Number(value) + Number(tx.gasUsed));//Then the transaction cost in gas
-    };
+   //Grab all the transactions based on the hash
+   const txs = await etherscan._txListInternal(tokenNftTx.result[0].hash);
+  
+   //Loop thru the transactions and add up the values
+   let value = 0;
+   for(const tx of txs.result){
+       //Add all the values togethers
+       value = (Number(value) + Number(tx.value));//First the value
+       value = (Number(value) + Number(tx.gasUsed));//Then the transaction cost in gas
+   };
 
-    console.log('value:', value);
+   console.log('value:', value);
 
-    //Convert the value to Ether
-    const ETH = web3.utils.fromWei(value.toString(), 'ether');
+   //Convert the value to Ether
+   const ETH = web3.utils.fromWei(value.toString(), 'ether');
 
-    console.log('ETH:', ETH);
+   console.log('ETH:', ETH);
 
 
-     //Based on the date of the transaction, lets get the price of ETH
-     const price = await etherscan._ethDailyPrice(startAndStop, startAndStop);
+    //Based on the date of the transaction, lets get the price of ETH
+    const price = await etherscan._ethDailyPrice(startAndStop, startAndStop);
 
-     console.log('price', price)
+    console.log('price', price)
 
-     //Convert ETH to USD based on the price of ETH on that date
-     const amount = parseFloat(ETH * price.result[0].value);
+    //Convert ETH to USD based on the price of ETH on that date
+    cost = parseFloat(ETH * price.result[0].value);
+     }
+
 
      console.log("Amount:",amount);
+     const currentPrice = await etherscan._ethPrice();
 
 
     //respond
@@ -99,7 +107,8 @@ module.exports.tokenNftTx = async (event) => {
       {
         error: false,
         success: true,
-        cost: amount
+        cost,
+        currentPrice: currentPrice.result
       },
       200
     );

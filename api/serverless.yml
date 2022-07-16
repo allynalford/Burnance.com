@@ -32,6 +32,7 @@ provider:
     DYNAMODB_TABLE_WALLET: ${self:service}-${opt:stage, self:provider.stage}-wallet
     DYNAMODB_TABLE_WALLET_NFT: ${self:service}-${opt:stage, self:provider.stage}-wallet-nft
     DYNAMODB_TABLE_WALLET_NFT_CACHE: ${self:service}-${opt:stage, self:provider.stage}-wallet-nft-cache
+    DYNAMODB_TABLE_WALLET_NFT_TX: ${self:service}-${opt:stage, self:provider.stage}-wallet-nft-tx
     NODE: ${file(config.${self:provider.stage}.json):NODE}
     KEY: ${file(config.${self:provider.stage}.json):KEY}
   iamRoleStatements:  
@@ -57,6 +58,7 @@ provider:
         - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE_WALLET}"
         - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE_WALLET_NFT}"
         - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE_WALLET_NFT_CACHE}"
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE_WALLET_NFT_TX}"
 package:
   individually: false
 functions:
@@ -78,27 +80,49 @@ resources:
         RestApiId:
           Ref: 'ApiGatewayRestApi'
         StatusCode: '401'
-    WalletNFTCacheDynamoDBTable:
+    WalletNFTtxDynamoDBTable:
       Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
       Properties:
         AttributeDefinitions:
           -
-            AttributeName: address
+            AttributeName: owner
             AttributeType: S
           -  
-            AttributeName: page
-            AttributeType: N
+            AttributeName: contractAddressTokenId
+            AttributeType: S
         KeySchema:
           -
-            AttributeName: address
+            AttributeName: owner
             KeyType: HASH
           -
-            AttributeName: page
-            KeyType: RANGE  
+            AttributeName: contractAddressTokenId
+            KeyType: RANGE      
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-        TableName: ${self:provider.environment.DYNAMODB_TABLE_WALLET_NFT_CACHE}
+        TableName: ${self:provider.environment.DYNAMODB_TABLE_WALLET_NFT_TX}
+    # WalletNFTCacheDynamoDBTable:
+    #   Type: 'AWS::DynamoDB::Table'
+    #   Properties:
+    #     AttributeDefinitions:
+    #       -
+    #         AttributeName: address
+    #         AttributeType: S
+    #       -  
+    #         AttributeName: page
+    #         AttributeType: N
+    #     KeySchema:
+    #       -
+    #         AttributeName: address
+    #         KeyType: HASH
+    #       -
+    #         AttributeName: page
+    #         KeyType: RANGE  
+    #     ProvisionedThroughput:
+    #       ReadCapacityUnits: 1
+    #       WriteCapacityUnits: 1
+    #     TableName: ${self:provider.environment.DYNAMODB_TABLE_WALLET_NFT_CACHE}
     # WalletDynamoDBTable:
     #   Type: 'AWS::DynamoDB::Table'
     #   DeletionPolicy: Retain

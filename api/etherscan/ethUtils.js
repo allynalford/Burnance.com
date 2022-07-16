@@ -63,6 +63,23 @@ const endpoint = require('../common/endpoint');
 };
 
 /**
+ * get an Ethereum latest price
+ *
+ * @author Allyn j. Alford <Allyn@tenablylabs.com>
+ * @async
+ * @function _ethPrice
+ * @return {Promise<Array>} Response Array for next step to process.
+ */
+ module.exports._ethPrice = async () => {
+    try {
+         const response = await endpoint._get(`${process.env.ETHERSCAN_API_URL}?module=stats&action=ethprice&apikey=${process.env.API_KEY_TOKEN}`);
+        return response.data;
+    } catch (e) {
+        console.error(e);
+    }
+};
+
+/**
  * get an Ethereum price by start and end date
  *
  * @author Allyn j. Alford <Allyn@tenablylabs.com>
@@ -154,3 +171,62 @@ module.exports._tokenURI = async (contract, tokenId) => {
         return "";
     }
 };
+
+   /**
+ * Returns NFT transaction data
+ *
+ * @author Allyn j. Alford <Allyn@tenablylabs.com>
+ * @async
+ * @function _getNftTxs
+ * @param {String} owner - nft owner ethereum wallet address
+ * @param {String} contractAddressTokenId - NFT Contract Address combined with tokenId
+ * @return {Promise<Array>} Response Array for next step to process.
+ */
+    module.exports._getNftTxs  = async (owner, contractAddressTokenId) => {
+        try {
+            const assets = await dynamo.qetFromDB({
+                TableName: process.env.DYNAMODB_TABLE_WALLET_NFT_TX,
+                Key: {
+                    owner,
+                    contractAddressTokenId
+                }
+            });
+          return assets;
+        } catch (e) {
+          console.error(e);
+          throw e;
+        }
+      };
+
+         /**
+ * Add NFT transaction
+ *
+ * @author Allyn j. Alford <Allyn@tenablylabs.com>
+ * @async
+ * @function _addNftTx
+ * @param {String} owner - nft owner ethereum wallet address
+ * @param {String} contractAddressTokenId - NFT Contract Address combined with tokenId
+ * @param {Number} cost
+ * @param {Number} value
+ * @param {Number} gasUsed
+ * @return {Promise<Array>} Response Array for next step to process.
+ */
+    module.exports._addNftTx = async (owner, contractAddressTokenId, cost, value, gasUsed) => {
+      try {
+        return await dynamo.saveItemInDB({
+          TableName: process.env.DYNAMODB_TABLE_WALLET_NFT_TX,
+          Item: {
+            owner,
+            contractAddressTokenId,
+            cost, 
+            value, 
+            gasUsed,
+            dt: dateformat(new Date(), "isoUtcDateTime"),
+            timestamp: new Date().getTime(),
+          },
+        });
+      } catch (e) {
+        console.error(e);
+        throw e;
+      }
+    };

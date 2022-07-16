@@ -1,0 +1,7 @@
+	
+burnanceServerlessCDN:
+  component: "@serverless/cdn"
+  inputs:
+    region: us-east-1
+    domain: cdn.burnance.io
+    bucketName: cdn.burnance.io.Bucket
