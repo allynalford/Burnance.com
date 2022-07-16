@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Container, Row, Col } from "reactstrap";
 import {getChain} from "../../common/config";
 import Asset from "./Assset";
+import ReactPaginate from 'react-paginate';
 var endpoint = require('../../common/endpoint');
 
 
@@ -11,7 +12,10 @@ class MostViewedProducts extends Component {
     this.state = {
       ethereumAddress: '',
       walletConnected: false,
-      nfts: []
+      nfts: [],
+      pageNumber: 0,
+      pageSize: 20,
+      totalPages: 0,
     };
     this.getNFTs.bind(this);
     this.accountsChanged.bind(this);
@@ -48,7 +52,7 @@ accountsChanged = () => {
           walletConnected: true,
         });
         //console.log('account', window.ethereum._state.accounts[0])
-        this.getNFTs(window.ethereum._state.accounts[0]);
+        this.getNFTs(window.ethereum._state.accounts[0], 1);
       }
     } else {
       alert('install metamask extension!!');
@@ -57,26 +61,22 @@ accountsChanged = () => {
   }
 
 
-  shouldComponentUpdate(nextProps, nextState) {
-    if (this.state.walletConnected === nextState.walletConnected) {
-        return true
-    }
-    else {
-        return false
-    }
-  }
+ 
 
   //Add try/catch to this function
-  getNFTs = async (ethereumAddress) => {
+  getNFTs = async (ethereumAddress, pageNumber) => {
       //Call the service to get the NFTs
-      const ERC721s = await endpoint._post(getChain()['eth'].getWalletNFTsApiUrl, {address: ethereumAddress, chain: 'ethereum', pageNumber: 1});
+      const ERC721s = await endpoint._post(getChain()['eth'].getWalletNFTsApiUrl, {address: ethereumAddress, chain: 'ethereum', pageNumber});
       //console.log('ERC721s', ERC721s);
       let nfts = ERC721s.data.ERC721s.assets;
       //Set the NFTs value
-      this.setState({nfts});
+      this.setState({nfts, pageNumber: ERC721s.data.ERC721s.pageNumber, pageSize: 20, totalPages: ERC721s.data.ERC721s.totalPages});
   };
 
-
+  ChangePage = (event) => {
+    console.log(event.selected);
+    this.getNFTs(this.state.ethereumAddress, event.selected);
+  };
 
   render() {
     return (
@@ -87,10 +87,34 @@ accountsChanged = () => {
               <h5 className="mb-0">Your NFT's</h5>
             </Col>
           </Row>
+          <Col xs={12}>
+          <div className="mt-4 pt-2">
+          <ReactPaginate
+              breakLabel="..."
+              nextLabel="next >"
+              onPageChange={this.ChangePage}
+              pageRangeDisplayed={5}
+              pageCount={this.state.totalPages}
+              previousLabel="< previous"
+              renderOnZeroPageCount={null}
+              pageClassName="page-item"
+              pageLinkClassName="page-link"
+              previousClassName="page-item"
+              previousLinkClassName="page-link"
+              nextClassName="page-item"
+              nextLinkClassName="page-link"
+              breakClassName="page-item"
+              breakLinkClassName="page-link"
+              containerClassName="pagination"
+              activeClassName="active"
+            />
+                </div>
+           
+          </Col>
           <Row>
             {this.state.nfts.map((nft, key) => (
               <Col key={key} lg={3} md={6} xs={12} className="mt-4 pt-2">
-                <Asset nft={nft}/>
+                <Asset nft={nft} />
               </Col>
             ))}
           </Row>
