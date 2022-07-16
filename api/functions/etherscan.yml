@@ -8,3 +8,13 @@
           method: post
           authorizer: aws_iam
           cors: true
+  viewNFTtx:
+    handler: etherscan/handler.tokenNftTx
+    memorySize: 128 # optional, in MB, default is 1024
+    timeout: 30 # optional, in seconds, default is 6
+    events:
+      - http:
+          path: etherscan/tokenNftTx
+          method: post
+          authorizer: aws_iam
+          cors: true        

@@ -36,7 +36,7 @@ const endpoint = require('../common/endpoint');
  */
  module.exports._tokenNftTx = async (contractaddress, address) => {
     try {
-        const response = await endpoint._get(`${process.env.ETHERSCAN_API_URL}?module=account&action=tokennfttx$contractaddress=${contractaddress}&address=${address}&sort=asc&apikey=${process.env.API_KEY_TOKEN}`);
+        const response = await endpoint._get(`${process.env.ETHERSCAN_API_URL}?module=account&action=tokennfttx&contractaddress=${contractaddress}&address=${address}&sort=asc&apikey=${process.env.API_KEY_TOKEN}`);
         return response.data;
     } catch (e) {
         console.error(e);
@@ -55,7 +55,8 @@ const endpoint = require('../common/endpoint');
  */
 module.exports._ethDailyPrice = async (startdate, enddate) => {
     try {
-        const response = await endpoint._get(`${process.env.ETHERSCAN_API_URL}?module=stats&action=ethdailyprice$startdate=${startdate}&enddate=${enddate}&sort=asc&apikey=${process.env.API_KEY_TOKEN}`);
+        console.log(`${process.env.ETHERSCAN_API_URL}?module=stats&action=ethdailyprice&startdate=${startdate}&enddate=${enddate}&sort=asc&apikey=${process.env.API_KEY_TOKEN}`);
+        const response = await endpoint._get(`${process.env.ETHERSCAN_API_URL}?module=stats&action=ethdailyprice&startdate=${startdate}&enddate=${enddate}&sort=asc&apikey=${process.env.API_KEY_TOKEN}`);
         return response.data;
     } catch (e) {
         console.error(e);
@@ -84,6 +85,23 @@ module.exports._getProvider = async (node) => {
     try {
         const provider = new ethers.providers.WebSocketProvider(node);
         return provider;
+    } catch (e) {
+        console.error(e);
+    }
+};
+
+module.exports._getWeb3Provider = async (provider) => {
+    try {
+
+        var Web3 = require('web3');
+        //var web3Provider = new Web3.providers.HttpProvider(provider);
+        var web3 = new Web3(provider);
+
+
+        //const Web3 = require('web3');
+        //const provider = Web3.HTTPProvider("https://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/")
+        //var web3 = new Web3(provider);
+        return web3;
     } catch (e) {
         console.error(e);
     }

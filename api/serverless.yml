@@ -16,6 +16,7 @@ provider:
     USER_AGENT: ${file(config.${self:provider.stage}.json):USER_AGENT}
     CDN_BUCKET: ${file(config.${self:provider.stage}.json):CDN_BUCKET}
     QUICK_NODE_HTTP: ${file(config.${self:provider.stage}.json):QUICK_NODE_HTTP}
+    QUICK_NODE_WSS: ${file(config.${self:provider.stage}.json):QUICK_NODE_WSS}
     ETHERSCAN_API_URL: ${file(config.${self:provider.stage}.json):ETHERSCAN_API_URL}
     API_KEY_TOKEN: ${file(config.${self:provider.stage}.json):API_KEY_TOKEN}
     PRO_API_KEY: ${file(config.${self:provider.stage}.json):PRO_API_KEY}
