@@ -65,6 +65,7 @@ accountsChanged = () => {
 
   //Add try/catch to this function
   getNFTs = async (ethereumAddress, pageNumber) => {
+    console.log('Loading Page:', pageNumber)
       //Call the service to get the NFTs
       const ERC721s = await endpoint._post(getChain()['eth'].getWalletNFTsApiUrl, {address: ethereumAddress, chain: 'ethereum', pageNumber});
       //console.log('ERC721s', ERC721s);
@@ -74,8 +75,8 @@ accountsChanged = () => {
   };
 
   ChangePage = (event) => {
-    console.log(event.selected);
-    this.getNFTs(this.state.ethereumAddress, event.selected);
+    const pageNumber = event.selected + 1;
+    this.getNFTs(this.state.ethereumAddress, pageNumber);
   };
 
   render() {
@@ -87,7 +88,7 @@ accountsChanged = () => {
               <h5 className="mb-0">Your NFT's</h5>
             </Col>
           </Row>
-          <Col xs={12}>
+          {(this.state.walletConnected ? <Col xs={12}>
           <div className="mt-4 pt-2">
           <ReactPaginate
               breakLabel="..."
@@ -110,7 +111,7 @@ accountsChanged = () => {
             />
                 </div>
            
-          </Col>
+          </Col> : "")}
           <Row>
             {this.state.nfts.map((nft, key) => (
               <Col key={key} lg={3} md={6} xs={12} className="mt-4 pt-2">
