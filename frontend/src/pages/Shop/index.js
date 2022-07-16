@@ -26,8 +26,6 @@ class Index extends Component {
       ethBalance: '',
     };
 
-    this.getEthBalance.bind(this);
-    this.connectWallet.bind(this);
     this.accountsChanged.bind(this);
   }
 
@@ -48,9 +46,7 @@ class Index extends Component {
         //console.log('account', window.ethereum._state.accounts[0])
         this.getEthBalance(window.ethereum._state.accounts[0]);
       }
-    } else {
-      alert('install metamask extension!!');
-    }
+    } 
   }
 
   // Make sure to remove the DOM listener when the component is unmounted.
@@ -73,45 +69,7 @@ class Index extends Component {
   }
 };
 
-  connectWallet = () => {
-    Event("connectWallet", "Connection Request", "connect")
-    if (window.ethereum) {
-      // Do something
-      window.ethereum.request({ method: 'eth_requestAccounts' }).then((ethereumAddress) => {
-        this.setState({ethereumAddress, walletConnected: true});
-        this.getEthBalance(ethereumAddress);
-        Event("connectWallet", "Connection Made", "connected");
-        
-      });
 
-      window.ethereum.on('accountsChanged', this.accountsChanged);
-
-    } else {
-      alert('install metamask extension!!');
-      Event("connectWallet", "MetaMask", "missing")
-    }
-  };
-
-
-  getEthBalance = (address) => {
-    if (window.ethereum) {
-      window.ethereum
-        .request({
-          method: 'eth_getBalance',
-          params: [address, 'latest'],
-        })
-        .then((balance) => {
-          // Return string value to convert it into int balance
-          //console.log(balance)
-
-          // Yarn add ethers for using ethers utils or
-          // npm install ethers
-          //console.log(ethers.utils.formatEther(balance))
-          this.setState({ ethBalance: ethers.utils.formatEther(balance) });
-          // Format the string into main latest balance
-        });
-    }
-  };
 
   scrollNavigation = () => {
     var doc = document.documentElement;

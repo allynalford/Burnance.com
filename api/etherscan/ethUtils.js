@@ -5,6 +5,25 @@
 const ethers = require("ethers");
 const endpoint = require('../common/endpoint');
 
+
+/**
+ * Returns transactions by hash
+ *
+ * @author Allyn j. Alford <Allyn@tenablylabs.com>
+ * @async
+ * @function _txListInternal
+ * @param {String} txhash - ethereum tx hash
+ * @return {Promise<Array>} Response Array for next step to process.
+ */
+ module.exports._txListInternal = async (txhash) => {
+    try {
+        const response = await endpoint._get(`${process.env.ETHERSCAN_API_URL}?module=account&action=txlistinternal&txhash=${txhash}&apikey=${process.env.API_KEY_TOKEN}`);
+        return response.data;
+    } catch (e) {
+        console.error(e);
+    }
+};
+
 /**
  * Returns the ERC-721 token inventory of an address, filtered by contract address. This endpoint is throttled to 2 calls/second regardless of API Pro tier.
  *
@@ -55,8 +74,7 @@ const endpoint = require('../common/endpoint');
  */
 module.exports._ethDailyPrice = async (startdate, enddate) => {
     try {
-        console.log(`${process.env.ETHERSCAN_API_URL}?module=stats&action=ethdailyprice&startdate=${startdate}&enddate=${enddate}&sort=asc&apikey=${process.env.API_KEY_TOKEN}`);
-        const response = await endpoint._get(`${process.env.ETHERSCAN_API_URL}?module=stats&action=ethdailyprice&startdate=${startdate}&enddate=${enddate}&sort=asc&apikey=${process.env.API_KEY_TOKEN}`);
+         const response = await endpoint._get(`${process.env.ETHERSCAN_API_URL}?module=stats&action=ethdailyprice&startdate=${startdate}&enddate=${enddate}&sort=asc&apikey=${process.env.API_KEY_TOKEN}`);
         return response.data;
     } catch (e) {
         console.error(e);

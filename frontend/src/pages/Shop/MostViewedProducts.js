@@ -54,9 +54,7 @@ accountsChanged = () => {
         //console.log('account', window.ethereum._state.accounts[0])
         this.getNFTs(window.ethereum._state.accounts[0], 1);
       }
-    } else {
-      alert('install metamask extension!!');
-    }
+    } 
 
   }
 
