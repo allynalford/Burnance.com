@@ -1,0 +1,10 @@
+  qn_fetchNFTs:
+    handler: quicknode/handler.qn_fetchNFTs
+    memorySize: 128 # optional, in MB, default is 1024
+    timeout: 30 # optional, in seconds, default is 6
+    events:
+      - http:
+          path: quicknode/qn_fetchNFTs
+          method: post
+          authorizer: aws_iam
+          cors: true

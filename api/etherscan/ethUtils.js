@@ -5,7 +5,24 @@
 const ethers = require("ethers");
 const endpoint = require('../common/endpoint');
 
-
+/**
+ * Returns the ERC-721 token inventory of an address, filtered by contract address. This endpoint is throttled to 2 calls/second regardless of API Pro tier.
+ *
+ * @author Allyn j. Alford <Allyn@tenablylabs.com>
+ * @async
+ * @function _addressTokenNftInventory
+ * @param {String} contractAddress - ethereum contract address
+ * @param {String} address - ethereum wallet address
+ * @return {Promise<Array>} Response Array for next step to process.
+ */
+ module.exports._addressTokenNftInventory = async (contractaddress, address) => {
+    try {
+        const response = await endpoint._get(`${process.env.ETHERSCAN_API_URL}?module=account&action=tokennfttx$contractaddress=${contractaddress}&address=${address}&sort=asc&apikey=${process.env.API_KEY_TOKEN}`);
+        return response.data;
+    } catch (e) {
+        console.error(e);
+    }
+};
 
 /**
  * get an Ethereum token transactions by Contract address and wallet address

@@ -1,26 +1,52 @@
 import React, { Component } from "react";
-import { Card, CardBody } from "reactstrap";
+import { Card, CardBody, Button } from "reactstrap";
 import { Link } from "react-router-dom";
 import FeatherIcon from "feather-icons-react";
-import ethers from "ethers"
-import { NftProvider, useNft } from "use-nft"
+import {getChain} from "../../common/config";
+var endpoint = require('../../common/endpoint');
 
 class Asset extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      
+      nft: {}
     };
+    this.getNFT.bind(this);
   }
 
+  componentDidMount() {
+
+    const nft = this.props.nft;
+
+    //Check if the NFT has an image
+    if(nft.imageUrl === "" | nft.imageUrl === null){
+      //Since we don't. Call our service to get it
+      this.getNFT('ethereum', nft.collectionAddress, nft.collectionTokenId, nft);
+    }
+  }
+
+  getNFT = async (chain, contractAddress, tokenId, orgNft) => {
+    //Call the service to get the NFTs
+    const nftMetaData = await endpoint._post(getChain()['eth'].viewNFTApiUrl, {chain, contractAddress, tokenId});
+
+    //If we found the NFT use the image URL
+    if(nftMetaData.data.success === true){
+      const nft = orgNft;
+      nft.imageUrl = nftMetaData.data.metadata.imageUrl;
+      this.setState({nft});
+    }else{
+      //Otherwise the base NFT
+      this.setState({nft: orgNft});
+    }
+};
 
 
   render() {
     return (
       <React.Fragment>
                 <Card className="shop-list border-0 position-relative">
-                  <ul className="label list-unstyled mb-0">
-                    {product.isNew && (
+                  {/* <ul className="label list-unstyled mb-0">
+                    {this.props.nft.isNew && (
                       <li>
                         <Link
                           to="#"
@@ -30,29 +56,29 @@ class Asset extends Component {
                         </Link>
                       </li>
                     )}
-                    {product.isFeatured && (
+                    {this.props.nft.isFeatured && (
                       <li><Link to="#" className="badge badge-link rounded-pill bg-success">Featured</Link></li>
                     )}
-                    {product.isSale && (
+                    {this.props.nft.isSale && (
                       <li><Link to="#" className="badge badge-link rounded-pill bg-warning">Sale</Link></li>
                     )}
-                  </ul>
+                  </ul> */}
                   <ul className="shop-image position-relative overflow-hidden rounded shadow">
-                    <Link to="shop-product-detail">
+                    <a target={"_new"} href={`https://opensea.io/assets/ethereum/${this.props.nft.collectionAddress}/${this.props.nft.collectionTokenId}`}>
                       <img
-                        src={product.image}
+                        src={this.props.nft.imageUrl}
                         className="img-fluid"
-                        alt="shop"
+                        alt={this.props.nft.name}
                       />
-                    </Link>
-                    <Link to="shop-product-detail" className="overlay-work">
+                    </a>
+                    <a target={"_new"} href={`https://opensea.io/assets/ethereum/${this.props.nft.collectionAddress}/${this.props.nft.collectionTokenId}`} className="overlay-work">
                       <img
-                        src={product.imgOverlay}
+                        src={this.props.nft.imageUrl}
                         className="img-fluid"
-                        alt="shop"
+                        alt={this.props.nft.name}
                       />
-                    </Link>
-                    <ul className="list-unstyled shop-icons">
+                    </a>
+                    {/* <ul className="list-unstyled shop-icons">
                       <li>
                         <Link
                           to="#"
@@ -86,47 +112,31 @@ class Asset extends Component {
                           </i>
                         </Link>
                       </li>
-                    </ul>
+                    </ul> */}
                   </ul>
                   <CardBody className="content pt-4 p-2">
                     <Link
                       to="shop-product-detail"
                       className="text-dark product-name h6"
                     >
-                      {product.name}
+                      {this.props.nft.name}
                     </Link>
                     <div className="d-flex justify-content-between mt-1">
                       <h6 className="text-muted small fst-italic mb-0 mt-1">
-                        ${product.price}{" "}
-                        {product.oldPrice ? (
+                        ${this.props.nft.price}{" "}
+                        {this.props.nft.oldPrice ? (
                           <del className="text-danger ms-2">
-                            ${product.oldPrice}
+                            ${this.props.nft.oldPrice}
                           </del>
                         ) : null}
-                        {product.desc ? (
+                        {/* {this.props.nft.description ? (
                           <span className="text-success ms-1">
-                            {product.desc}
+                            {this.props.nft.description}
                           </span>
-                        ) : null}
+                        ) : null} */}
                       </h6>
-                      <ul className="list-unstyled text-warning mb-0">
-                        <li className="list-inline-item">
-                          <i className="mdi mdi-star me-1"></i>
-                        </li>
-                        <li className="list-inline-item">
-                          <i className="mdi mdi-star me-1"></i>
-                        </li>
-                        <li className="list-inline-item">
-                          <i className="mdi mdi-star me-1"></i>
-                        </li>
-                        <li className="list-inline-item">
-                          <i className="mdi mdi-star me-1"></i>
-                        </li>
-                        <li className="list-inline-item">
-                          <i className="mdi mdi-star"></i>
-                        </li>
-                      </ul>
                     </div>
+                    <Button>Burn NFT</Button>
                   </CardBody>
                 </Card>
       </React.Fragment>

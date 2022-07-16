@@ -5,8 +5,8 @@ const serverVars = {
   },
   chain: {
         eth: {
-         viewNFTApiUrl:
-          process.env.REACT_APP_BASE_API_URL + '/view/nft',
+         viewNFTApiUrl: process.env.REACT_APP_BASE_API_URL + '/view/nft',
+         getWalletNFTsApiUrl: process.env.REACT_APP_BASE_API_URL + '/quicknode/qn_fetchNFTs',
         }
   },
 };
@@ -18,8 +18,8 @@ const localVars = {
   },
   chain: {
         eth: {
-         viewNFTApiUrl:
-          process.env.REACT_APP_BASE_API_URL + '/view/nft',
+         viewNFTApiUrl: process.env.REACT_APP_BASE_API_URL + '/view/nft',
+         getWalletNFTsApiUrl: process.env.REACT_APP_BASE_API_URL + '/quicknode/qn_fetchNFTs',
         }
   },
 };
@@ -43,7 +43,7 @@ export function getUser() {
 
 export function getChain() {
   if (process.env.REACT_APP_STAGE === 'production') {
-    return serverVars.billing;
+    return serverVars.chain;
   }
-  return localVars.billing;
+  return localVars.chain;
 }

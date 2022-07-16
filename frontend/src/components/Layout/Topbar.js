@@ -9,15 +9,15 @@ class Topbar extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      ethereumAddress: "",
+      ethereumAddress: '',
       walletConnected: false,
       ethBalance: 0,
       isOpen: false,
       dropdownOpenShop: false,
       navLinks: [
         //Note : each child and nested child must have unique id
-        { id: 1, title: "Home", link: "/" },
-        ],
+        { id: 1, title: 'Home', link: '/' },
+      ],
       wishlistModal: false,
       dropdownIsOpen: false,
     };
@@ -29,6 +29,7 @@ class Topbar extends Component {
     this.toggleDropdownIsOpen.bind(this);
     this.connectWallet.bind(this);
     this.getEthBalance.bind(this);
+    this.accountsChanged.bind(this);
   }
 
   toggleWishlistModal = () => {
@@ -54,8 +55,8 @@ class Topbar extends Component {
 
   componentDidMount() {
     var matchingMenuItem = null;
-    var ul = document.getElementById("top-menu");
-    var items = ul.getElementsByTagName("a");
+    var ul = document.getElementById('top-menu');
+    var items = ul.getElementsByTagName('a');
     for (var i = 0; i < items.length; ++i) {
       if (this.props.location.pathname === items[i].pathname) {
         matchingMenuItem = items[i];
@@ -66,64 +67,81 @@ class Topbar extends Component {
       this.activateParentDropdown(matchingMenuItem);
     }
 
-    if(window.ethereum && window.ethereum._state.isConnected && typeof window.ethereum._state.accounts[0] !== "undefined"){
-      console.log("connected",window.ethereum._state);
-      this.setState({ethereumAddress: window.ethereum._state.accounts[0], walletConnected: true});
-      this.getEthBalance(window.ethereum._state.accounts[0]);
+    if (window.ethereum) {
+      window.ethereum.on('accountsChanged', this.accountsChanged);
+      if (
+        window.ethereum &&
+        window.ethereum._state.isConnected &&
+        typeof window.ethereum._state.accounts[0] !== 'undefined'
+      ) {
+        //console.log("connected",window.ethereum._state);
+        this.setState({
+          ethereumAddress: window.ethereum._state.accounts[0],
+          walletConnected: true,
+        });
+        this.getEthBalance(window.ethereum._state.accounts[0]);
+      }
     }
 
     initGA();
-
   }
 
   connectWallet = () => {
-    Event("connectWallet", "Connection Request", "connect")
+    Event('connectWallet', 'Connection Request', 'connect');
     if (window.ethereum) {
       // Do something
-      window.ethereum.request({ method: 'eth_requestAccounts' }).then((ethereumAddress) => {
-        this.setState({ethereumAddress, walletConnected: true});
-        this.getEthBalance(ethereumAddress);
-        Event("connectWallet", "Connection Made", "connected")
-      });
+      window.ethereum
+        .request({ method: 'eth_requestAccounts' })
+        .then((ethereumAddress) => {
+          this.setState({ ethereumAddress, walletConnected: true });
+          this.getEthBalance(ethereumAddress);
+          Event('connectWallet', 'Connection Made', 'connected');
+        });
     } else {
       alert('install metamask extension!!');
-      Event("connectWallet", "MetaMask", "missing")
+      Event('connectWallet', 'MetaMask', 'missing');
     }
   };
 
-  getEthBalance = (address)=>{
-    console.log(address)
-    if(window.ethereum){
-      window.ethereum.request({
-        method:'eth_getBalance', 
-        params: [address, 'latest']
-    }).then(balance => {
-        // Return string value to convert it into int balance
-        console.log(balance) 
-          
-        // Yarn add ethers for using ethers utils or
-        // npm install ethers
-        console.log(ethers.utils.formatEther(balance))
-        // Format the string into main latest balance
-    })
+  accountsChanged = () => {
+    if (typeof window.ethereum._state.accounts[0] === 'undefined') {
+      this.setState({ walletConnected: false, ethereumAddress: '' });
     }
-  }
+  };
+
+  getEthBalance = (address) => {
+    if (window.ethereum) {
+      window.ethereum
+        .request({
+          method: 'eth_getBalance',
+          params: [address, 'latest'],
+        })
+        .then((balance) => {
+          // Return string value to convert it into int balance
+          //console.log(balance)
+          // Yarn add ethers for using ethers utils or
+          // npm install ethers
+          //console.log(ethers.utils.formatEther(balance))
+          // Format the string into main latest balance
+        });
+    }
+  };
 
   activateParentDropdown = (item) => {
     const parent = item.parentElement;
     if (parent) {
-      parent.classList.add("active"); // li
+      parent.classList.add('active'); // li
       const parent1 = parent.parentElement;
-      parent1.classList.add("active"); // li
+      parent1.classList.add('active'); // li
       if (parent1) {
         const parent2 = parent1.parentElement;
-        parent2.classList.add("active"); // li
+        parent2.classList.add('active'); // li
         if (parent2) {
           const parent3 = parent2.parentElement;
-          parent3.classList.add("active"); // li
+          parent3.classList.add('active'); // li
           if (parent3) {
             const parent4 = parent3.parentElement;
-            parent4.classList.add("active"); // li
+            parent4.classList.add('active'); // li
           }
         }
       }
@@ -136,7 +154,7 @@ class Topbar extends Component {
       //Match level 2 id
       tmpLink.id === level2_id
         ? (tmpLink.isOpenSubMenu = !tmpLink.isOpenSubMenu)
-        : false
+        : false,
     );
     this.setState({ navLinks: tmpLinks });
   };
@@ -147,13 +165,13 @@ class Topbar extends Component {
       //Match level 2 id
       tmpLink.id === level2_id
         ? tmpLink.child.map((tmpchild) =>
-          //if level1 id is matched then match level 3 id
-          tmpchild.id === level3_id
-            ? //if id is matched then update status(level 3 sub menu will be open)
-            (tmpchild.isOpenNestedSubMenu = !tmpchild.isOpenNestedSubMenu)
-            : (tmpchild.isOpenNestedSubMenu = false)
-        )
-        : false
+            //if level1 id is matched then match level 3 id
+            tmpchild.id === level3_id
+              ? //if id is matched then update status(level 3 sub menu will be open)
+                (tmpchild.isOpenNestedSubMenu = !tmpchild.isOpenNestedSubMenu)
+              : (tmpchild.isOpenNestedSubMenu = false),
+          )
+        : false,
     );
     this.setState({ navLinks: tmpLinks });
   };
@@ -183,22 +201,24 @@ class Topbar extends Component {
               }
             </div> */}
 
-              <div className="buy-button">
-                    <Link
-                      to="#"
-                      target="_blank"
-                      className="btn btn-pills"
-                      style={{ backgroundColor: '#ff914d'}}
-                      onClick={e => {
-                        e.preventDefault();
-                        if(this.state.walletConnected === false){
-                          this.connectWallet();
-                        }
-                      }}>{(this.state.walletConnected && this.state.ethereumAddress !== "" ? "Connected" : "Connect Wallet")}
-                    </Link>
-                    {/* <Button style={{backgroundColor: '#D47500'}}>Connect Wallet</Button> */}
-                  </div>
-
+            <div className="buy-button">
+              <Link
+                to="#"
+                target="_blank"
+                className="btn btn-pills"
+                style={{ backgroundColor: '#ff914d' }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (this.state.walletConnected === false) {
+                    this.connectWallet();
+                  }
+                }}
+              >
+                {this.state.walletConnected && this.state.ethereumAddress !== ''
+                  ? 'Connected'
+                  : 'Connect Wallet'}
+              </Link>
+            </div>
 
             <div className="menu-extras">
               <div className="menu-item">
@@ -207,7 +227,7 @@ class Topbar extends Component {
                   aria-label="Toggle menu"
                   onClick={this.toggleLine}
                   className={
-                    this.state.isOpen ? "navbar-toggle open" : "navbar-toggle"
+                    this.state.isOpen ? 'navbar-toggle open' : 'navbar-toggle'
                   }
                 >
                   <div className="lines">
@@ -221,7 +241,7 @@ class Topbar extends Component {
 
             <div
               id="navigation"
-              style={{ display: this.state.isOpen ? "block" : "none" }}
+              style={{ display: this.state.isOpen ? 'block' : 'none' }}
             >
               <ul className="navigation-menu" id="top-menu">
                 {this.state.navLinks.map((navLink, key) =>
@@ -244,8 +264,8 @@ class Topbar extends Component {
                         <ul
                           className={
                             navLink.isOpenSubMenu
-                              ? "submenu megamenu open"
-                              : "submenu megamenu"
+                              ? 'submenu megamenu open'
+                              : 'submenu megamenu'
                           }
                         >
                           <li>
@@ -253,11 +273,9 @@ class Topbar extends Component {
                               {navLink.child.map((item, childKey) =>
                                 item.id < 12 ? (
                                   <li key={childKey}>
-                                    <Link to={item.link}>
-                                      {item.title}
-                                    </Link>
+                                    <Link to={item.link}>{item.title}</Link>
                                   </li>
-                                ) : null
+                                ) : null,
                               )}
                             </ul>
                           </li>
@@ -275,7 +293,7 @@ class Topbar extends Component {
                                       ) : null}
                                     </Link>
                                   </li>
-                                ) : null
+                                ) : null,
                               )}
                             </ul>
                           </li>
@@ -303,7 +321,7 @@ class Topbar extends Component {
                                       ) : null}
                                     </Link>
                                   </li>
-                                ) : null
+                                ) : null,
                               )}
                             </ul>
                           </li>
@@ -327,7 +345,7 @@ class Topbar extends Component {
                                       ) : null}
                                     </Link>
                                   </li>
-                                ) : null
+                                ) : null,
                               )}
                             </ul>
                           </li>
@@ -351,7 +369,7 @@ class Topbar extends Component {
                                       ) : null}
                                     </Link>
                                   </li>
-                                ) : null
+                                ) : null,
                               )}
                             </ul>
                           </li>
@@ -360,7 +378,7 @@ class Topbar extends Component {
                         // if menu is not mega menu(1grid)
                         <ul
                           className={
-                            navLink.isOpenSubMenu ? "submenu open" : "submenu"
+                            navLink.isOpenSubMenu ? 'submenu open' : 'submenu'
                           }
                         >
                           {navLink.child.map((childArray, childKey) =>
@@ -373,11 +391,11 @@ class Topbar extends Component {
                                     event.preventDefault();
                                     this.openNestedBlock(
                                       navLink.id,
-                                      childArray.id
+                                      childArray.id,
                                     );
                                   }}
                                 >
-                                  {childArray.title}{" "}
+                                  {childArray.title}{' '}
                                   {childArray.isNew ? (
                                     <span className="badge badge-pill badge-success">
                                       Added
@@ -388,8 +406,8 @@ class Topbar extends Component {
                                 <ul
                                   className={
                                     childArray.isOpenNestedSubMenu
-                                      ? "submenu open"
-                                      : "submenu"
+                                      ? 'submenu open'
+                                      : 'submenu'
                                   }
                                 >
                                   {childArray.nestedChild.map(
@@ -397,7 +415,7 @@ class Topbar extends Component {
                                       // nested sub menu item - Level 3
                                       <li key={nestedKey}>
                                         <Link to={nestedChildArray.link}>
-                                          {nestedChildArray.title}{" "}
+                                          {nestedChildArray.title}{' '}
                                           {nestedChildArray.isNewPage ? (
                                             <span className="badge badge-danger rounded">
                                               NEW
@@ -410,7 +428,7 @@ class Topbar extends Component {
                                           ) : null}
                                         </Link>
                                       </li>
-                                    )
+                                    ),
                                   )}
                                 </ul>
                               </li>
@@ -420,16 +438,23 @@ class Topbar extends Component {
                                   {childArray.title}
                                 </Link>
                               </li>
-                            )
+                            ),
                           )}
                         </ul>
                       )}
                     </li>
                   ) : (
                     <li key={key}>
-                      {typeof navLink.external !== "undefined" && navLink.external === true ? <a href={navLink.link} target="_new">{navLink.title}</a> : <Link to={navLink.link}>{navLink.title}</Link>}
+                      {typeof navLink.external !== 'undefined' &&
+                      navLink.external === true ? (
+                        <a href={navLink.link} target="_new">
+                          {navLink.title}
+                        </a>
+                      ) : (
+                        <Link to={navLink.link}>{navLink.title}</Link>
+                      )}
                     </li>
-                  )
+                  ),
                 )}
               </ul>
             </div>

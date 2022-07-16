@@ -14,7 +14,7 @@ import FeatherIcon from "feather-icons-react";
 import imgbg from "../../assets/images/account/bg.png";
 import profile from "../../assets/images/client/05.jpg";
 import { ethers } from "ethers";
-
+import {Event, initGA, PageView} from "../../common/gaUtils";
 var timer;
 
 class Index extends Component {
@@ -27,24 +27,26 @@ class Index extends Component {
     };
 
     this.getEthBalance.bind(this);
-    this.startTimer.bind(this);
-    this.checkConnection.bind(this);
+    this.connectWallet.bind(this);
+    this.accountsChanged.bind(this);
   }
 
   componentDidMount() {
     document.body.classList = '';
     window.addEventListener('scroll', this.scrollNavigation, true);
 
+    initGA();
+    PageView();
+
     if (window.ethereum) {
+      window.ethereum.on('accountsChanged', this.accountsChanged);
       if (window.ethereum._state.isConnected && typeof window.ethereum._state.accounts[0] !== "undefined") {
         this.setState({
           ethereumAddress: window.ethereum._state.accounts[0],
           walletConnected: true,
         });
+        //console.log('account', window.ethereum._state.accounts[0])
         this.getEthBalance(window.ethereum._state.accounts[0]);
-      }else{
-        console.log("Not Connected")
-        this.startTimer();
       }
     } else {
       alert('install metamask extension!!');
@@ -54,31 +56,41 @@ class Index extends Component {
   // Make sure to remove the DOM listener when the component is unmounted.
   componentWillUnmount() {
     window.removeEventListener('scroll', this.scrollNavigation, true);
+    //window.ethereum.off('disconnect', this.disconnect);
+  
   }
 
-  startTimer = () => {
-    console.log('starting timer');
+ accountsChanged = () => {
+  if (window.ethereum._state.isConnected && typeof window.ethereum._state.accounts[0] !== "undefined") {
+    this.setState({
+      ethereumAddress: window.ethereum._state.accounts[0],
+      walletConnected: true,
+    });
+    //console.log('account', window.ethereum._state.accounts[0])
+    this.getEthBalance(window.ethereum._state.accounts[0]);
+  }else if (typeof window.ethereum._state.accounts[0] === "undefined") {
+    this.setState({walletConnected: false, ethereumAddress: ""})
+  }
+};
 
-    timer = setInterval(this.checkConnection, 15000);
-  };
-
-  checkConnection = () =>{
+  connectWallet = () => {
+    Event("connectWallet", "Connection Request", "connect")
     if (window.ethereum) {
-      console.log("Running connection Check")
-      if (window.ethereum._state.isConnected && typeof window.ethereum._state.accounts[0] !== "undefined") {
-        console.log("Connected")
-        this.setState({
-          ethereumAddress: window.ethereum._state.accounts[0],
-          walletConnected: true,
-        });
-        this.getEthBalance(window.ethereum._state.accounts[0]);
-        clearInterval(timer);
-        console.log('stopping timer');
-      }else{
-        console.log("Not connected");
-      }
+      // Do something
+      window.ethereum.request({ method: 'eth_requestAccounts' }).then((ethereumAddress) => {
+        this.setState({ethereumAddress, walletConnected: true});
+        this.getEthBalance(ethereumAddress);
+        Event("connectWallet", "Connection Made", "connected");
+        
+      });
+
+      window.ethereum.on('accountsChanged', this.accountsChanged);
+
+    } else {
+      alert('install metamask extension!!');
+      Event("connectWallet", "MetaMask", "missing")
     }
-  }
+  };
 
 
   getEthBalance = (address) => {
@@ -132,13 +144,13 @@ class Index extends Component {
                 >
                   <CardBody>
                     <Row className="align-items-center">
-                      <Col lg="2" md="3" className="text-md-start text-center">
+                      {/* <Col lg="2" md="3" className="text-md-start text-center">
                         <img
                           src={profile}
                           className="avatar avatar-large rounded-circle shadow d-block mx-auto"
                           alt=""
                         />
-                      </Col>
+                      </Col> */}
 
                       <Col lg="10" md="9">
                         <Row className="align-items-end">
@@ -149,7 +161,7 @@ class Index extends Component {
                             <h3 className="title mb-0">
                               {this.state.ethereumAddress}
                             </h3>
-                            <small className="text-muted h6 me-2">
+                            {/* <small className="text-muted h6 me-2">
                               Web Developer
                             </small>
                             <ul className="list-inline mb-0 mt-3">
@@ -183,34 +195,23 @@ class Index extends Component {
                                   krista_joseph
                                 </Link>
                               </li>
-                            </ul>
+                            </ul> */}
                           </Col>
                           <Col md="5" className="text-md-end text-center">
-                            <ul className="list-unstyled social-icon social mb-0 mt-4">
-                              <li className="list-inline-item">
-                                <Link to="#" className="rounded">
-                                  <i className="uil uil-user-plus align-middle"></i>
-                                </Link>
-                              </li>
-                              <li className="list-inline-item">
-                                <Link to="#" className="rounded">
-                                  <i className="uil uil-comment align-middle"></i>
-                                </Link>
-                              </li>
-                              <li className="list-inline-item">
-                                <Link to="#" className="rounded">
-                                  <i className="uil uil-bell align-middle"></i>
-                                </Link>
-                              </li>
-                              <li className="list-inline-item">
-                                <Link
-                                  to="/page-profile-edit"
-                                  className="rounded"
-                                >
-                                  <i className="uil uil-cog align-middle"></i>
-                                </Link>
-                              </li>
-                            </ul>
+                          {/* <Link
+                      to="#"
+                      target="_blank"
+                      className="btn btn-pills"
+                      style={{ backgroundColor: '#ff914d'}}
+                      onClick={e => {
+                        e.preventDefault();
+                        if(this.state.walletConnected === false){
+                          this.connectWallet();
+                        }else{
+                          console.log('Wallet Connected')
+                        }
+                      }}>{(this.state.walletConnected === true ? "Connected" : "Connect Wallet")}
+                    </Link> */}
                           </Col>
                         </Row>
                       </Col>
@@ -222,7 +223,7 @@ class Index extends Component {
           </Container>
         </section>
         <section className="section">
-          <MostViewedProducts ethereumAddress={this.state.ethereumAddress} />
+          <MostViewedProducts walletConnected={this.state.walletConnected} ethereumAddress={this.state.ethereumAddress} />
 
           {/* <TopCategories />
 

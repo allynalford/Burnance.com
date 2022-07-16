@@ -14,6 +14,12 @@
         "LogGroupName": "/aws/lambda/burnance-prod-addToWaitlist"
       }
     },
+    "QnUnderscorefetchNFTsLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/burnance-prod-qn_fetchNFTs"
+      }
+    },
     "IamRoleLambdaExecution": {
       "Type": "AWS::IAM::Role",
       "Properties": {
@@ -96,7 +102,8 @@
                     "arn:aws:dynamodb:us-east-1:*:table/burnance-prod-contract-abi",
                     "arn:aws:dynamodb:us-east-1:*:table/burnance-prod-waitlist",
                     "arn:aws:dynamodb:us-east-1:*:table/burnance-prod-wallet",
-                    "arn:aws:dynamodb:us-east-1:*:table/burnance-prod-wallet-nft"
+                    "arn:aws:dynamodb:us-east-1:*:table/burnance-prod-wallet-nft",
+                    "arn:aws:dynamodb:us-east-1:*:table/burnance-prod-wallet-nft-cache"
                   ]
                 }
               ]
@@ -124,7 +131,7 @@
       "Properties": {
         "Code": {
           "S3Bucket": "service.burnance.nodejs.lambdas.prod",
-          "S3Key": "serverless/burnance/prod/1657850744964-2022-07-15T02:05:44.964Z/burnance.zip"
+          "S3Key": "serverless/burnance/prod/1657934005945-2022-07-16T01:13:25.945Z/burnance.zip"
         },
         "Handler": "actions.view",
         "Runtime": "nodejs12.x",
@@ -138,8 +145,10 @@
             "ACCOUNTID": "297677912558",
             "USER_AGENT": "nft.burnance.io",
             "CDN_BUCKET": "nft.burnance.io",
+            "QUICK_NODE_HTTP": "https://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
             "ETHERSCAN_API_URL": "https://api.etherscan.io/api",
-            "API_KEY_TOKEN": "JC6KEHKVTY3ITGM8AUQRBXR9ZRF57SFA7C",
+            "API_KEY_TOKEN": "WWY6WGBKZCG5U8JEY2RNTXT1YWMMER6SPN",
+            "PRO_API_KEY": "TFSZVPV8PUQ2HZWWJAI6TPSASX72HRYNWS",
             "ETHERSCAN_ABI_PARAMS": "module=contract&action=getabi",
             "OPEN": "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",
             "SLACK_API_WAITLIST_WEBHOOK": "https://hooks.slack.com/services/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",
@@ -151,6 +160,7 @@
             "DYNAMODB_TABLE_WAITLIST": "burnance-prod-waitlist",
             "DYNAMODB_TABLE_WALLET": "burnance-prod-wallet",
             "DYNAMODB_TABLE_WALLET_NFT": "burnance-prod-wallet-nft",
+            "DYNAMODB_TABLE_WALLET_NFT_CACHE": "burnance-prod-wallet-nft-cache",
             "NODE": "wss://mainnet.infura.io/ws/v3/4168ad1b2f574ec1a6944fcb1d4d906c",
             "KEY": "adfb72ce9754e3cbc1e79e44a8e20804cebd3c4a347605c6a3462a8de05b8783"
           }
@@ -171,7 +181,7 @@
       "Properties": {
         "Code": {
           "S3Bucket": "service.burnance.nodejs.lambdas.prod",
-          "S3Key": "serverless/burnance/prod/1657850744964-2022-07-15T02:05:44.964Z/burnance.zip"
+          "S3Key": "serverless/burnance/prod/1657934005945-2022-07-16T01:13:25.945Z/burnance.zip"
         },
         "Handler": "waitlist/handler.add",
         "Runtime": "nodejs12.x",
@@ -185,8 +195,10 @@
             "ACCOUNTID": "297677912558",
             "USER_AGENT": "nft.burnance.io",
             "CDN_BUCKET": "nft.burnance.io",
+            "QUICK_NODE_HTTP": "https://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
             "ETHERSCAN_API_URL": "https://api.etherscan.io/api",
-            "API_KEY_TOKEN": "JC6KEHKVTY3ITGM8AUQRBXR9ZRF57SFA7C",
+            "API_KEY_TOKEN": "WWY6WGBKZCG5U8JEY2RNTXT1YWMMER6SPN",
+            "PRO_API_KEY": "TFSZVPV8PUQ2HZWWJAI6TPSASX72HRYNWS",
             "ETHERSCAN_ABI_PARAMS": "module=contract&action=getabi",
             "OPEN": "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",
             "SLACK_API_WAITLIST_WEBHOOK": "https://hooks.slack.com/services/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",
@@ -198,6 +210,7 @@
             "DYNAMODB_TABLE_WAITLIST": "burnance-prod-waitlist",
             "DYNAMODB_TABLE_WALLET": "burnance-prod-wallet",
             "DYNAMODB_TABLE_WALLET_NFT": "burnance-prod-wallet-nft",
+            "DYNAMODB_TABLE_WALLET_NFT_CACHE": "burnance-prod-wallet-nft-cache",
             "NODE": "wss://mainnet.infura.io/ws/v3/4168ad1b2f574ec1a6944fcb1d4d906c",
             "KEY": "adfb72ce9754e3cbc1e79e44a8e20804cebd3c4a347605c6a3462a8de05b8783"
           }
@@ -213,24 +226,84 @@
         "AddToWaitlistLogGroup"
       ]
     },
-    "AddToWaitlistLambdaVersione0NpZaMIFX1LYjI4SXzY6Mc3YbUzGEJEy8SvEgOKc": {
+    "QnUnderscorefetchNFTsLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": "service.burnance.nodejs.lambdas.prod",
+          "S3Key": "serverless/burnance/prod/1657934005945-2022-07-16T01:13:25.945Z/burnance.zip"
+        },
+        "Handler": "quicknode/handler.qn_fetchNFTs",
+        "Runtime": "nodejs12.x",
+        "FunctionName": "burnance-prod-qn_fetchNFTs",
+        "MemorySize": 128,
+        "Timeout": 30,
+        "Environment": {
+          "Variables": {
+            "STAGE": "prod",
+            "REGION": "us-east-1",
+            "ACCOUNTID": "297677912558",
+            "USER_AGENT": "nft.burnance.io",
+            "CDN_BUCKET": "nft.burnance.io",
+            "QUICK_NODE_HTTP": "https://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
+            "ETHERSCAN_API_URL": "https://api.etherscan.io/api",
+            "API_KEY_TOKEN": "WWY6WGBKZCG5U8JEY2RNTXT1YWMMER6SPN",
+            "PRO_API_KEY": "TFSZVPV8PUQ2HZWWJAI6TPSASX72HRYNWS",
+            "ETHERSCAN_ABI_PARAMS": "module=contract&action=getabi",
+            "OPEN": "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",
+            "SLACK_API_WAITLIST_WEBHOOK": "https://hooks.slack.com/services/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",
+            "DRIP": "d19af8d64382261d9cbd9762fdd07356",
+            "DRIP_ID": "4947055",
+            "S3_DRIP_CDN_BUCKET": "events.nft.burnance.io",
+            "DYNAMODB_TABLE_CONTRACT_ABI": "burnance-prod-contract-abi",
+            "DYNAMODB_TABLE_NFT_METADATA": "burnance-prod-nfts-metadata",
+            "DYNAMODB_TABLE_WAITLIST": "burnance-prod-waitlist",
+            "DYNAMODB_TABLE_WALLET": "burnance-prod-wallet",
+            "DYNAMODB_TABLE_WALLET_NFT": "burnance-prod-wallet-nft",
+            "DYNAMODB_TABLE_WALLET_NFT_CACHE": "burnance-prod-wallet-nft-cache",
+            "NODE": "wss://mainnet.infura.io/ws/v3/4168ad1b2f574ec1a6944fcb1d4d906c",
+            "KEY": "adfb72ce9754e3cbc1e79e44a8e20804cebd3c4a347605c6a3462a8de05b8783"
+          }
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        }
+      },
+      "DependsOn": [
+        "QnUnderscorefetchNFTsLogGroup"
+      ]
+    },
+    "AddToWaitlistLambdaVersionITu7xIeuKFBcIAmbg7GsRBHHaaRhPQFkf59T86O7g": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "AddToWaitlistLambdaFunction"
         },
-        "CodeSha256": "fuv6SqmMzqi0vSWkGdIYUApswmSBHdkfUrsfkAvko6Q="
+        "CodeSha256": "AoNuErCFUF+eriRoXfu2QtmqKAbARsQtqP4f7sJYNoA="
       }
     },
-    "ViewNFTLambdaVersion6syO0LFy76QFnxDLpQWdssPqVY7IoTxPCAIT65AI": {
+    "ViewNFTLambdaVersion97nCE8e1ix1aH8nrh0P8xD7PzFboZQKZGltLwfKFQM": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "ViewNFTLambdaFunction"
         },
-        "CodeSha256": "fuv6SqmMzqi0vSWkGdIYUApswmSBHdkfUrsfkAvko6Q="
+        "CodeSha256": "AoNuErCFUF+eriRoXfu2QtmqKAbARsQtqP4f7sJYNoA="
+      }
+    },
+    "QnUnderscorefetchNFTsLambdaVersionJstUWkRJhjPAmoGKFYVTUy1AnG45g4V0FdWxFlHqxw": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "QnUnderscorefetchNFTsLambdaFunction"
+        },
+        "CodeSha256": "AoNuErCFUF+eriRoXfu2QtmqKAbARsQtqP4f7sJYNoA="
       }
     },
     "ApiGatewayRestApi": {
@@ -294,6 +367,33 @@
           "Ref": "ApiGatewayResourceWaitlist"
         },
         "PathPart": "add",
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        }
+      }
+    },
+    "ApiGatewayResourceQuicknode": {
+      "Type": "AWS::ApiGateway::Resource",
+      "Properties": {
+        "ParentId": {
+          "Fn::GetAtt": [
+            "ApiGatewayRestApi",
+            "RootResourceId"
+          ]
+        },
+        "PathPart": "quicknode",
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        }
+      }
+    },
+    "ApiGatewayResourceQuicknodeQnfetchnfts": {
+      "Type": "AWS::ApiGateway::Resource",
+      "Properties": {
+        "ParentId": {
+          "Ref": "ApiGatewayResourceQuicknode"
+        },
+        "PathPart": "qn_fetchNFTs",
         "RestApiId": {
           "Ref": "ApiGatewayRestApi"
         }
@@ -383,6 +483,51 @@
         },
         "ResourceId": {
           "Ref": "ApiGatewayResourceWaitlistAdd"
+        },
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        }
+      }
+    },
+    "ApiGatewayMethodQuicknodeQnfetchnftsOptions": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "AuthorizationType": "NONE",
+        "HttpMethod": "OPTIONS",
+        "MethodResponses": [
+          {
+            "StatusCode": "200",
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Origin": true,
+              "method.response.header.Access-Control-Allow-Headers": true,
+              "method.response.header.Access-Control-Allow-Methods": true
+            },
+            "ResponseModels": {}
+          }
+        ],
+        "RequestParameters": {},
+        "Integration": {
+          "Type": "MOCK",
+          "RequestTemplates": {
+            "application/json": "{statusCode:200}"
+          },
+          "ContentHandling": "CONVERT_TO_TEXT",
+          "IntegrationResponses": [
+            {
+              "StatusCode": "200",
+              "ResponseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'",
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,POST'"
+              },
+              "ResponseTemplates": {
+                "application/json": ""
+              }
+            }
+          ]
+        },
+        "ResourceId": {
+          "Ref": "ApiGatewayResourceQuicknodeQnfetchnfts"
         },
         "RestApiId": {
           "Ref": "ApiGatewayRestApi"
@@ -481,7 +626,53 @@
         "AddToWaitlistLambdaPermissionApiGateway"
       ]
     },
-    "ApiGatewayDeployment1657850736540": {
+    "ApiGatewayMethodQuicknodeQnfetchnftsPost": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "HttpMethod": "POST",
+        "RequestParameters": {},
+        "ResourceId": {
+          "Ref": "ApiGatewayResourceQuicknodeQnfetchnfts"
+        },
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        },
+        "ApiKeyRequired": false,
+        "AuthorizationType": "AWS_IAM",
+        "Integration": {
+          "IntegrationHttpMethod": "POST",
+          "Type": "AWS_PROXY",
+          "Uri": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":apigateway:",
+                {
+                  "Ref": "AWS::Region"
+                },
+                ":lambda:path/2015-03-31/functions/",
+                {
+                  "Fn::GetAtt": [
+                    "QnUnderscorefetchNFTsLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "/invocations"
+              ]
+            ]
+          }
+        },
+        "MethodResponses": []
+      },
+      "DependsOn": [
+        "QnUnderscorefetchNFTsLambdaPermissionApiGateway"
+      ]
+    },
+    "ApiGatewayDeployment1657933996660": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
         "RestApiId": {
@@ -492,8 +683,10 @@
       "DependsOn": [
         "ApiGatewayMethodViewNftOptions",
         "ApiGatewayMethodWaitlistAddOptions",
+        "ApiGatewayMethodQuicknodeQnfetchnftsOptions",
         "ApiGatewayMethodViewNftPost",
-        "ApiGatewayMethodWaitlistAddPost"
+        "ApiGatewayMethodWaitlistAddPost",
+        "ApiGatewayMethodQuicknodeQnfetchnftsPost"
       ]
     },
     "ViewNFTLambdaPermissionApiGateway": {
@@ -570,6 +763,43 @@
         }
       }
     },
+    "QnUnderscorefetchNFTsLambdaPermissionApiGateway": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "QnUnderscorefetchNFTsLambdaFunction",
+            "Arn"
+          ]
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition"
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":",
+              {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "/*/*"
+            ]
+          ]
+        }
+      }
+    },
     "Bucket": {
       "Type": "AWS::S3::Bucket",
       "Properties": {
@@ -589,27 +819,26 @@
         "StatusCode": "401"
       }
     },
-    "WalletDynamoDBTable": {
+    "WalletNFTCacheDynamoDBTable": {
       "Type": "AWS::DynamoDB::Table",
-      "DeletionPolicy": "Retain",
       "Properties": {
         "AttributeDefinitions": [
           {
-            "AttributeName": "chain",
+            "AttributeName": "address",
             "AttributeType": "S"
           },
           {
-            "AttributeName": "address",
-            "AttributeType": "S"
+            "AttributeName": "page",
+            "AttributeType": "N"
           }
         ],
         "KeySchema": [
           {
-            "AttributeName": "chain",
+            "AttributeName": "address",
             "KeyType": "HASH"
           },
           {
-            "AttributeName": "address",
+            "AttributeName": "page",
             "KeyType": "RANGE"
           }
         ],
@@ -617,7 +846,7 @@
           "ReadCapacityUnits": 1,
           "WriteCapacityUnits": 1
         },
-        "TableName": "burnance-prod-wallet"
+        "TableName": "burnance-prod-wallet-nft-cache"
       }
     }
   },
@@ -631,7 +860,7 @@
     "AddToWaitlistLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "AddToWaitlistLambdaVersione0NpZaMIFX1LYjI4SXzY6Mc3YbUzGEJEy8SvEgOKc"
+        "Ref": "AddToWaitlistLambdaVersionITu7xIeuKFBcIAmbg7GsRBHHaaRhPQFkf59T86O7g"
       },
       "Export": {
         "Name": "sls-burnance-prod-AddToWaitlistLambdaFunctionQualifiedArn"
@@ -640,10 +869,19 @@
     "ViewNFTLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "ViewNFTLambdaVersion6syO0LFy76QFnxDLpQWdssPqVY7IoTxPCAIT65AI"
+        "Ref": "ViewNFTLambdaVersion97nCE8e1ix1aH8nrh0P8xD7PzFboZQKZGltLwfKFQM"
       },
       "Export": {
         "Name": "sls-burnance-prod-ViewNFTLambdaFunctionQualifiedArn"
+      }
+    },
+    "QnUnderscorefetchNFTsLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "QnUnderscorefetchNFTsLambdaVersionJstUWkRJhjPAmoGKFYVTUy1AnG45g4V0FdWxFlHqxw"
+      },
+      "Export": {
+        "Name": "sls-burnance-prod-QnUnderscorefetchNFTsLambdaFunctionQualifiedArn"
       }
     },
     "ServiceEndpoint": {
