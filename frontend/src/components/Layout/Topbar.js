@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import { withRouter } from "react-router";
 import {Container} from "reactstrap";
-import { ethers } from "ethers";
 import {Event, initGA} from "../../common/gaUtils";
 
 class Topbar extends Component {

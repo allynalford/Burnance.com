@@ -9,7 +9,7 @@ const _ = require('lodash');
 const dateformat = require("dateformat");
 
 module.exports.tokenNftTx = async (event) => {
-  let req, address, contractaddress, tokenId, cost;
+  let req, address, contractaddress, tokenId, cost, value, gasUsed;
 
   try {
     //Logging
@@ -73,11 +73,12 @@ module.exports.tokenNftTx = async (event) => {
    const txs = await etherscan._txListInternal(tokenNftTx.result[0].hash);
   
    //Loop thru the transactions and add up the values
-   let value = 0;
+   value = 0;
    for(const tx of txs.result){
        //Add all the values togethers
        value = (Number(value) + Number(tx.value));//First the value
-       value = (Number(value) + Number(tx.gasUsed));//Then the transaction cost in gas
+       cost = (Number(cost) + Number(value) + Number(tx.gasUsed));//Then the transaction cost in gas
+       gas = (Number(gas) + Number(tx.gasUsed));//Then the transaction cost in gas
    };
 
    console.log('value:', value);

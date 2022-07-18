@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { Card, CardBody, Button } from "reactstrap";
 import { Link } from "react-router-dom";
-import FeatherIcon from "feather-icons-react";
 import {getChain} from "../../common/config";
 var endpoint = require('../../common/endpoint');
 

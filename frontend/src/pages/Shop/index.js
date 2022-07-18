@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import MostViewedProducts from "./MostViewedProducts";
-import { Link } from "react-router-dom";
 import {
   Container,
   Row,
@@ -9,13 +8,9 @@ import {
   CardBody,
 } from "reactstrap";
 //Import Icons
-import FeatherIcon from "feather-icons-react";
 //Import Images
 import imgbg from "../../assets/images/account/bg.png";
-import profile from "../../assets/images/client/05.jpg";
-import { ethers } from "ethers";
-import {Event, initGA, PageView} from "../../common/gaUtils";
-var timer;
+import {initGA, PageView} from "../../common/gaUtils";
 
 class Index extends Component {
   constructor(props) {
@@ -44,7 +39,7 @@ class Index extends Component {
           walletConnected: true,
         });
         //console.log('account', window.ethereum._state.accounts[0])
-        this.getEthBalance(window.ethereum._state.accounts[0]);
+        //this.getEthBalance(window.ethereum._state.accounts[0]);
       }
     } 
   }
@@ -63,7 +58,7 @@ class Index extends Component {
       walletConnected: true,
     });
     //console.log('account', window.ethereum._state.accounts[0])
-    this.getEthBalance(window.ethereum._state.accounts[0]);
+    //this.getEthBalance(window.ethereum._state.accounts[0]);
   }else if (typeof window.ethereum._state.accounts[0] === "undefined") {
     this.setState({walletConnected: false, ethereumAddress: ""})
   }
