@@ -38,11 +38,7 @@ class Footer extends Component {
                 name="footercolumn"
               >
                 <Link to="/" className="logo-footer">
-                  <img
-                    src={logodark}
-                    height="118"
-                    alt="Burnance Logo"
-                  />
+                  <img src={logodark} height="118" alt="Burnance Logo" />
                 </Link>
                 <ul
                   className={
@@ -104,6 +100,19 @@ class Footer extends Component {
                     </a>
                   </li> */}
                 </ul>
+              </Col>
+              <Col md="6">
+                <h4 style={{ fontWeight: 'bold' }}>No Legal Advice Intended</h4>
+                <p>
+                  The contents of this website, and the posting and viewing of
+                  the information on this website, should not be construed as,
+                  and should not be relied upon for, legal or tax advice in any
+                  particular circumstance or fact situation.
+                </p>
+                <p>
+                  Burnance does not provide tax, legal or accounting advice. You
+                  should consult your own tax, legal and accounting advisors.
+                </p>
               </Col>
 
               {/* <Col
