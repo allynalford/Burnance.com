@@ -7,6 +7,7 @@ const serverVars = {
         eth: {
          viewNFTApiUrl: process.env.REACT_APP_BASE_API_URL + '/view/nft',
          getWalletNFTsApiUrl: process.env.REACT_APP_BASE_API_URL + '/quicknode/qn_fetchNFTs',
+         getNFTImageApiUrl: process.env.REACT_APP_BASE_API_URL + '/nft/image',
         }
   },
 };
@@ -20,6 +21,7 @@ const localVars = {
         eth: {
          viewNFTApiUrl: process.env.REACT_APP_BASE_API_URL + '/view/nft',
          getWalletNFTsApiUrl: process.env.REACT_APP_BASE_API_URL + '/quicknode/qn_fetchNFTs',
+         getNFTImageApiUrl: process.env.REACT_APP_BASE_API_URL + '/nft/image',
         }
   },
 };

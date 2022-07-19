@@ -15,6 +15,7 @@ provider:
     ACCOUNTID: ${file(config.${self:provider.stage}.json):AWS_ACT_ID}  
     USER_AGENT: ${file(config.${self:provider.stage}.json):USER_AGENT}
     CDN_BUCKET: ${file(config.${self:provider.stage}.json):CDN_BUCKET}
+    NFT_IMAGE_CDN_BUCKET: ${file(config.${self:provider.stage}.json):NFT_IMAGE_CDN_BUCKET}
     QUICK_NODE_HTTP: ${file(config.${self:provider.stage}.json):QUICK_NODE_HTTP}
     QUICK_NODE_WSS: ${file(config.${self:provider.stage}.json):QUICK_NODE_WSS}
     ETHERSCAN_API_URL: ${file(config.${self:provider.stage}.json):ETHERSCAN_API_URL}
@@ -28,6 +29,7 @@ provider:
     S3_DRIP_CDN_BUCKET: ${file(config.${self:provider.stage}.json):S3_DRIP_CDN_BUCKET}
     DYNAMODB_TABLE_CONTRACT_ABI: ${self:service}-${opt:stage, self:provider.stage}-contract-abi
     DYNAMODB_TABLE_NFT_METADATA: ${self:service}-${opt:stage, self:provider.stage}-nfts-metadata
+    DYNAMODB_TABLE_NFT_IMAGE: ${self:service}-${opt:stage, self:provider.stage}-nfts-image
     DYNAMODB_TABLE_WAITLIST: ${self:service}-${opt:stage, self:provider.stage}-waitlist
     DYNAMODB_TABLE_WALLET: ${self:service}-${opt:stage, self:provider.stage}-wallet
     DYNAMODB_TABLE_WALLET_NFT: ${self:service}-${opt:stage, self:provider.stage}-wallet-nft
@@ -41,7 +43,10 @@ provider:
         - s3:PutObject
         - s3:GetObject
         - s3:DeleteObject
-      Resource: "arn:aws:s3:::${file(config.${self:provider.stage}.json):CDN_BUCKET}/*"
+        - s3:*
+      Resource: 
+        - "arn:aws:s3:::${file(config.${self:provider.stage}.json):CDN_BUCKET}/*"
+        - "arn:aws:s3:::${file(config.${self:provider.stage}.json):NFT_IMAGE_CDN_BUCKET}/*"
     - Effect: Allow
       Action:
         - dynamodb:DescribeTable
@@ -59,70 +64,97 @@ provider:
         - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE_WALLET_NFT}"
         - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE_WALLET_NFT_CACHE}"
         - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE_WALLET_NFT_TX}"
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE_NFT_IMAGE}"
 package:
   individually: false
 functions:
+  - ${file(./functions/nft.yml)}
   - ${file(./functions/etherscan.yml)}
   - ${file(./functions/waitlist.yml)}  
   - ${file(./functions/quicknode.yml)} 
 resources:
   Resources:
-    Bucket:
-     Type: AWS::S3::Bucket
-     Properties:
-       BucketName: ${self:provider.environment.CDN_BUCKET} 
-    GatewayResponse:
-      Type: 'AWS::ApiGateway::GatewayResponse'
-      Properties:
-        ResponseParameters:
-          gatewayresponse.header.WWW-Authenticate: "'Basic'"
-        ResponseType: UNAUTHORIZED
-        RestApiId:
-          Ref: 'ApiGatewayRestApi'
-        StatusCode: '401'
-    WalletNFTtxDynamoDBTable:
+    # NFTImageBucket:
+    #  Type: AWS::S3::Bucket
+    #  Properties:
+    #    BucketName: ${self:provider.environment.NFT_IMAGE_CDN_BUCKET} 
+    # NFTBucket:
+    #  Type: AWS::S3::Bucket
+    #  Properties:
+    #    BucketName: ${self:provider.environment.CDN_BUCKET} 
+    # GatewayResponse:
+    #   Type: 'AWS::ApiGateway::GatewayResponse'
+    #   Properties:
+    #     ResponseParameters:
+    #       gatewayresponse.header.WWW-Authenticate: "'Basic'"
+    #     ResponseType: UNAUTHORIZED
+    #     RestApiId:
+    #       Ref: 'ApiGatewayRestApi'
+    #     StatusCode: '401'
+    NFTImageDynamoDBTable:
       Type: 'AWS::DynamoDB::Table'
-      DeletionPolicy: Retain
       Properties:
         AttributeDefinitions:
           -
-            AttributeName: owner
+            AttributeName: chainContractAddress
             AttributeType: S
           -  
-            AttributeName: contractAddressTokenId
-            AttributeType: S
+            AttributeName: tokenId
+            AttributeType: N
         KeySchema:
           -
-            AttributeName: owner
+            AttributeName: chainContractAddress
             KeyType: HASH
           -
-            AttributeName: contractAddressTokenId
+            AttributeName: tokenId
             KeyType: RANGE      
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-        TableName: ${self:provider.environment.DYNAMODB_TABLE_WALLET_NFT_TX}
-    # WalletNFTCacheDynamoDBTable:
+        TableName: ${self:provider.environment.DYNAMODB_TABLE_NFT_IMAGE}
+    # WalletNFTtxDynamoDBTable:
     #   Type: 'AWS::DynamoDB::Table'
+    #   DeletionPolicy: Retain
     #   Properties:
     #     AttributeDefinitions:
     #       -
-    #         AttributeName: address
+    #         AttributeName: owner
     #         AttributeType: S
     #       -  
-    #         AttributeName: page
-    #         AttributeType: N
+    #         AttributeName: contractAddressTokenId
+    #         AttributeType: S
     #     KeySchema:
     #       -
-    #         AttributeName: address
+    #         AttributeName: owner
     #         KeyType: HASH
     #       -
-    #         AttributeName: page
-    #         KeyType: RANGE  
+    #         AttributeName: contractAddressTokenId
+    #         KeyType: RANGE      
     #     ProvisionedThroughput:
     #       ReadCapacityUnits: 1
     #       WriteCapacityUnits: 1
-    #     TableName: ${self:provider.environment.DYNAMODB_TABLE_WALLET_NFT_CACHE}
+    #     TableName: ${self:provider.environment.DYNAMODB_TABLE_WALLET_NFT_TX}
+    WalletNFTCacheDynamoDBTable:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: address
+            AttributeType: S
+          -  
+            AttributeName: page
+            AttributeType: N
+        KeySchema:
+          -
+            AttributeName: address
+            KeyType: HASH
+          -
+            AttributeName: page
+            KeyType: RANGE  
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.environment.DYNAMODB_TABLE_WALLET_NFT_CACHE}
     # WalletDynamoDBTable:
     #   Type: 'AWS::DynamoDB::Table'
     #   DeletionPolicy: Retain
@@ -253,10 +285,11 @@ resources:
     #       WriteCapacityUnits: 2
     #     TableName: ${self:provider.environment.DYNAMODB_TABLE_CONTRACT_ABI}    
 custom:
-  tableThroughput: 1
-  prune:
-    automatic: true
-    number: 5   
+   tableThroughput: 1
+   prune:
+     automatic: true
+     number: 5   
 plugins:
   - serverless-offline
   - serverless-prune-plugin
+

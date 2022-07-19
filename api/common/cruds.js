@@ -22,6 +22,22 @@ module.exports._getNFT = async (contractAddress, tokenId, chain) => {
     }
 };
 
+module.exports._getNFTImage = async (contractAddress, tokenId, chain) => {
+    try {
+        return await dynamo.qetFromDB({
+            TableName: process.env.DYNAMODB_TABLE_NFT_IMAGE,
+            Key: {
+                chainContractAddress: chain + '-' + contractAddress,
+                tokenId
+            }
+        });
+    } catch (e) {
+        console.error('module.exports._getNFTImage',e);
+        log.error(err);
+        throw err;
+    }
+};
+
 module.exports._getABI = async (contractAddress, chain) => {
     try {
         return await dynamo.qetFromDB({
@@ -110,6 +126,50 @@ module.exports._saveNFT = async function (Item) {
         console.error(e);
         log.error(err);
         throw err;
+    }
+};
+
+module.exports._saveNFTImage = async function (chain, contractAddress, tokenId, key) {
+    try {
+        const dateFormat = require('dateformat');
+        const createDateTime = dateFormat(new Date(), "isoUtcDateTime")
+        return await dynamo.saveItemInDB({
+            TableName: process.env.DYNAMODB_TABLE_NFT_IMAGE,
+            Item : {
+                chainContractAddress: chain + '-' + contractAddress,
+                tokenId,
+                key,
+                createDateTime,
+                lastActivityDate: createDateTime
+            }
+        });
+    } catch (e) {
+        console.error(e);
+        log.error(err);
+        throw err;
+    }
+};
+
+module.exports._updateNFTImageLastActivityDate = async (chain, contractAddress, tokenId) =>{
+    try {
+        const dateFormat = require('dateformat');
+        await dynamo.updateDB({
+            TableName: process.env.DYNAMODB_TABLE_NFT_IMAGE,
+            Key: {
+                chainContractAddress: chain + '-' + contractAddress,
+                tokenId,
+            },
+            UpdateExpression: "set lastActivityDate = :ut",
+            ExpressionAttributeValues: {
+              ":ut": dateFormat(new Date(), "isoUtcDateTime")
+            },
+            ReturnValues: "UPDATED_NEW"
+          });
+        return true;
+    } catch (e) {
+        console.log(e);
+        log.error(e);
+        throw e;
     }
 };
 

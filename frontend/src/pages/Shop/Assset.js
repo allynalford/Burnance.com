@@ -8,34 +8,66 @@ class Asset extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      nft: {}
+      imageUrl: `${process.env.REACT_APP_BASE_CDN_URL}/loading.jpg`,
+      name: ""
     };
     this.getNFT.bind(this);
   }
 
   componentDidMount() {
 
-    const nft = this.props.nft;
-
-    //Check if the NFT has an image
-    if(nft.imageUrl === "" | nft.imageUrl === null){
+      //Check if the NFT has an image
+    if(this.props.nft.imageUrl === "" | this.props.nft.imageUrl === null){
       //Since we don't. Call our service to get it
-      this.getNFT('ethereum', nft.collectionAddress, nft.collectionTokenId, nft);
+      this.setState({imageUrl: `${process.env.REACT_APP_BASE_CDN_URL}/loading.jpg`});
+      //setTimeout(this.getNFT('ethereum', this.props.nft.collectionAddress, this.props.nft.collectionTokenId, "", 300), 5500);
+      this.getNFT('ethereum', this.props.nft.collectionAddress, this.props.nft.collectionTokenId, "", 300)
+    }else{
+      console.log('ELSE');
+      this.setState({imageUrl: this.props.nft.imageUrl});
+      //setTimeout(this.getNFT('ethereum', this.props.nft.collectionAddress, this.props.nft.collectionTokenId, this.props.nft.imageUrl, 300), 5500);
+      this.getNFT('ethereum', this.props.nft.collectionAddress, this.props.nft.collectionTokenId, this.props.nft.imageUrl, 300)
     }
   }
 
-  getNFT = async (chain, contractAddress, tokenId, orgNft) => {
-    //Call the service to get the NFTs
-    const nftMetaData = await endpoint._post(getChain()['eth'].viewNFTApiUrl, {chain, contractAddress, tokenId});
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps.nft !== this.props.nft) {
+      this.getNFT('ethereum', this.props.nft.collectionAddress, this.props.nft.collectionTokenId, "", 300);
+    }
+  }
 
-    //If we found the NFT use the image URL
-    if(nftMetaData.data.success === true){
-      const nft = orgNft;
-      nft.imageUrl = nftMetaData.data.metadata.imageUrl;
-      this.setState({nft});
-    }else{
-      //Otherwise the base NFT
-      this.setState({nft: orgNft});
+  shouldComponentUpdate(nextProps, nextState) {
+    if (nextState.imageUrl !== this.state.imageUrl) {
+      return true
+    } else if (nextProps.nft !== this.props.nft) {
+      return true
+    } else {
+      return false;
+    }
+  }
+
+  getNFT = async (chain, contractAddress, tokenId, imageUrl, Expires) => {
+    //console.log('Calling for: ', {chain, contractAddress, tokenId, imageUrl})
+    //Call the service to get the NFTs
+    try{
+      const nftMetaData = await endpoint._post(getChain()['eth'].getNFTImageApiUrl, {chain, contractAddress, tokenId, imageUrl, Expires});
+   
+      if (imageUrl === "") {
+        //If we found the NFT use the image URL
+        if (typeof nftMetaData.data !== "undefined") {
+          this.setState({ imageUrl: nftMetaData.data.imageUrl });
+          //console.log('Image URL set to:',  nftMetaData.data.imageUrl);
+        } else {
+          this.setState({ imageUrl: `${process.env.REACT_APP_BASE_CDN_URL}/default-image.jpg` });
+          //setTimeout(this.getNFT(chain, contractAddress, tokenId, imageUrl, 300), 70000);
+        }
+      }
+   
+
+    }catch(e){
+      console.error(e);
+      this.setState({imageUrl: `${process.env.REACT_APP_BASE_CDN_URL}/default-image.jpg`});
+      setTimeout(this.getNFT(chain, contractAddress, tokenId, imageUrl, 300), 15000);
     }
 };
 
@@ -65,14 +97,14 @@ class Asset extends Component {
                   <ul className="shop-image position-relative overflow-hidden rounded shadow">
                     <a target={"_new"} href={`https://opensea.io/assets/ethereum/${this.props.nft.collectionAddress}/${this.props.nft.collectionTokenId}`}>
                       <img
-                        src={this.props.nft.imageUrl}
+                        src={this.state.imageUrl}
                         className="img-fluid"
                         alt={this.props.nft.name}
                       />
                     </a>
                     <a target={"_new"} href={`https://opensea.io/assets/ethereum/${this.props.nft.collectionAddress}/${this.props.nft.collectionTokenId}`} className="overlay-work">
                       <img
-                        src={this.props.nft.imageUrl}
+                        src={this.state.imageUrl}
                         className="img-fluid"
                         alt={this.props.nft.name}
                       />

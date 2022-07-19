@@ -4,6 +4,7 @@
 "DOMAIN": "*",
 "AWS_ACT_ID": 297677912558 ,
 "CDN_BUCKET": "dev.nft.burnance.io",
+"NFT_IMAGE_CDN_BUCKET": "dev.image.nft.burnance.io",
 "USER_AGENT" : "dev.nft.burnance.io",
 "OPEN" : "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",
 "KEY" : "adfb72ce9754e3cbc1e79e44a8e20804cebd3c4a347605c6a3462a8de05b8783",

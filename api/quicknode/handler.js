@@ -46,7 +46,7 @@ module.exports.qn_fetchNFTs = async (event) => {
     
     //Check the cache for the page first
     let ERC721s = await quickNode._qn_fetchNFTsCache(address, pageNumber);
-    //console.log('ERC721s Cache', ERC721s.assets);
+    console.log('ERC721s Cache', ERC721s);
 
     if(typeof ERC721s === "undefined" || quickNode._isCacheExpired(ERC721s.timestamp) === true){
       //Let's call the API to get the first page
@@ -61,10 +61,12 @@ module.exports.qn_fetchNFTs = async (event) => {
         ERC721s = ERC721s.assets
     };
 
-    //Remove Shared Store front assets
-    _.remove(ERC721s.assets, function(currentObject) {
+    if (typeof ERC721s.assets !== "undefined") {
+      //Remove Shared Store front assets
+      _.remove(ERC721s.assets, function (currentObject) {
         return currentObject.collectionName === "OpenSea Shared Storefront";
-    });
+      });
+    }
 
 
     

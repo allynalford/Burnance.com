@@ -1,0 +1,10 @@
+  nftImage:
+    handler: actions.getNFTImage
+    memorySize: 128 # optional, in MB, default is 1024
+    timeout: 30 # optional, in seconds, default is 6
+    events:
+      - http:
+          path: nft/image
+          method: post
+          authorizer: aws_iam
+          cors: true     

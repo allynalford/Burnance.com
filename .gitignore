@@ -6,7 +6,9 @@ logs
 
 # dependencies
 /node_modules*
-
+/api/node_modules*
+/hardhat/node_modules*
+/frontend/node_modules*
 # testing
 /coverage
 

@@ -65,12 +65,28 @@ module.exports._getUrl = (bucket, key, expires, contenttype) =>{
     }
 };
 
-module.exports._generateGetUrl =(bucket, key, expires) =>{
+// module.exports._generateGetUrl =(bucket, key, expires) =>{
+//   try {
+//     return s3.getSignedUrl('getObject', {
+//       Bucket: bucket,
+//       Key: key,
+//       Expires: expires
+//     });
+//   } catch (err) {
+//     console.error(err);
+//     return { error: true, message: err.message, e: err };
+//   }
+// };
+
+module.exports._generateGetUrl = (bucket, key, expires) =>{
   try {
+    //const s3 = new AWS.S3({region: process.env.REGION, apiVersion: process.env.S3_API_VERSION, endpoint, s3BucketEndpoint: true});
     return s3.getSignedUrl('getObject', {
       Bucket: bucket,
       Key: key,
-      Expires: expires
+      Expires: expires,
+      //ResponseContentType,
+      //ResponseContentDisposition: 'inline',
     });
   } catch (err) {
     console.error(err);

@@ -13,7 +13,7 @@ class MostViewedProducts extends Component {
       ethereumAddress: '',
       walletConnected: false,
       nfts: [],
-      pageNumber: 0,
+      pageNumber: 1,
       pageSize: 20,
       totalPages: 0,
     };
@@ -32,7 +32,7 @@ accountsChanged = () => {
     });
 
     //Get the NFTs
-    this.getNFTs(window.ethereum._state.accounts[0]);
+    this.getNFTs(window.ethereum._state.accounts[0], 1);
 
   }else if (typeof window.ethereum._state.accounts[0] === "undefined") {
     this.setState({nfts: [], walletConnected: false, ethereumAddress: ""})
@@ -63,13 +63,17 @@ accountsChanged = () => {
 
   //Add try/catch to this function
   getNFTs = async (ethereumAddress, pageNumber) => {
-    console.log('Loading Page:', pageNumber)
+    console.log('Loading Page:',pageNumber);
+    try {
       //Call the service to get the NFTs
-      const ERC721s = await endpoint._post(getChain()['eth'].getWalletNFTsApiUrl, {address: ethereumAddress, chain: 'ethereum', pageNumber});
-      //console.log('ERC721s', ERC721s);
+      const ERC721s = await endpoint._post(getChain()['eth'].getWalletNFTsApiUrl, { address: ethereumAddress, chain: 'ethereum', pageNumber });
+      //console.log('ERC721s', ERC721s.data.ERC721s);
       let nfts = ERC721s.data.ERC721s.assets;
       //Set the NFTs value
-      this.setState({nfts, pageNumber: ERC721s.data.ERC721s.pageNumber, pageSize: 20, totalPages: ERC721s.data.ERC721s.totalPages});
+      this.setState({ nfts, pageNumber: ERC721s.data.ERC721s.pageNumber, pageSize: 20, totalPages: ERC721s.data.ERC721s.totalPages });
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   ChangePage = (event) => {

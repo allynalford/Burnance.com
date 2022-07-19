@@ -34,13 +34,15 @@ module.exports._isCacheExpired = (timestamp) =>{
      const provider = new ethers.providers.JsonRpcProvider(
        process.env.QUICK_NODE_HTTP
      );
-     provider.connection.headers = { "x-qn-api-version": 1 };
-     const heads = await provider.send("qn_fetchNFTs", {
-       wallet,
-       omitFields: ["provenance", "traits"],
-       page,
-       perPage: 10,
-     });
+     //provider.connection.headers = { "x-qn-api-version": 1 };
+     const payload = {
+      wallet,
+      omitFields: ["provenance", "traits"],
+      page,
+      perPage: 5,
+    };
+    console.log(payload)
+     return await provider.send("qn_fetchNFTs", payload);
    } catch (e) {
      console.error(e);
      throw e;
