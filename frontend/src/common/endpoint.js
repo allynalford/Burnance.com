@@ -122,7 +122,7 @@ export const generateApiClient = (url, region, path, method) => {
             return axios.get(path);
         } catch (e) {
             console.log(e.message);
-            return {error: true, message: e.message, e: e};
+            throw e;
         }
     };
 /**

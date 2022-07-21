@@ -312,9 +312,7 @@ class Faqs extends Component {
                       </Link>
                       <Collapse isOpen={this.state.col3}>
                         <CardBody>
-                          <p className="text mb-0 faq-ans">
-                           ......
-                          </p>
+                          <p className="text mb-0 faq-ans">......</p>
                         </CardBody>
                       </Collapse>
                     </Card>
@@ -346,9 +344,7 @@ class Faqs extends Component {
                       </Link>
                       <Collapse isOpen={this.state.col4}>
                         <CardBody>
-                          <p className="text mb-0 faq-ans">
-                            .....
-                          </p>
+                          <p className="text mb-0 faq-ans">.....</p>
                         </CardBody>
                       </Collapse>
                     </Card>
@@ -380,9 +376,7 @@ class Faqs extends Component {
                       </Link>
                       <Collapse isOpen={this.state.col5}>
                         <CardBody>
-                          <p className="text mb-0 faq-ans">
-                            ......
-                          </p>
+                          <p className="text mb-0 faq-ans">......</p>
                         </CardBody>
                       </Collapse>
                     </Card>
@@ -415,9 +409,7 @@ class Faqs extends Component {
                       </Link>
                       <Collapse isOpen={this.state.col6}>
                         <CardBody>
-                          <p className="text mb-0 faq-ans">
-                            ......
-                          </p>
+                          <p className="text mb-0 faq-ans">......</p>
                         </CardBody>
                       </Collapse>
                     </Card>
@@ -450,7 +442,11 @@ class Faqs extends Component {
                       <Collapse isOpen={this.state.col7}>
                         <CardBody>
                           <p className="text mb-0 faq-ans">
-                           .......
+                            Creators are treated as a “business” when it comes
+                            to taxes. The money generated is considered income
+                            and should be taxed accordingly. This also applies
+                            to the royalties associated with the sales of the
+                            assets.
                           </p>
                         </CardBody>
                       </Collapse>

@@ -14,7 +14,7 @@ class MostViewedProducts extends Component {
       walletConnected: false,
       nfts: [],
       pageNumber: 1,
-      pageSize: 20,
+      pageSize: 6,
       totalPages: 0,
     };
     this.getNFTs.bind(this);
@@ -70,7 +70,7 @@ accountsChanged = () => {
       //console.log('ERC721s', ERC721s.data.ERC721s);
       let nfts = ERC721s.data.ERC721s.assets;
       //Set the NFTs value
-      this.setState({ nfts, pageNumber: ERC721s.data.ERC721s.pageNumber, pageSize: 20, totalPages: ERC721s.data.ERC721s.totalPages });
+      this.setState({ nfts, pageNumber: ERC721s.data.ERC721s.pageNumber, pageSize: 6, totalPages: ERC721s.data.ERC721s.totalPages });
     } catch (e) {
       console.error(e);
     }
