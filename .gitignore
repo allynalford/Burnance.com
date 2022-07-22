@@ -4,7 +4,9 @@ logs
 
 *_credentials.csv
 
+
 # dependencies
+/api/.serverless*
 /node_modules*
 /api/node_modules*
 /hardhat/node_modules*
