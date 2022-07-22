@@ -1,0 +1,17 @@
+NFTImageBucket:
+  Type: AWS::S3::Bucket
+  Properties:
+    BucketName: ${self:provider.environment.NFT_IMAGE_CDN_BUCKET} 
+NFTBucket:
+  Type: AWS::S3::Bucket
+  Properties:
+    BucketName: ${self:provider.environment.CDN_BUCKET} 
+GatewayResponse:
+  Type: 'AWS::ApiGateway::GatewayResponse'
+  Properties:
+    ResponseParameters:
+      gatewayresponse.header.WWW-Authenticate: "'Basic'"
+    ResponseType: UNAUTHORIZED
+    RestApiId:
+      Ref: 'ApiGatewayRestApi'
+    StatusCode: '401'

@@ -17,4 +17,14 @@
           path: etherscan/tokenNftTx
           method: post
           authorizer: aws_iam
+          cors: true
+  getEthPrice:
+    handler: etherscan/handler.getEthPrice
+    memorySize: 128 # optional, in MB, default is 1024
+    timeout: 30 # optional, in seconds, default is 6
+    events:
+      - http:
+          path: etherscan/ethprice
+          method: get
+          authorizer: aws_iam
           cors: true        

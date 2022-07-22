@@ -67,7 +67,7 @@ accountsChanged = () => {
     try {
       //Call the service to get the NFTs
       const ERC721s = await endpoint._post(getChain()['eth'].getWalletNFTsApiUrl, { address: ethereumAddress, chain: 'ethereum', pageNumber });
-      //console.log('ERC721s', ERC721s.data.ERC721s);
+      console.log('ERC721s', ERC721s);
       let nfts = ERC721s.data.ERC721s.assets;
       //Set the NFTs value
       this.setState({ nfts, pageNumber: ERC721s.data.ERC721s.pageNumber, pageSize: 6, totalPages: ERC721s.data.ERC721s.totalPages });
@@ -117,7 +117,7 @@ accountsChanged = () => {
           <Row>
             {this.state.nfts.map((nft, key) => (
               <Col key={key} lg={3} md={6} xs={12} className="mt-4 pt-2">
-                <Asset nft={nft} />
+                <Asset ethereumAddress={this.state.ethereumAddress} nft={nft} />
               </Col>
             ))}
           </Row>

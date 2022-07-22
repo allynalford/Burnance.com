@@ -230,17 +230,16 @@ module.exports._tokenURI = async (contract, tokenId) => {
  * @param {Number} gasUsed
  * @return {Promise<Array>} Response Array for next step to process.
  */
-    module.exports._addNftTx = async (owner, contractAddressTokenId, cost, value, gasUsed) => {
+    module.exports._addNftTx = async (owner, contractAddressTokenId, result) => {
       try {
         const dynamo = require('../common/dynamo');
+        const dateformat = require("dateformat");
         return await dynamo.saveItemInDB({
           TableName: process.env.DYNAMODB_TABLE_WALLET_NFT_TX,
           Item: {
             owner,
             contractAddressTokenId,
-            cost, 
-            value, 
-            gasUsed,
+            result,
             dt: dateformat(new Date(), "isoUtcDateTime"),
             timestamp: new Date().getTime(),
           },
@@ -250,3 +249,80 @@ module.exports._tokenURI = async (contract, tokenId) => {
         throw e;
       }
     };
+
+
+       /**
+ * Returns Wallet NFT data
+ *
+ * @author Allyn j. Alford <Allyn@tenablylabs.com>
+ * @async
+ * @function _getWalletNFT
+ * @param {String} owner - nft owner ethereum wallet address
+ * @param {String} contractAddressTokenId - NFT Contract Address combined with tokenId
+ * @return {Promise<Array>} Response Array for next step to process.
+ */
+
+module.exports._getWalletNFT = async (owner, contractAddressTokenId) => {
+    try {
+        const dynamo = require('../common/dynamo');
+        return await dynamo.queryDB({
+            TableName: process.env.DYNAMODB_TABLE_WALLET_NFT,
+            IndexName: 'InstanceIdIndex',
+            KeyConditionExpression: "#owner = :owner and #contractAddressTokenId = :contractAddressTokenId",
+            ExpressionAttributeNames: {
+                "#owner": "owner",
+                "#contractAddressTokenId": "contractAddressTokenId"
+            },
+            ExpressionAttributeValues: {
+                ":owner": owner,
+                ":contractAddressTokenId": contractAddressTokenId
+            },
+        });
+
+    } catch (e) {
+        console.error(e.message);
+        throw e;
+    }
+};
+    
+             /**
+     * Add NFT transaction
+     *
+     * @author Allyn j. Alford <Allyn@tenablylabs.com>
+     * @async
+     * @function _addNftTx
+     * @param {String} owner - nft owner ethereum wallet address
+     * @param {String} contractAddressTokenId - NFT Contract Address combined with tokenId
+     * @param {Number} costETH
+     * @param {Number} costUSD
+     * @param {Number} valueUSD
+     * @param {Number} valueETH
+     * @param {Number} ethTransPriceUSD
+     * @param {String} hash
+     * @return {Promise<Array>} Response Array for next step to process.
+     */
+        module.exports._addWalletNFT = async (chain, owner, contractAddressTokenId, costETH, costUSD, valueUSD, valueETH, ethTransPriceUSD, hash) => {
+          try {
+            const dynamo = require('../common/dynamo');
+            const dateformat = require("dateformat");
+            return await dynamo.saveItemInDB({
+              TableName: process.env.DYNAMODB_TABLE_WALLET_NFT,
+              Item: {
+                chain,
+                owner,
+                contractAddressTokenId,
+                costETH, 
+                costUSD, 
+                valueUSD, 
+                valueETH, 
+                ethTransPriceUSD, 
+                hash,
+                createdatetime: dateformat(new Date(), "isoUtcDateTime"),
+                timestamp: new Date().getTime(),
+              },
+            });
+          } catch (e) {
+            console.error(e);
+            throw e;
+          }
+        };

@@ -1,0 +1,198 @@
+NFTImageDynamoDBTable:
+  Type: 'AWS::DynamoDB::Table'
+  Properties:
+    AttributeDefinitions:
+      -
+        AttributeName: chainContractAddress
+        AttributeType: S
+      -  
+        AttributeName: tokenId
+        AttributeType: N
+    KeySchema:
+      -
+        AttributeName: chainContractAddress
+        KeyType: HASH
+      -
+        AttributeName: tokenId
+        KeyType: RANGE      
+    ProvisionedThroughput:
+      ReadCapacityUnits: 1
+      WriteCapacityUnits: 1
+    TableName: ${self:provider.environment.DYNAMODB_TABLE_NFT_IMAGE}
+WalletNFTtxDynamoDBTable:
+  Type: 'AWS::DynamoDB::Table'
+  DeletionPolicy: Retain
+  Properties:
+    AttributeDefinitions:
+      -
+        AttributeName: owner
+        AttributeType: S
+      -  
+        AttributeName: contractAddressTokenId
+        AttributeType: S
+    KeySchema:
+      -
+        AttributeName: owner
+        KeyType: HASH
+      -
+        AttributeName: contractAddressTokenId
+        KeyType: RANGE      
+    ProvisionedThroughput:
+      ReadCapacityUnits: 1
+      WriteCapacityUnits: 1
+    TableName: ${self:provider.environment.DYNAMODB_TABLE_WALLET_NFT_TX}
+WalletNFTCacheDynamoDBTable:
+  Type: 'AWS::DynamoDB::Table'
+  Properties:
+    AttributeDefinitions:
+      -
+        AttributeName: address
+        AttributeType: S
+      -  
+        AttributeName: page
+        AttributeType: N
+    KeySchema:
+      -
+        AttributeName: address
+        KeyType: HASH
+      -
+        AttributeName: page
+        KeyType: RANGE  
+    ProvisionedThroughput:
+      ReadCapacityUnits: 1
+      WriteCapacityUnits: 1
+    TableName: ${self:provider.environment.DYNAMODB_TABLE_WALLET_NFT_CACHE}
+WalletDynamoDBTable:
+  Type: 'AWS::DynamoDB::Table'
+  DeletionPolicy: Retain
+  Properties:
+    AttributeDefinitions:
+      -
+        AttributeName: chain
+        AttributeType: S
+      -  
+        AttributeName: address
+        AttributeType: S
+    KeySchema:
+      -
+        AttributeName: chain
+        KeyType: HASH
+      -
+        AttributeName: address
+        KeyType: RANGE  
+    ProvisionedThroughput:
+      ReadCapacityUnits: 1
+      WriteCapacityUnits: 1
+    TableName: ${self:provider.environment.DYNAMODB_TABLE_WALLET}
+WalletNFTDynamoDBTable:
+  Type: 'AWS::DynamoDB::Table'
+  DeletionPolicy: Retain
+  Properties:
+    AttributeDefinitions:
+      -
+        AttributeName: chain
+        AttributeType: S
+      -  
+        AttributeName: contractAddressTokenId
+        AttributeType: S
+      -  
+        AttributeName: owner
+        AttributeType: S
+    KeySchema:
+      -
+        AttributeName: chain
+        KeyType: HASH
+      -
+        AttributeName: contractAddressTokenId
+        KeyType: RANGE
+    GlobalSecondaryIndexes:
+      - IndexName: InstanceIdIndex
+        KeySchema:
+          - AttributeName: owner
+            KeyType: HASH
+          - AttributeName: contractAddressTokenId
+            KeyType: RANGE
+        Projection:
+          NonKeyAttributes:
+            - costETH 
+            - costUSD 
+            - valueUSD 
+            - valueETH
+            - ethTransPriceUSD
+            - hash
+            - createdatetime
+            - timestamp
+          ProjectionType: 'INCLUDE'
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1      
+    ProvisionedThroughput:
+      ReadCapacityUnits: 1
+      WriteCapacityUnits: 1
+    TableName: ${self:provider.environment.DYNAMODB_TABLE_WALLET_NFT}
+WaitlistDynamoDBTable:
+  Type: 'AWS::DynamoDB::Table'
+  DeletionPolicy: Retain
+  Properties:
+    AttributeDefinitions:
+      -
+        AttributeName: chain
+        AttributeType: S
+      -  
+        AttributeName: emailaddress
+        AttributeType: S
+    KeySchema:
+      -
+        AttributeName: chain
+        KeyType: HASH
+      -
+        AttributeName: emailaddress
+        KeyType: RANGE  
+    ProvisionedThroughput:
+      ReadCapacityUnits: 1
+      WriteCapacityUnits: 1
+    TableName: ${self:provider.environment.DYNAMODB_TABLE_WAITLIST}
+NFTMetaDataDynamoDBTable:
+  Type: 'AWS::DynamoDB::Table'
+  DeletionPolicy: Retain
+  Properties:
+    AttributeDefinitions:
+      -
+        AttributeName: chainContractAddress
+        AttributeType: S
+      -  
+        AttributeName: tokenId
+        AttributeType: S
+    KeySchema:
+      -
+        AttributeName: chainContractAddress
+        KeyType: HASH
+      -
+        AttributeName: tokenId
+        KeyType: RANGE  
+    ProvisionedThroughput:
+      ReadCapacityUnits: 2
+      WriteCapacityUnits: 2
+    TableName: ${self:provider.environment.DYNAMODB_TABLE_NFT_METADATA} 
+ContractABIDynamoDBTable:
+  Type: 'AWS::DynamoDB::Table'
+  DeletionPolicy: Retain
+  Properties:
+    AttributeDefinitions:
+      -
+        AttributeName: chain
+        AttributeType: S
+      -  
+        AttributeName: contractAddress
+        AttributeType: S
+    KeySchema:
+      -
+        AttributeName: chain
+        KeyType: HASH
+      -
+        AttributeName: contractAddress
+        KeyType: RANGE  
+    ProvisionedThroughput:
+      ReadCapacityUnits: 2
+      WriteCapacityUnits: 2
+    TableName: ${self:provider.environment.DYNAMODB_TABLE_CONTRACT_ABI}

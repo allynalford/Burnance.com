@@ -9,7 +9,7 @@ const _ = require('lodash');
 
 
 module.exports.qn_fetchNFTs = async (event) => {
-  let req, address, chain, pageNumber, cached = false, saved = false;
+  let req, address, chain, pageNumber, cached = false, saved = false, ERC721s;
 
   try {
     //Logging
@@ -45,7 +45,7 @@ module.exports.qn_fetchNFTs = async (event) => {
   try {
     
     //Check the cache for the page first
-    let ERC721s = await quickNode._qn_fetchNFTsCache(address, pageNumber);
+    ERC721s = await quickNode._qn_fetchNFTsCache(address, pageNumber);
     console.log('ERC721s Cache', ERC721s);
 
     if(typeof ERC721s === "undefined" || quickNode._isCacheExpired(ERC721s.timestamp) === true){
@@ -84,6 +84,7 @@ module.exports.qn_fetchNFTs = async (event) => {
     );
   } catch (err) {
     console.error(err);
+    console.log(ERC721s);
     const res = {
       error: true,
       success: false,
