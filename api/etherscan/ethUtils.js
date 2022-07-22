@@ -6,6 +6,24 @@ const ethers = require("ethers");
 const endpoint = require('../common/endpoint');
 
 
+module.exports._addressTokenNFTBalance = async (address, page, offset) => {
+    try {
+        const response = await endpoint._get(`${process.env.ETHERSCAN_API_URL}?module=account&action=addresstokennftbalance&address=${address}&page=1&offset=100apikey=${process.env.API_KEY_TOKEN}`);
+        return response.data;
+    } catch (e) {
+        console.error(e);
+    }
+};
+
+module.exports._addressTokenNFTInventory = async (address, contractaddress, page, offset) => {
+    try {
+        const response = await endpoint._get(`${process.env.ETHERSCAN_API_URL}?module=account&action=addresstokennftinventory&address=${address}&contractaddress=${contractaddress}&page=1&offset=100apikey=${process.env.API_KEY_TOKEN}`);
+        return response.data;
+    } catch (e) {
+        console.error(e);
+    }
+};
+
 /**
  * Returns transactions by hash
  *
@@ -184,6 +202,7 @@ module.exports._tokenURI = async (contract, tokenId) => {
  */
     module.exports._getNftTxs  = async (owner, contractAddressTokenId) => {
         try {
+            const dynamo = require('../common/dynamo');
             const assets = await dynamo.qetFromDB({
                 TableName: process.env.DYNAMODB_TABLE_WALLET_NFT_TX,
                 Key: {
@@ -213,6 +232,7 @@ module.exports._tokenURI = async (contract, tokenId) => {
  */
     module.exports._addNftTx = async (owner, contractAddressTokenId, cost, value, gasUsed) => {
       try {
+        const dynamo = require('../common/dynamo');
         return await dynamo.saveItemInDB({
           TableName: process.env.DYNAMODB_TABLE_WALLET_NFT_TX,
           Item: {
