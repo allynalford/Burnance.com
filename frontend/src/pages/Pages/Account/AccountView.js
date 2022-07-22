@@ -3,16 +3,25 @@ import { Link } from "react-router-dom";
 import { Container, Row, Col, Table, Card, CardBody } from "reactstrap";
 import logodark from "../../../assets/images/burnance_logo.png";
 //Import Icons
-import FeatherIcon from "feather-icons-react";
+import dateFormat, { masks } from "dateformat";
+
+var formatter = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+
+  // These options are needed to round to whole numbers if that's what you want.
+  //minimumFractionDigits: 0, // (this suffices for whole numbers, but will print 2500.10 as $2,500.1)
+  //maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
+});
 
 class PageInvoice extends Component {
   constructor(props) {
     super(props);
     this.state = {
       items: [
-        { id: 1, name: "One Day Bae #7925", qty: 2, rate: 2600 },
-        { id: 2, name: "Loopy Donuts #7257", qty: 1, rate: 3660 },
-        { id: 3, name: "Jailed Baby Ape Club #5940", qty: 3, rate: 4580 },
+        { id: 1, name: "One Day Bae #7925", qty: 2, floor: 0.1, usd: 10.15, eth: 0.25548, gas: 0.25348, ethPrice:  1573.00},
+        { id: 2, name: "Loopy Donuts #7257", qty: 1, floor: 0.1, usd: 10.15, eth: 0.25548, gas: 0.25348, ethPrice:  2412.23},
+        { id: 3, name: "Jailed Baby Ape Club #5940", qty: 3, floor: 0.1, usd: 10.15, eth: 0.25548, gas: 0.25348, ethPrice:  2570.15},
       ],
       nfts: [],
       ethereumAddress: '',
@@ -111,30 +120,22 @@ class PageInvoice extends Component {
                         <Col md={{ size: 8, order: 1 }} xs={{ order: 2 }}>
                           <dl className="row">
                             <dt className="col-md-3 col-5 fw-normal">
-                              Invoice No. :
+                              Total Gas Spent :
                             </dt>
-                            <dd className="col-md-9 col-7 text-muted">
-                              land45845621
+                            <dd className="col-md-9 col-7 text">
+                              0.23584 ( $358.34 )
                             </dd>
-
-                            <dt className="col-md-3 col-5 fw-normal">Name :</dt>
-                            <dd className="col-md-9 col-7 text-muted">
-                              Calvin Carlo
-                            </dd>
-
                             <dt className="col-md-3 col-5 fw-normal">
-                              Address :
+                              Total ETH Spent :
                             </dt>
-                            <dd className="col-md-9 col-7 text-muted">
-                              <p className="mb-0">1962 Pike Street,</p>
-                              <p className="mb-0">Diego, CA 92123</p>
+                            <dd className="col-md-9 col-7 text">
+                              4.63824 ( $7,047.37 ) - Gas
                             </dd>
-
                             <dt className="col-md-3 col-5 fw-normal">
-                              Phone :
+                              Total Spent :
                             </dt>
-                            <dd className="col-md-9 col-7 text-muted">
-                              (+45) 4584-458-695
+                            <dd className="col-md-9 col-7 text">
+                              4.89028 ( $7,405.71 ) - Gas
                             </dd>
                           </dl>
                         </Col>
@@ -144,12 +145,7 @@ class PageInvoice extends Component {
                           xs={{ order: 1 }}
                           className="mt-2 mt-sm-0"
                         >
-                          <dl className="row mb-0">
-                            <dt className="col-md-4 col-5 fw-normal">Date :</dt>
-                            <dd className="col-md-8 col-7 text-muted">
-                              15th Oct, 2019
-                            </dd>
-                          </dl>
+                          {dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")}
                         </Col>
                       </Row>
                     </div>
@@ -184,7 +180,7 @@ class PageInvoice extends Component {
                                 ETH
                               </th>
                               <th scope="col" className="border-bottom">
-                                Total
+                                GAS
                               </th>
                             </tr>
                           </thead>
@@ -195,11 +191,11 @@ class PageInvoice extends Component {
                                   {key + 1}
                                 </th>
                                 <td className="text-start">{item.name}</td>
-                                <td>{item.qty}</td>
-                                <td>$ {item.rate}</td>
-                                <td>{item.qty}</td>
-                                <td>{item.qty}</td>
-                                <td>{item.qty}</td>
+                                <td>{item.floor}  <span style={{fontSize: '12px'}}>{formatter.format(5.20)}</span> </td>
+                                <td>{formatter.format(item.ethPrice)}</td>
+                                <td>{formatter.format(item.usd)}</td>
+                                <td>{item.eth}</td>
+                                <td>{item.gas}</td>
                               </tr>
                             ))}
                           </tbody>
