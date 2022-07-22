@@ -87,12 +87,14 @@ module.exports.tokenNftTx = async (event) => {
 
     //Check if the data already exists
      let tokenNftTx = await etherscan._getNftTxs(address, contractaddress + tokenId);
-     //console.log(tokenNftTx);
+     
   
     if (typeof tokenNftTx === "undefined") {
       //Grab the NFT transactions from API if we don't have it
       tokenNftTx = await etherscan._tokenNftTx(contractaddress, address);
     }
+
+    console.log(tokenNftTx);
 
 
       //Save the transactions
@@ -135,7 +137,7 @@ module.exports.tokenNftTx = async (event) => {
       //Grab all the transactions based on the hash
       const txs = await etherscan._txListInternal(tokenNftTx.result[0].hash);
 
-      //console.log(txs);
+      console.log(txs);
 
       //Loop thru the transactions and add up the values
       valueETH = 0.0, gasETH = 0.0, gas = 0.0, gasUsed = 0.0, ETH = 0.0;
@@ -150,7 +152,7 @@ module.exports.tokenNftTx = async (event) => {
         gasETH = (Number(gasETH) + Number(gasToEth));//First the value
       };
       // const tx = txs.result[txs.result.length-1];
-      // console.log(tx);
+      //console.log(tx);
       // value = web3.utils.fromWei(tx.value.toString(), 'ether');
       // gas = web3.utils.fromWei(tx.gas.toString(), 'ether');//Then the transaction cost in gas
       // gasUsed = web3.utils.fromWei(tx.gasUsed.toString(), 'ether');;//Then the transaction cost in gas

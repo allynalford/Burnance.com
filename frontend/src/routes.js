@@ -13,6 +13,10 @@ const OnlineLearning = React.lazy(() => import("./pages/OnlineLearning/index"));
 const PageError = React.lazy(() => import("./pages/Pages/Special/PageError"));
 const Shop = React.lazy(() => import("./pages/Shop/index"));
 
+const PageInvoice = React.lazy(() =>
+  import("./pages/Pages/Account/AccountView")
+);
+
 const routes = [
   
 
@@ -27,7 +31,7 @@ const routes = [
   //{ path: "/widget", component: Widget, isTopbarDark: true },
 
   { path: "/profile", component: Shop, isTopbarDark: true },
-
+  { path: "/account", component: PageInvoice, isTopbarDark: true },
 
   //Index Main
   { path: "/index", component: OnlineLearning, isTopbarDark: true },

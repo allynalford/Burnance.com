@@ -299,24 +299,6 @@ class Asset extends Component {
     return (
       <React.Fragment>
         <Card className="shop-list border-0 position-relative">
-          {/* <ul className="label list-unstyled mb-0">
-                    {this.props.nft.isNew && (
-                      <li>
-                        <Link
-                          to="#"
-                          className="badge badge-link rounded-pill bg-primary"
-                        >
-                          New
-                        </Link>
-                      </li>
-                    )}
-                    {this.props.nft.isFeatured && (
-                      <li><Link to="#" className="badge badge-link rounded-pill bg-success">Featured</Link></li>
-                    )}
-                    {this.props.nft.isSale && (
-                      <li><Link to="#" className="badge badge-link rounded-pill bg-warning">Sale</Link></li>
-                    )}
-                  </ul> */}
           <ul className="shop-image position-relative overflow-hidden rounded shadow">
             <a
               target={'_new'}
@@ -385,6 +367,7 @@ class Asset extends Component {
             />
               </Col>
               <Col md={6}>
+                
                 <h2>            <a
               target={'_new'}
               href={`https://opensea.io/assets/ethereum/${this.props.nft.collectionAddress}/${this.props.nft.collectionTokenId}`}
