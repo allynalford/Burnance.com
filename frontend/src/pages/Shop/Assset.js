@@ -380,7 +380,7 @@ class Asset extends Component {
               <Col md={6}>
               <img
               src={this.state.imageUrl}
-              alt="Provide a database schema along with a query"
+              alt={this.props.nft.name}
               height={'300px'}
             />
               </Col>
@@ -458,6 +458,15 @@ class Asset extends Component {
             </Row>
           </ModalBody>
           <ModalFooter>
+          <Button 
+            disabled={(this.state.txUrl === "" ? true : false)}
+            color="secondary" 
+            onClick={e=>{
+              e.preventDefault();
+             this.props.AddToBatch(this.props.nft.collectionAddress,this.props.nft.collectionTokenId, this.props.nft.name);
+            }}>
+              Add to Batch
+            </Button>
             <Button 
             disabled={(this.state.txUrl === "" ? true : false)}
             color="secondary" 

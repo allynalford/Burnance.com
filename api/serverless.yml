@@ -226,28 +226,28 @@ resources:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         TableName: ${self:provider.environment.DYNAMODB_TABLE_WALLET_NFT}
-    WaitlistDynamoDBTable:
-      Type: 'AWS::DynamoDB::Table'
-      DeletionPolicy: Retain
-      Properties:
-        AttributeDefinitions:
-          -
-            AttributeName: chain
-            AttributeType: S
-          -  
-            AttributeName: emailaddress
-            AttributeType: S
-        KeySchema:
-          -
-            AttributeName: chain
-            KeyType: HASH
-          -
-            AttributeName: emailaddress
-            KeyType: RANGE  
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-        TableName: ${self:provider.environment.DYNAMODB_TABLE_WAITLIST}
+    # WaitlistDynamoDBTable:
+    #   Type: 'AWS::DynamoDB::Table'
+    #   DeletionPolicy: Retain
+    #   Properties:
+    #     AttributeDefinitions:
+    #       -
+    #         AttributeName: chain
+    #         AttributeType: S
+    #       -  
+    #         AttributeName: emailaddress
+    #         AttributeType: S
+    #     KeySchema:
+    #       -
+    #         AttributeName: chain
+    #         KeyType: HASH
+    #       -
+    #         AttributeName: emailaddress
+    #         KeyType: RANGE  
+    #     ProvisionedThroughput:
+    #       ReadCapacityUnits: 1
+    #       WriteCapacityUnits: 1
+    #     TableName: ${self:provider.environment.DYNAMODB_TABLE_WAITLIST}
     NFTMetaDataDynamoDBTable:
       Type: 'AWS::DynamoDB::Table'
       DeletionPolicy: Retain

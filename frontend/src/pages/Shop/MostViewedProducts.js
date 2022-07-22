@@ -3,8 +3,9 @@ import { Container, Row, Col } from "reactstrap";
 import {getChain} from "../../common/config";
 import Asset from "./Assset";
 import ReactPaginate from 'react-paginate';
+var _ = require('lodash');
 var endpoint = require('../../common/endpoint');
-
+const Swal = require('sweetalert2');
 
 class MostViewedProducts extends Component {
   constructor(props) {
@@ -16,12 +17,24 @@ class MostViewedProducts extends Component {
       pageNumber: 1,
       pageSize: 6,
       totalPages: 0,
+      batch: []
     };
     this.getNFTs.bind(this);
     this.accountsChanged.bind(this);
+    this.AddToBatch.bind(this);
+    this.fireMsg.bind(this);
   }
 
-
+  fireMsg(title, text, icon){
+    Swal.fire({
+      title,
+      text,
+      icon,
+      confirmButtonText: 'Ok',
+      confirmButtonAriaLabel:'Ok',
+      focusConfirm: true,
+    })
+  }
 
 accountsChanged = () => {
    if (window.ethereum._state.isConnected && typeof window.ethereum._state.accounts[0] !== "undefined") {
@@ -63,11 +76,11 @@ accountsChanged = () => {
 
   //Add try/catch to this function
   getNFTs = async (ethereumAddress, pageNumber) => {
-    console.log('Loading Page:',pageNumber);
+    //console.log('Loading Page:',pageNumber);
     try {
       //Call the service to get the NFTs
       const ERC721s = await endpoint._post(getChain()['eth'].getWalletNFTsApiUrl, { address: ethereumAddress, chain: 'ethereum', pageNumber });
-      console.log('ERC721s', ERC721s);
+      //console.log('ERC721s', ERC721s);
       let nfts = ERC721s.data.ERC721s.assets;
       //Set the NFTs value
       this.setState({ nfts, pageNumber: ERC721s.data.ERC721s.pageNumber, pageSize: 6, totalPages: ERC721s.data.ERC721s.totalPages });
@@ -80,6 +93,17 @@ accountsChanged = () => {
     const pageNumber = event.selected + 1;
     this.getNFTs(this.state.ethereumAddress, pageNumber);
   };
+
+  AddToBatch = (contractAddress, tokenId, name) =>{
+    var nft = _.find(this.state.batch, {contractAddress, tokenId});
+    
+    if(typeof nft === "undefined"){
+      this.state.batch.push({contractAddress, tokenId});
+      this.fireMsg("Added to Batch", `${name} Added to Batch`, "INFO");
+    }else{
+      this.fireMsg("NFT Exists", `${name} exists in Batch`, "WARN");
+    }
+  }
 
   render() {
     return (
@@ -117,7 +141,7 @@ accountsChanged = () => {
           <Row>
             {this.state.nfts.map((nft, key) => (
               <Col key={key} lg={3} md={6} xs={12} className="mt-4 pt-2">
-                <Asset ethereumAddress={this.state.ethereumAddress} nft={nft} />
+                <Asset AddToBatch={this.AddToBatch} ethereumAddress={this.state.ethereumAddress} nft={nft} />
               </Col>
             ))}
           </Row>

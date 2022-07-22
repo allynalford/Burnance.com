@@ -1,0 +1,1855 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "The AWS CloudFormation template for this Serverless application",
+  "Resources": {
+    "NftImageLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/burnance-prod-nftImage"
+      }
+    },
+    "ViewNFTLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/burnance-prod-viewNFT"
+      }
+    },
+    "ViewNFTtxLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/burnance-prod-viewNFTtx"
+      }
+    },
+    "GetEthPriceLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/burnance-prod-getEthPrice"
+      }
+    },
+    "AddToWaitlistLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/burnance-prod-addToWaitlist"
+      }
+    },
+    "QnUnderscorefetchNFTsLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/burnance-prod-qn_fetchNFTs"
+      }
+    },
+    "IamRoleLambdaExecution": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": {
+              "Fn::Join": [
+                "-",
+                [
+                  "burnance",
+                  "prod",
+                  "lambda"
+                ]
+              ]
+            },
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:CreateLogStream",
+                    "logs:CreateLogGroup"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/burnance-prod*:*"
+                    }
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:PutLogEvents"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/burnance-prod*:*:*"
+                    }
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "s3:PutObject",
+                    "s3:GetObject",
+                    "s3:DeleteObject",
+                    "s3:*"
+                  ],
+                  "Resource": [
+                    "arn:aws:s3:::nft.burnance.io/*",
+                    "arn:aws:s3:::image.nft.burnance.io/*"
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "dynamodb:DescribeTable",
+                    "dynamodb:Query",
+                    "dynamodb:Scan",
+                    "dynamodb:GetItem",
+                    "dynamodb:PutItem",
+                    "dynamodb:UpdateItem",
+                    "dynamodb:DeleteItem"
+                  ],
+                  "Resource": [
+                    "arn:aws:dynamodb:us-east-1:*:table/burnance-prod-nfts-metadata",
+                    "arn:aws:dynamodb:us-east-1:*:table/burnance-prod-contract-abi",
+                    "arn:aws:dynamodb:us-east-1:*:table/burnance-prod-waitlist",
+                    "arn:aws:dynamodb:us-east-1:*:table/burnance-prod-wallet",
+                    "arn:aws:dynamodb:us-east-1:*:table/burnance-prod-wallet-nft",
+                    "arn:aws:dynamodb:us-east-1:*:table/burnance-prod-wallet-nft/index/*",
+                    "arn:aws:dynamodb:us-east-1:*:table/burnance-prod-wallet-nft-cache",
+                    "arn:aws:dynamodb:us-east-1:*:table/burnance-prod-wallet-nft-tx",
+                    "arn:aws:dynamodb:us-east-1:*:table/burnance-prod-nfts-image"
+                  ]
+                }
+              ]
+            }
+          }
+        ],
+        "Path": "/",
+        "RoleName": {
+          "Fn::Join": [
+            "-",
+            [
+              "burnance",
+              "prod",
+              {
+                "Ref": "AWS::Region"
+              },
+              "lambdaRole"
+            ]
+          ]
+        }
+      }
+    },
+    "NftImageLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": "service.burnance.nodejs.lambdas.prod",
+          "S3Key": "serverless/burnance/prod/1658468318736-2022-07-22T05:38:38.736Z/burnance.zip"
+        },
+        "Handler": "actions.getNFTImage",
+        "Runtime": "nodejs12.x",
+        "FunctionName": "burnance-prod-nftImage",
+        "MemorySize": 128,
+        "Timeout": 30,
+        "Environment": {
+          "Variables": {
+            "STAGE": "prod",
+            "REGION": "us-east-1",
+            "ACCOUNTID": "297677912558",
+            "USER_AGENT": "nft.burnance.io",
+            "CDN_BUCKET": "nft.burnance.io",
+            "NFT_IMAGE_CDN_BUCKET": "image.nft.burnance.io",
+            "QUICK_NODE_HTTP": "https://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
+            "QUICK_NODE_WSS": "wss://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
+            "ETHERSCAN_API_URL": "https://api.etherscan.io/api",
+            "API_KEY_TOKEN": "WWY6WGBKZCG5U8JEY2RNTXT1YWMMER6SPN",
+            "PRO_API_KEY": "TFSZVPV8PUQ2HZWWJAI6TPSASX72HRYNWS",
+            "ETHERSCAN_ABI_PARAMS": "module=contract&action=getabi",
+            "OPEN": "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",
+            "SLACK_API_WAITLIST_WEBHOOK": "https://hooks.slack.com/services/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",
+            "DRIP": "d19af8d64382261d9cbd9762fdd07356",
+            "DRIP_ID": "4947055",
+            "S3_DRIP_CDN_BUCKET": "events.nft.burnance.io",
+            "DYNAMODB_TABLE_CONTRACT_ABI": "burnance-prod-contract-abi",
+            "DYNAMODB_TABLE_NFT_METADATA": "burnance-prod-nfts-metadata",
+            "DYNAMODB_TABLE_NFT_IMAGE": "burnance-prod-nfts-image",
+            "DYNAMODB_TABLE_WAITLIST": "burnance-prod-waitlist",
+            "DYNAMODB_TABLE_WALLET": "burnance-prod-wallet",
+            "DYNAMODB_TABLE_WALLET_NFT": "burnance-prod-wallet-nft",
+            "DYNAMODB_TABLE_WALLET_NFT_CACHE": "burnance-prod-wallet-nft-cache",
+            "DYNAMODB_TABLE_WALLET_NFT_TX": "burnance-prod-wallet-nft-tx",
+            "NODE": "wss://mainnet.infura.io/ws/v3/4168ad1b2f574ec1a6944fcb1d4d906c",
+            "KEY": "adfb72ce9754e3cbc1e79e44a8e20804cebd3c4a347605c6a3462a8de05b8783"
+          }
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        }
+      },
+      "DependsOn": [
+        "NftImageLogGroup"
+      ]
+    },
+    "ViewNFTLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": "service.burnance.nodejs.lambdas.prod",
+          "S3Key": "serverless/burnance/prod/1658468318736-2022-07-22T05:38:38.736Z/burnance.zip"
+        },
+        "Handler": "actions.view",
+        "Runtime": "nodejs12.x",
+        "FunctionName": "burnance-prod-viewNFT",
+        "MemorySize": 128,
+        "Timeout": 30,
+        "Environment": {
+          "Variables": {
+            "STAGE": "prod",
+            "REGION": "us-east-1",
+            "ACCOUNTID": "297677912558",
+            "USER_AGENT": "nft.burnance.io",
+            "CDN_BUCKET": "nft.burnance.io",
+            "NFT_IMAGE_CDN_BUCKET": "image.nft.burnance.io",
+            "QUICK_NODE_HTTP": "https://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
+            "QUICK_NODE_WSS": "wss://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
+            "ETHERSCAN_API_URL": "https://api.etherscan.io/api",
+            "API_KEY_TOKEN": "WWY6WGBKZCG5U8JEY2RNTXT1YWMMER6SPN",
+            "PRO_API_KEY": "TFSZVPV8PUQ2HZWWJAI6TPSASX72HRYNWS",
+            "ETHERSCAN_ABI_PARAMS": "module=contract&action=getabi",
+            "OPEN": "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",
+            "SLACK_API_WAITLIST_WEBHOOK": "https://hooks.slack.com/services/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",
+            "DRIP": "d19af8d64382261d9cbd9762fdd07356",
+            "DRIP_ID": "4947055",
+            "S3_DRIP_CDN_BUCKET": "events.nft.burnance.io",
+            "DYNAMODB_TABLE_CONTRACT_ABI": "burnance-prod-contract-abi",
+            "DYNAMODB_TABLE_NFT_METADATA": "burnance-prod-nfts-metadata",
+            "DYNAMODB_TABLE_NFT_IMAGE": "burnance-prod-nfts-image",
+            "DYNAMODB_TABLE_WAITLIST": "burnance-prod-waitlist",
+            "DYNAMODB_TABLE_WALLET": "burnance-prod-wallet",
+            "DYNAMODB_TABLE_WALLET_NFT": "burnance-prod-wallet-nft",
+            "DYNAMODB_TABLE_WALLET_NFT_CACHE": "burnance-prod-wallet-nft-cache",
+            "DYNAMODB_TABLE_WALLET_NFT_TX": "burnance-prod-wallet-nft-tx",
+            "NODE": "wss://mainnet.infura.io/ws/v3/4168ad1b2f574ec1a6944fcb1d4d906c",
+            "KEY": "adfb72ce9754e3cbc1e79e44a8e20804cebd3c4a347605c6a3462a8de05b8783"
+          }
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        }
+      },
+      "DependsOn": [
+        "ViewNFTLogGroup"
+      ]
+    },
+    "ViewNFTtxLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": "service.burnance.nodejs.lambdas.prod",
+          "S3Key": "serverless/burnance/prod/1658468318736-2022-07-22T05:38:38.736Z/burnance.zip"
+        },
+        "Handler": "etherscan/handler.tokenNftTx",
+        "Runtime": "nodejs12.x",
+        "FunctionName": "burnance-prod-viewNFTtx",
+        "MemorySize": 128,
+        "Timeout": 30,
+        "Environment": {
+          "Variables": {
+            "STAGE": "prod",
+            "REGION": "us-east-1",
+            "ACCOUNTID": "297677912558",
+            "USER_AGENT": "nft.burnance.io",
+            "CDN_BUCKET": "nft.burnance.io",
+            "NFT_IMAGE_CDN_BUCKET": "image.nft.burnance.io",
+            "QUICK_NODE_HTTP": "https://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
+            "QUICK_NODE_WSS": "wss://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
+            "ETHERSCAN_API_URL": "https://api.etherscan.io/api",
+            "API_KEY_TOKEN": "WWY6WGBKZCG5U8JEY2RNTXT1YWMMER6SPN",
+            "PRO_API_KEY": "TFSZVPV8PUQ2HZWWJAI6TPSASX72HRYNWS",
+            "ETHERSCAN_ABI_PARAMS": "module=contract&action=getabi",
+            "OPEN": "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",
+            "SLACK_API_WAITLIST_WEBHOOK": "https://hooks.slack.com/services/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",
+            "DRIP": "d19af8d64382261d9cbd9762fdd07356",
+            "DRIP_ID": "4947055",
+            "S3_DRIP_CDN_BUCKET": "events.nft.burnance.io",
+            "DYNAMODB_TABLE_CONTRACT_ABI": "burnance-prod-contract-abi",
+            "DYNAMODB_TABLE_NFT_METADATA": "burnance-prod-nfts-metadata",
+            "DYNAMODB_TABLE_NFT_IMAGE": "burnance-prod-nfts-image",
+            "DYNAMODB_TABLE_WAITLIST": "burnance-prod-waitlist",
+            "DYNAMODB_TABLE_WALLET": "burnance-prod-wallet",
+            "DYNAMODB_TABLE_WALLET_NFT": "burnance-prod-wallet-nft",
+            "DYNAMODB_TABLE_WALLET_NFT_CACHE": "burnance-prod-wallet-nft-cache",
+            "DYNAMODB_TABLE_WALLET_NFT_TX": "burnance-prod-wallet-nft-tx",
+            "NODE": "wss://mainnet.infura.io/ws/v3/4168ad1b2f574ec1a6944fcb1d4d906c",
+            "KEY": "adfb72ce9754e3cbc1e79e44a8e20804cebd3c4a347605c6a3462a8de05b8783"
+          }
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        }
+      },
+      "DependsOn": [
+        "ViewNFTtxLogGroup"
+      ]
+    },
+    "GetEthPriceLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": "service.burnance.nodejs.lambdas.prod",
+          "S3Key": "serverless/burnance/prod/1658468318736-2022-07-22T05:38:38.736Z/burnance.zip"
+        },
+        "Handler": "etherscan/handler.getEthPrice",
+        "Runtime": "nodejs12.x",
+        "FunctionName": "burnance-prod-getEthPrice",
+        "MemorySize": 128,
+        "Timeout": 30,
+        "Environment": {
+          "Variables": {
+            "STAGE": "prod",
+            "REGION": "us-east-1",
+            "ACCOUNTID": "297677912558",
+            "USER_AGENT": "nft.burnance.io",
+            "CDN_BUCKET": "nft.burnance.io",
+            "NFT_IMAGE_CDN_BUCKET": "image.nft.burnance.io",
+            "QUICK_NODE_HTTP": "https://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
+            "QUICK_NODE_WSS": "wss://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
+            "ETHERSCAN_API_URL": "https://api.etherscan.io/api",
+            "API_KEY_TOKEN": "WWY6WGBKZCG5U8JEY2RNTXT1YWMMER6SPN",
+            "PRO_API_KEY": "TFSZVPV8PUQ2HZWWJAI6TPSASX72HRYNWS",
+            "ETHERSCAN_ABI_PARAMS": "module=contract&action=getabi",
+            "OPEN": "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",
+            "SLACK_API_WAITLIST_WEBHOOK": "https://hooks.slack.com/services/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",
+            "DRIP": "d19af8d64382261d9cbd9762fdd07356",
+            "DRIP_ID": "4947055",
+            "S3_DRIP_CDN_BUCKET": "events.nft.burnance.io",
+            "DYNAMODB_TABLE_CONTRACT_ABI": "burnance-prod-contract-abi",
+            "DYNAMODB_TABLE_NFT_METADATA": "burnance-prod-nfts-metadata",
+            "DYNAMODB_TABLE_NFT_IMAGE": "burnance-prod-nfts-image",
+            "DYNAMODB_TABLE_WAITLIST": "burnance-prod-waitlist",
+            "DYNAMODB_TABLE_WALLET": "burnance-prod-wallet",
+            "DYNAMODB_TABLE_WALLET_NFT": "burnance-prod-wallet-nft",
+            "DYNAMODB_TABLE_WALLET_NFT_CACHE": "burnance-prod-wallet-nft-cache",
+            "DYNAMODB_TABLE_WALLET_NFT_TX": "burnance-prod-wallet-nft-tx",
+            "NODE": "wss://mainnet.infura.io/ws/v3/4168ad1b2f574ec1a6944fcb1d4d906c",
+            "KEY": "adfb72ce9754e3cbc1e79e44a8e20804cebd3c4a347605c6a3462a8de05b8783"
+          }
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        }
+      },
+      "DependsOn": [
+        "GetEthPriceLogGroup"
+      ]
+    },
+    "AddToWaitlistLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": "service.burnance.nodejs.lambdas.prod",
+          "S3Key": "serverless/burnance/prod/1658468318736-2022-07-22T05:38:38.736Z/burnance.zip"
+        },
+        "Handler": "waitlist/handler.add",
+        "Runtime": "nodejs12.x",
+        "FunctionName": "burnance-prod-addToWaitlist",
+        "MemorySize": 128,
+        "Timeout": 30,
+        "Environment": {
+          "Variables": {
+            "STAGE": "prod",
+            "REGION": "us-east-1",
+            "ACCOUNTID": "297677912558",
+            "USER_AGENT": "nft.burnance.io",
+            "CDN_BUCKET": "nft.burnance.io",
+            "NFT_IMAGE_CDN_BUCKET": "image.nft.burnance.io",
+            "QUICK_NODE_HTTP": "https://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
+            "QUICK_NODE_WSS": "wss://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
+            "ETHERSCAN_API_URL": "https://api.etherscan.io/api",
+            "API_KEY_TOKEN": "WWY6WGBKZCG5U8JEY2RNTXT1YWMMER6SPN",
+            "PRO_API_KEY": "TFSZVPV8PUQ2HZWWJAI6TPSASX72HRYNWS",
+            "ETHERSCAN_ABI_PARAMS": "module=contract&action=getabi",
+            "OPEN": "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",
+            "SLACK_API_WAITLIST_WEBHOOK": "https://hooks.slack.com/services/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",
+            "DRIP": "d19af8d64382261d9cbd9762fdd07356",
+            "DRIP_ID": "4947055",
+            "S3_DRIP_CDN_BUCKET": "events.nft.burnance.io",
+            "DYNAMODB_TABLE_CONTRACT_ABI": "burnance-prod-contract-abi",
+            "DYNAMODB_TABLE_NFT_METADATA": "burnance-prod-nfts-metadata",
+            "DYNAMODB_TABLE_NFT_IMAGE": "burnance-prod-nfts-image",
+            "DYNAMODB_TABLE_WAITLIST": "burnance-prod-waitlist",
+            "DYNAMODB_TABLE_WALLET": "burnance-prod-wallet",
+            "DYNAMODB_TABLE_WALLET_NFT": "burnance-prod-wallet-nft",
+            "DYNAMODB_TABLE_WALLET_NFT_CACHE": "burnance-prod-wallet-nft-cache",
+            "DYNAMODB_TABLE_WALLET_NFT_TX": "burnance-prod-wallet-nft-tx",
+            "NODE": "wss://mainnet.infura.io/ws/v3/4168ad1b2f574ec1a6944fcb1d4d906c",
+            "KEY": "adfb72ce9754e3cbc1e79e44a8e20804cebd3c4a347605c6a3462a8de05b8783"
+          }
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        }
+      },
+      "DependsOn": [
+        "AddToWaitlistLogGroup"
+      ]
+    },
+    "QnUnderscorefetchNFTsLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": "service.burnance.nodejs.lambdas.prod",
+          "S3Key": "serverless/burnance/prod/1658468318736-2022-07-22T05:38:38.736Z/burnance.zip"
+        },
+        "Handler": "quicknode/handler.qn_fetchNFTs",
+        "Runtime": "nodejs12.x",
+        "FunctionName": "burnance-prod-qn_fetchNFTs",
+        "MemorySize": 128,
+        "Timeout": 30,
+        "Environment": {
+          "Variables": {
+            "STAGE": "prod",
+            "REGION": "us-east-1",
+            "ACCOUNTID": "297677912558",
+            "USER_AGENT": "nft.burnance.io",
+            "CDN_BUCKET": "nft.burnance.io",
+            "NFT_IMAGE_CDN_BUCKET": "image.nft.burnance.io",
+            "QUICK_NODE_HTTP": "https://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
+            "QUICK_NODE_WSS": "wss://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
+            "ETHERSCAN_API_URL": "https://api.etherscan.io/api",
+            "API_KEY_TOKEN": "WWY6WGBKZCG5U8JEY2RNTXT1YWMMER6SPN",
+            "PRO_API_KEY": "TFSZVPV8PUQ2HZWWJAI6TPSASX72HRYNWS",
+            "ETHERSCAN_ABI_PARAMS": "module=contract&action=getabi",
+            "OPEN": "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",
+            "SLACK_API_WAITLIST_WEBHOOK": "https://hooks.slack.com/services/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",
+            "DRIP": "d19af8d64382261d9cbd9762fdd07356",
+            "DRIP_ID": "4947055",
+            "S3_DRIP_CDN_BUCKET": "events.nft.burnance.io",
+            "DYNAMODB_TABLE_CONTRACT_ABI": "burnance-prod-contract-abi",
+            "DYNAMODB_TABLE_NFT_METADATA": "burnance-prod-nfts-metadata",
+            "DYNAMODB_TABLE_NFT_IMAGE": "burnance-prod-nfts-image",
+            "DYNAMODB_TABLE_WAITLIST": "burnance-prod-waitlist",
+            "DYNAMODB_TABLE_WALLET": "burnance-prod-wallet",
+            "DYNAMODB_TABLE_WALLET_NFT": "burnance-prod-wallet-nft",
+            "DYNAMODB_TABLE_WALLET_NFT_CACHE": "burnance-prod-wallet-nft-cache",
+            "DYNAMODB_TABLE_WALLET_NFT_TX": "burnance-prod-wallet-nft-tx",
+            "NODE": "wss://mainnet.infura.io/ws/v3/4168ad1b2f574ec1a6944fcb1d4d906c",
+            "KEY": "adfb72ce9754e3cbc1e79e44a8e20804cebd3c4a347605c6a3462a8de05b8783"
+          }
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        }
+      },
+      "DependsOn": [
+        "QnUnderscorefetchNFTsLogGroup"
+      ]
+    },
+    "QnUnderscorefetchNFTsLambdaVersionaalFRk529bVfMJNrtEFb6NUCjAoJ6aZXUbIz2hnTw": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "QnUnderscorefetchNFTsLambdaFunction"
+        },
+        "CodeSha256": "Sbw6j9V3NwcE8vU4sWw/9MFaTAoVkBdqPO5zY38BZ18="
+      }
+    },
+    "NftImageLambdaVersionRkAgjXg8tuj276EGTlwthJev7uMbuYpnkEFuoiPuVk": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "NftImageLambdaFunction"
+        },
+        "CodeSha256": "Sbw6j9V3NwcE8vU4sWw/9MFaTAoVkBdqPO5zY38BZ18="
+      }
+    },
+    "ViewNFTLambdaVersioniKUGecvaNHY8ak36pYYMxbHD8Xtc5X7wdjdGK3r3U": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "ViewNFTLambdaFunction"
+        },
+        "CodeSha256": "Sbw6j9V3NwcE8vU4sWw/9MFaTAoVkBdqPO5zY38BZ18="
+      }
+    },
+    "AddToWaitlistLambdaVersion5ZplaitgMldrCZy0D6CFFflwgoYNzag7FfDFfYREeUY": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "AddToWaitlistLambdaFunction"
+        },
+        "CodeSha256": "Sbw6j9V3NwcE8vU4sWw/9MFaTAoVkBdqPO5zY38BZ18="
+      }
+    },
+    "ViewNFTtxLambdaVersionxnrdon4G1tOiGN8XIDL7ym6p9UAJjen5CA4RlPi68w": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "ViewNFTtxLambdaFunction"
+        },
+        "CodeSha256": "Sbw6j9V3NwcE8vU4sWw/9MFaTAoVkBdqPO5zY38BZ18="
+      }
+    },
+    "GetEthPriceLambdaVersionacCXblawOBgn5ddjIjklwL8uP6DTjroMFLJygFUzq10": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "GetEthPriceLambdaFunction"
+        },
+        "CodeSha256": "Sbw6j9V3NwcE8vU4sWw/9MFaTAoVkBdqPO5zY38BZ18="
+      }
+    },
+    "ApiGatewayRestApi": {
+      "Type": "AWS::ApiGateway::RestApi",
+      "Properties": {
+        "Name": "prod-burnance",
+        "EndpointConfiguration": {
+          "Types": [
+            "EDGE"
+          ]
+        },
+        "Policy": ""
+      }
+    },
+    "ApiGatewayResourceNft": {
+      "Type": "AWS::ApiGateway::Resource",
+      "Properties": {
+        "ParentId": {
+          "Fn::GetAtt": [
+            "ApiGatewayRestApi",
+            "RootResourceId"
+          ]
+        },
+        "PathPart": "nft",
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        }
+      }
+    },
+    "ApiGatewayResourceNftImage": {
+      "Type": "AWS::ApiGateway::Resource",
+      "Properties": {
+        "ParentId": {
+          "Ref": "ApiGatewayResourceNft"
+        },
+        "PathPart": "image",
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        }
+      }
+    },
+    "ApiGatewayResourceView": {
+      "Type": "AWS::ApiGateway::Resource",
+      "Properties": {
+        "ParentId": {
+          "Fn::GetAtt": [
+            "ApiGatewayRestApi",
+            "RootResourceId"
+          ]
+        },
+        "PathPart": "view",
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        }
+      }
+    },
+    "ApiGatewayResourceViewNft": {
+      "Type": "AWS::ApiGateway::Resource",
+      "Properties": {
+        "ParentId": {
+          "Ref": "ApiGatewayResourceView"
+        },
+        "PathPart": "nft",
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        }
+      }
+    },
+    "ApiGatewayResourceEtherscan": {
+      "Type": "AWS::ApiGateway::Resource",
+      "Properties": {
+        "ParentId": {
+          "Fn::GetAtt": [
+            "ApiGatewayRestApi",
+            "RootResourceId"
+          ]
+        },
+        "PathPart": "etherscan",
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        }
+      }
+    },
+    "ApiGatewayResourceEtherscanTokennfttx": {
+      "Type": "AWS::ApiGateway::Resource",
+      "Properties": {
+        "ParentId": {
+          "Ref": "ApiGatewayResourceEtherscan"
+        },
+        "PathPart": "tokenNftTx",
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        }
+      }
+    },
+    "ApiGatewayResourceEtherscanEthprice": {
+      "Type": "AWS::ApiGateway::Resource",
+      "Properties": {
+        "ParentId": {
+          "Ref": "ApiGatewayResourceEtherscan"
+        },
+        "PathPart": "ethprice",
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        }
+      }
+    },
+    "ApiGatewayResourceWaitlist": {
+      "Type": "AWS::ApiGateway::Resource",
+      "Properties": {
+        "ParentId": {
+          "Fn::GetAtt": [
+            "ApiGatewayRestApi",
+            "RootResourceId"
+          ]
+        },
+        "PathPart": "waitlist",
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        }
+      }
+    },
+    "ApiGatewayResourceWaitlistAdd": {
+      "Type": "AWS::ApiGateway::Resource",
+      "Properties": {
+        "ParentId": {
+          "Ref": "ApiGatewayResourceWaitlist"
+        },
+        "PathPart": "add",
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        }
+      }
+    },
+    "ApiGatewayResourceQuicknode": {
+      "Type": "AWS::ApiGateway::Resource",
+      "Properties": {
+        "ParentId": {
+          "Fn::GetAtt": [
+            "ApiGatewayRestApi",
+            "RootResourceId"
+          ]
+        },
+        "PathPart": "quicknode",
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        }
+      }
+    },
+    "ApiGatewayResourceQuicknodeQnfetchnfts": {
+      "Type": "AWS::ApiGateway::Resource",
+      "Properties": {
+        "ParentId": {
+          "Ref": "ApiGatewayResourceQuicknode"
+        },
+        "PathPart": "qn_fetchNFTs",
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        }
+      }
+    },
+    "ApiGatewayMethodNftImageOptions": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "AuthorizationType": "NONE",
+        "HttpMethod": "OPTIONS",
+        "MethodResponses": [
+          {
+            "StatusCode": "200",
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Origin": true,
+              "method.response.header.Access-Control-Allow-Headers": true,
+              "method.response.header.Access-Control-Allow-Methods": true
+            },
+            "ResponseModels": {}
+          }
+        ],
+        "RequestParameters": {},
+        "Integration": {
+          "Type": "MOCK",
+          "RequestTemplates": {
+            "application/json": "{statusCode:200}"
+          },
+          "ContentHandling": "CONVERT_TO_TEXT",
+          "IntegrationResponses": [
+            {
+              "StatusCode": "200",
+              "ResponseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'",
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,POST'"
+              },
+              "ResponseTemplates": {
+                "application/json": ""
+              }
+            }
+          ]
+        },
+        "ResourceId": {
+          "Ref": "ApiGatewayResourceNftImage"
+        },
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        }
+      }
+    },
+    "ApiGatewayMethodViewNftOptions": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "AuthorizationType": "NONE",
+        "HttpMethod": "OPTIONS",
+        "MethodResponses": [
+          {
+            "StatusCode": "200",
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Origin": true,
+              "method.response.header.Access-Control-Allow-Headers": true,
+              "method.response.header.Access-Control-Allow-Methods": true
+            },
+            "ResponseModels": {}
+          }
+        ],
+        "RequestParameters": {},
+        "Integration": {
+          "Type": "MOCK",
+          "RequestTemplates": {
+            "application/json": "{statusCode:200}"
+          },
+          "ContentHandling": "CONVERT_TO_TEXT",
+          "IntegrationResponses": [
+            {
+              "StatusCode": "200",
+              "ResponseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'",
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,POST'"
+              },
+              "ResponseTemplates": {
+                "application/json": ""
+              }
+            }
+          ]
+        },
+        "ResourceId": {
+          "Ref": "ApiGatewayResourceViewNft"
+        },
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        }
+      }
+    },
+    "ApiGatewayMethodEtherscanTokennfttxOptions": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "AuthorizationType": "NONE",
+        "HttpMethod": "OPTIONS",
+        "MethodResponses": [
+          {
+            "StatusCode": "200",
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Origin": true,
+              "method.response.header.Access-Control-Allow-Headers": true,
+              "method.response.header.Access-Control-Allow-Methods": true
+            },
+            "ResponseModels": {}
+          }
+        ],
+        "RequestParameters": {},
+        "Integration": {
+          "Type": "MOCK",
+          "RequestTemplates": {
+            "application/json": "{statusCode:200}"
+          },
+          "ContentHandling": "CONVERT_TO_TEXT",
+          "IntegrationResponses": [
+            {
+              "StatusCode": "200",
+              "ResponseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'",
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,POST'"
+              },
+              "ResponseTemplates": {
+                "application/json": ""
+              }
+            }
+          ]
+        },
+        "ResourceId": {
+          "Ref": "ApiGatewayResourceEtherscanTokennfttx"
+        },
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        }
+      }
+    },
+    "ApiGatewayMethodEtherscanEthpriceOptions": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "AuthorizationType": "NONE",
+        "HttpMethod": "OPTIONS",
+        "MethodResponses": [
+          {
+            "StatusCode": "200",
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Origin": true,
+              "method.response.header.Access-Control-Allow-Headers": true,
+              "method.response.header.Access-Control-Allow-Methods": true
+            },
+            "ResponseModels": {}
+          }
+        ],
+        "RequestParameters": {},
+        "Integration": {
+          "Type": "MOCK",
+          "RequestTemplates": {
+            "application/json": "{statusCode:200}"
+          },
+          "ContentHandling": "CONVERT_TO_TEXT",
+          "IntegrationResponses": [
+            {
+              "StatusCode": "200",
+              "ResponseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'",
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET'"
+              },
+              "ResponseTemplates": {
+                "application/json": ""
+              }
+            }
+          ]
+        },
+        "ResourceId": {
+          "Ref": "ApiGatewayResourceEtherscanEthprice"
+        },
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        }
+      }
+    },
+    "ApiGatewayMethodWaitlistAddOptions": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "AuthorizationType": "NONE",
+        "HttpMethod": "OPTIONS",
+        "MethodResponses": [
+          {
+            "StatusCode": "200",
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Origin": true,
+              "method.response.header.Access-Control-Allow-Headers": true,
+              "method.response.header.Access-Control-Allow-Methods": true
+            },
+            "ResponseModels": {}
+          }
+        ],
+        "RequestParameters": {},
+        "Integration": {
+          "Type": "MOCK",
+          "RequestTemplates": {
+            "application/json": "{statusCode:200}"
+          },
+          "ContentHandling": "CONVERT_TO_TEXT",
+          "IntegrationResponses": [
+            {
+              "StatusCode": "200",
+              "ResponseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'",
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,POST'"
+              },
+              "ResponseTemplates": {
+                "application/json": ""
+              }
+            }
+          ]
+        },
+        "ResourceId": {
+          "Ref": "ApiGatewayResourceWaitlistAdd"
+        },
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        }
+      }
+    },
+    "ApiGatewayMethodQuicknodeQnfetchnftsOptions": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "AuthorizationType": "NONE",
+        "HttpMethod": "OPTIONS",
+        "MethodResponses": [
+          {
+            "StatusCode": "200",
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Origin": true,
+              "method.response.header.Access-Control-Allow-Headers": true,
+              "method.response.header.Access-Control-Allow-Methods": true
+            },
+            "ResponseModels": {}
+          }
+        ],
+        "RequestParameters": {},
+        "Integration": {
+          "Type": "MOCK",
+          "RequestTemplates": {
+            "application/json": "{statusCode:200}"
+          },
+          "ContentHandling": "CONVERT_TO_TEXT",
+          "IntegrationResponses": [
+            {
+              "StatusCode": "200",
+              "ResponseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'",
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,POST'"
+              },
+              "ResponseTemplates": {
+                "application/json": ""
+              }
+            }
+          ]
+        },
+        "ResourceId": {
+          "Ref": "ApiGatewayResourceQuicknodeQnfetchnfts"
+        },
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        }
+      }
+    },
+    "ApiGatewayMethodNftImagePost": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "HttpMethod": "POST",
+        "RequestParameters": {},
+        "ResourceId": {
+          "Ref": "ApiGatewayResourceNftImage"
+        },
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        },
+        "ApiKeyRequired": false,
+        "AuthorizationType": "AWS_IAM",
+        "Integration": {
+          "IntegrationHttpMethod": "POST",
+          "Type": "AWS_PROXY",
+          "Uri": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":apigateway:",
+                {
+                  "Ref": "AWS::Region"
+                },
+                ":lambda:path/2015-03-31/functions/",
+                {
+                  "Fn::GetAtt": [
+                    "NftImageLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "/invocations"
+              ]
+            ]
+          }
+        },
+        "MethodResponses": []
+      },
+      "DependsOn": [
+        "NftImageLambdaPermissionApiGateway"
+      ]
+    },
+    "ApiGatewayMethodViewNftPost": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "HttpMethod": "POST",
+        "RequestParameters": {},
+        "ResourceId": {
+          "Ref": "ApiGatewayResourceViewNft"
+        },
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        },
+        "ApiKeyRequired": false,
+        "AuthorizationType": "AWS_IAM",
+        "Integration": {
+          "IntegrationHttpMethod": "POST",
+          "Type": "AWS_PROXY",
+          "Uri": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":apigateway:",
+                {
+                  "Ref": "AWS::Region"
+                },
+                ":lambda:path/2015-03-31/functions/",
+                {
+                  "Fn::GetAtt": [
+                    "ViewNFTLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "/invocations"
+              ]
+            ]
+          }
+        },
+        "MethodResponses": []
+      },
+      "DependsOn": [
+        "ViewNFTLambdaPermissionApiGateway"
+      ]
+    },
+    "ApiGatewayMethodEtherscanTokennfttxPost": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "HttpMethod": "POST",
+        "RequestParameters": {},
+        "ResourceId": {
+          "Ref": "ApiGatewayResourceEtherscanTokennfttx"
+        },
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        },
+        "ApiKeyRequired": false,
+        "AuthorizationType": "AWS_IAM",
+        "Integration": {
+          "IntegrationHttpMethod": "POST",
+          "Type": "AWS_PROXY",
+          "Uri": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":apigateway:",
+                {
+                  "Ref": "AWS::Region"
+                },
+                ":lambda:path/2015-03-31/functions/",
+                {
+                  "Fn::GetAtt": [
+                    "ViewNFTtxLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "/invocations"
+              ]
+            ]
+          }
+        },
+        "MethodResponses": []
+      },
+      "DependsOn": [
+        "ViewNFTtxLambdaPermissionApiGateway"
+      ]
+    },
+    "ApiGatewayMethodEtherscanEthpriceGet": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "HttpMethod": "GET",
+        "RequestParameters": {},
+        "ResourceId": {
+          "Ref": "ApiGatewayResourceEtherscanEthprice"
+        },
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        },
+        "ApiKeyRequired": false,
+        "AuthorizationType": "AWS_IAM",
+        "Integration": {
+          "IntegrationHttpMethod": "POST",
+          "Type": "AWS_PROXY",
+          "Uri": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":apigateway:",
+                {
+                  "Ref": "AWS::Region"
+                },
+                ":lambda:path/2015-03-31/functions/",
+                {
+                  "Fn::GetAtt": [
+                    "GetEthPriceLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "/invocations"
+              ]
+            ]
+          }
+        },
+        "MethodResponses": []
+      },
+      "DependsOn": [
+        "GetEthPriceLambdaPermissionApiGateway"
+      ]
+    },
+    "ApiGatewayMethodWaitlistAddPost": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "HttpMethod": "POST",
+        "RequestParameters": {},
+        "ResourceId": {
+          "Ref": "ApiGatewayResourceWaitlistAdd"
+        },
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        },
+        "ApiKeyRequired": false,
+        "AuthorizationType": "AWS_IAM",
+        "Integration": {
+          "IntegrationHttpMethod": "POST",
+          "Type": "AWS_PROXY",
+          "Uri": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":apigateway:",
+                {
+                  "Ref": "AWS::Region"
+                },
+                ":lambda:path/2015-03-31/functions/",
+                {
+                  "Fn::GetAtt": [
+                    "AddToWaitlistLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "/invocations"
+              ]
+            ]
+          }
+        },
+        "MethodResponses": []
+      },
+      "DependsOn": [
+        "AddToWaitlistLambdaPermissionApiGateway"
+      ]
+    },
+    "ApiGatewayMethodQuicknodeQnfetchnftsPost": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "HttpMethod": "POST",
+        "RequestParameters": {},
+        "ResourceId": {
+          "Ref": "ApiGatewayResourceQuicknodeQnfetchnfts"
+        },
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        },
+        "ApiKeyRequired": false,
+        "AuthorizationType": "AWS_IAM",
+        "Integration": {
+          "IntegrationHttpMethod": "POST",
+          "Type": "AWS_PROXY",
+          "Uri": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":apigateway:",
+                {
+                  "Ref": "AWS::Region"
+                },
+                ":lambda:path/2015-03-31/functions/",
+                {
+                  "Fn::GetAtt": [
+                    "QnUnderscorefetchNFTsLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "/invocations"
+              ]
+            ]
+          }
+        },
+        "MethodResponses": []
+      },
+      "DependsOn": [
+        "QnUnderscorefetchNFTsLambdaPermissionApiGateway"
+      ]
+    },
+    "ApiGatewayDeployment1658468265892": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        },
+        "StageName": "prod"
+      },
+      "DependsOn": [
+        "ApiGatewayMethodNftImageOptions",
+        "ApiGatewayMethodViewNftOptions",
+        "ApiGatewayMethodEtherscanTokennfttxOptions",
+        "ApiGatewayMethodEtherscanEthpriceOptions",
+        "ApiGatewayMethodWaitlistAddOptions",
+        "ApiGatewayMethodQuicknodeQnfetchnftsOptions",
+        "ApiGatewayMethodNftImagePost",
+        "ApiGatewayMethodViewNftPost",
+        "ApiGatewayMethodEtherscanTokennfttxPost",
+        "ApiGatewayMethodEtherscanEthpriceGet",
+        "ApiGatewayMethodWaitlistAddPost",
+        "ApiGatewayMethodQuicknodeQnfetchnftsPost"
+      ]
+    },
+    "NftImageLambdaPermissionApiGateway": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "NftImageLambdaFunction",
+            "Arn"
+          ]
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition"
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":",
+              {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "/*/*"
+            ]
+          ]
+        }
+      }
+    },
+    "ViewNFTLambdaPermissionApiGateway": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "ViewNFTLambdaFunction",
+            "Arn"
+          ]
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition"
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":",
+              {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "/*/*"
+            ]
+          ]
+        }
+      }
+    },
+    "ViewNFTtxLambdaPermissionApiGateway": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "ViewNFTtxLambdaFunction",
+            "Arn"
+          ]
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition"
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":",
+              {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "/*/*"
+            ]
+          ]
+        }
+      }
+    },
+    "GetEthPriceLambdaPermissionApiGateway": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "GetEthPriceLambdaFunction",
+            "Arn"
+          ]
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition"
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":",
+              {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "/*/*"
+            ]
+          ]
+        }
+      }
+    },
+    "AddToWaitlistLambdaPermissionApiGateway": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "AddToWaitlistLambdaFunction",
+            "Arn"
+          ]
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition"
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":",
+              {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "/*/*"
+            ]
+          ]
+        }
+      }
+    },
+    "QnUnderscorefetchNFTsLambdaPermissionApiGateway": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "QnUnderscorefetchNFTsLambdaFunction",
+            "Arn"
+          ]
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition"
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":",
+              {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "/*/*"
+            ]
+          ]
+        }
+      }
+    },
+    "NFTImageBucket": {
+      "Type": "AWS::S3::Bucket",
+      "Properties": {
+        "BucketName": "image.nft.burnance.io"
+      }
+    },
+    "NFTBucket": {
+      "Type": "AWS::S3::Bucket",
+      "Properties": {
+        "BucketName": "nft.burnance.io"
+      }
+    },
+    "GatewayResponse": {
+      "Type": "AWS::ApiGateway::GatewayResponse",
+      "Properties": {
+        "ResponseParameters": {
+          "gatewayresponse.header.WWW-Authenticate": "'Basic'"
+        },
+        "ResponseType": "UNAUTHORIZED",
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        },
+        "StatusCode": "401"
+      }
+    },
+    "NFTImageDynamoDBTable": {
+      "Type": "AWS::DynamoDB::Table",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "chainContractAddress",
+            "AttributeType": "S"
+          },
+          {
+            "AttributeName": "tokenId",
+            "AttributeType": "N"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "chainContractAddress",
+            "KeyType": "HASH"
+          },
+          {
+            "AttributeName": "tokenId",
+            "KeyType": "RANGE"
+          }
+        ],
+        "ProvisionedThroughput": {
+          "ReadCapacityUnits": 1,
+          "WriteCapacityUnits": 1
+        },
+        "TableName": "burnance-prod-nfts-image"
+      }
+    },
+    "WalletNFTtxDynamoDBTable": {
+      "Type": "AWS::DynamoDB::Table",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "owner",
+            "AttributeType": "S"
+          },
+          {
+            "AttributeName": "contractAddressTokenId",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "owner",
+            "KeyType": "HASH"
+          },
+          {
+            "AttributeName": "contractAddressTokenId",
+            "KeyType": "RANGE"
+          }
+        ],
+        "ProvisionedThroughput": {
+          "ReadCapacityUnits": 1,
+          "WriteCapacityUnits": 1
+        },
+        "TableName": "burnance-prod-wallet-nft-tx"
+      }
+    },
+    "WalletNFTCacheDynamoDBTable": {
+      "Type": "AWS::DynamoDB::Table",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "address",
+            "AttributeType": "S"
+          },
+          {
+            "AttributeName": "page",
+            "AttributeType": "N"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "address",
+            "KeyType": "HASH"
+          },
+          {
+            "AttributeName": "page",
+            "KeyType": "RANGE"
+          }
+        ],
+        "ProvisionedThroughput": {
+          "ReadCapacityUnits": 1,
+          "WriteCapacityUnits": 1
+        },
+        "TableName": "burnance-prod-wallet-nft-cache"
+      }
+    },
+    "WalletDynamoDBTable": {
+      "Type": "AWS::DynamoDB::Table",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "chain",
+            "AttributeType": "S"
+          },
+          {
+            "AttributeName": "address",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "chain",
+            "KeyType": "HASH"
+          },
+          {
+            "AttributeName": "address",
+            "KeyType": "RANGE"
+          }
+        ],
+        "ProvisionedThroughput": {
+          "ReadCapacityUnits": 1,
+          "WriteCapacityUnits": 1
+        },
+        "TableName": "burnance-prod-wallet"
+      }
+    },
+    "WalletNFTDynamoDBTable": {
+      "Type": "AWS::DynamoDB::Table",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "chain",
+            "AttributeType": "S"
+          },
+          {
+            "AttributeName": "contractAddressTokenId",
+            "AttributeType": "S"
+          },
+          {
+            "AttributeName": "owner",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "chain",
+            "KeyType": "HASH"
+          },
+          {
+            "AttributeName": "contractAddressTokenId",
+            "KeyType": "RANGE"
+          }
+        ],
+        "GlobalSecondaryIndexes": [
+          {
+            "IndexName": "InstanceIdIndex",
+            "KeySchema": [
+              {
+                "AttributeName": "owner",
+                "KeyType": "HASH"
+              },
+              {
+                "AttributeName": "contractAddressTokenId",
+                "KeyType": "RANGE"
+              }
+            ],
+            "Projection": {
+              "NonKeyAttributes": [
+                "costETH",
+                "costUSD",
+                "valueUSD",
+                "valueETH",
+                "ethTransPriceUSD",
+                "hash",
+                "createdatetime",
+                "timestamp"
+              ],
+              "ProjectionType": "INCLUDE"
+            },
+            "ProvisionedThroughput": {
+              "ReadCapacityUnits": 1,
+              "WriteCapacityUnits": 1
+            }
+          }
+        ],
+        "ProvisionedThroughput": {
+          "ReadCapacityUnits": 1,
+          "WriteCapacityUnits": 1
+        },
+        "TableName": "burnance-prod-wallet-nft"
+      }
+    },
+    "NFTMetaDataDynamoDBTable": {
+      "Type": "AWS::DynamoDB::Table",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "chainContractAddress",
+            "AttributeType": "S"
+          },
+          {
+            "AttributeName": "tokenId",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "chainContractAddress",
+            "KeyType": "HASH"
+          },
+          {
+            "AttributeName": "tokenId",
+            "KeyType": "RANGE"
+          }
+        ],
+        "ProvisionedThroughput": {
+          "ReadCapacityUnits": 2,
+          "WriteCapacityUnits": 2
+        },
+        "TableName": "burnance-prod-nfts-metadata"
+      }
+    },
+    "ContractABIDynamoDBTable": {
+      "Type": "AWS::DynamoDB::Table",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "chain",
+            "AttributeType": "S"
+          },
+          {
+            "AttributeName": "contractAddress",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "chain",
+            "KeyType": "HASH"
+          },
+          {
+            "AttributeName": "contractAddress",
+            "KeyType": "RANGE"
+          }
+        ],
+        "ProvisionedThroughput": {
+          "ReadCapacityUnits": 2,
+          "WriteCapacityUnits": 2
+        },
+        "TableName": "burnance-prod-contract-abi"
+      }
+    }
+  },
+  "Outputs": {
+    "ServerlessDeploymentBucketName": {
+      "Value": "service.burnance.nodejs.lambdas.prod",
+      "Export": {
+        "Name": "sls-burnance-prod-ServerlessDeploymentBucketName"
+      }
+    },
+    "QnUnderscorefetchNFTsLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "QnUnderscorefetchNFTsLambdaVersionaalFRk529bVfMJNrtEFb6NUCjAoJ6aZXUbIz2hnTw"
+      },
+      "Export": {
+        "Name": "sls-burnance-prod-QnUnderscorefetchNFTsLambdaFunctionQualifiedArn"
+      }
+    },
+    "NftImageLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "NftImageLambdaVersionRkAgjXg8tuj276EGTlwthJev7uMbuYpnkEFuoiPuVk"
+      },
+      "Export": {
+        "Name": "sls-burnance-prod-NftImageLambdaFunctionQualifiedArn"
+      }
+    },
+    "ViewNFTLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "ViewNFTLambdaVersioniKUGecvaNHY8ak36pYYMxbHD8Xtc5X7wdjdGK3r3U"
+      },
+      "Export": {
+        "Name": "sls-burnance-prod-ViewNFTLambdaFunctionQualifiedArn"
+      }
+    },
+    "AddToWaitlistLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "AddToWaitlistLambdaVersion5ZplaitgMldrCZy0D6CFFflwgoYNzag7FfDFfYREeUY"
+      },
+      "Export": {
+        "Name": "sls-burnance-prod-AddToWaitlistLambdaFunctionQualifiedArn"
+      }
+    },
+    "ViewNFTtxLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "ViewNFTtxLambdaVersionxnrdon4G1tOiGN8XIDL7ym6p9UAJjen5CA4RlPi68w"
+      },
+      "Export": {
+        "Name": "sls-burnance-prod-ViewNFTtxLambdaFunctionQualifiedArn"
+      }
+    },
+    "GetEthPriceLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "GetEthPriceLambdaVersionacCXblawOBgn5ddjIjklwL8uP6DTjroMFLJygFUzq10"
+      },
+      "Export": {
+        "Name": "sls-burnance-prod-GetEthPriceLambdaFunctionQualifiedArn"
+      }
+    },
+    "ServiceEndpoint": {
+      "Description": "URL of the service endpoint",
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            "https://",
+            {
+              "Ref": "ApiGatewayRestApi"
+            },
+            ".execute-api.",
+            {
+              "Ref": "AWS::Region"
+            },
+            ".",
+            {
+              "Ref": "AWS::URLSuffix"
+            },
+            "/prod"
+          ]
+        ]
+      },
+      "Export": {
+        "Name": "sls-burnance-prod-ServiceEndpoint"
+      }
+    }
+  }
+}
