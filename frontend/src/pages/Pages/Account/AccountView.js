@@ -1,9 +1,10 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
-import { Container, Row, Col, Table, Card, CardBody } from "reactstrap";
+import { Container, Row, Col, Table, Card, CardBody, Input } from "reactstrap";
 import logodark from "../../../assets/images/burnance_logo.png";
 //Import Icons
-import dateFormat, { masks } from "dateformat";
+import dateFormat from "dateformat";
+import { Chart } from "react-google-charts";
 
 var formatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
@@ -14,6 +15,30 @@ var formatter = new Intl.NumberFormat('en-US', {
   //maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
 });
 
+
+export const data = [
+  ["Department", "Revenues Change"],
+  ["Shoes", { v: 12, f: "12.0%" }],
+  ["Sports", { v: -7.3, f: "-7.3%" }],
+  ["Toys", { v: 0, f: "0%" }],
+  ["Electronics", { v: -2.1, f: "-2.1%" }],
+  ["Food", { v: 22, f: "22.0%" }],
+];
+
+export const options = {
+  allowHtml: true,
+  showRowNumber: true,
+};
+
+export const formatters = [
+  {
+    type: "ArrowFormat",
+    column: 7,
+  },
+];
+
+var _nfts = [];
+
 class PageInvoice extends Component {
   constructor(props) {
     super(props);
@@ -23,13 +48,41 @@ class PageInvoice extends Component {
         { id: 2, name: "Loopy Donuts #7257", qty: 1, floor: 0.1, usd: 10.15, eth: 0.25548, gas: 0.25348, ethPrice:  2412.23},
         { id: 3, name: "Jailed Baby Ape Club #5940", qty: 3, floor: 0.1, usd: 10.15, eth: 0.25548, gas: 0.25348, ethPrice:  2570.15},
       ],
-      nfts: [],
       ethereumAddress: '',
       walletConnected: false,
+      nfts : [
+        ["Item", "Date", "Floor", "Gas", "USD", "ETH", "ETH Price", "Change", "Burn"],
+        ["One Day Bae #7925", "2/28/08", 0.1, 10.15, 0.25548, 0.25348, 1573.00, { v: 12, f: "12.0%" }, `<Input type="checkbox" id={1} name="check1"></Input>`],
+        ["Loopy Donuts #7257", "2/28/08", 0.1, 10.15, 0.25548, 0.25348, 2412.23,{ v: -7.3, f: "-7.3%" }, `<Input type="checkbox" id={1} name="check1" ></Input>`],
+        ["Jailed Baby Ape Club #5940","2/28/08", 0.1, 10.15, 0.25548, 0.25348, 2570.15, { v: 0, f: "0%" }, `<Input type="checkbox" id={1} name="check1"></Input>`],
+        ["The Donut Shop #3090", "2/28/08", 0.1, 10.15, 0.25548, 0.25348, 1573.00,{ v: -2.1, f: "-2.1%" }, `<Input type="checkbox" id={1} name="check1"></Input>`],
+        ["Loopy Cups #7257", "2/28/08", 0.1, 10.15, 0.25548, 0.25348, 1573.00, { v: 22, f: "22.0%" }, `<input type="checkbox" id={1} name="check1" onClick={e=>{console.log(e.target.name)}}></input>`],
+      ],
+      data : [
+        ["Collection", "Change"],
+        ["One Day Bae", { v: 12, f: "12.0%" }],
+        ["Loopy Donuts", { v: -7.3, f: "-7.3%" }],
+        ["Jailed Baby Ape Club", { v: 0, f: "0%" }],
+        ["The Donut Shop", { v: -2.1, f: "-2.1%" }],
+        ["Loopy Cups", { v: 22, f: "22.0%" }],
+      ],
+      options : {
+        allowHtml: true,
+        showRowNumber: true,
+      },
+      formatters : [
+        {
+          type: "ArrowFormat",
+          column: 1,
+        },
+      ]
     };
     this.sendMail.bind(this);
     this.callNumber.bind(this);
     this.accountsChanged.bind(this);
+    //this.chartEvents.bind(this);
+
+
   }
 
   sendMail() {
@@ -52,6 +105,7 @@ class PageInvoice extends Component {
           ethereumAddress: window.ethereum._state.accounts[0],
           walletConnected: true,
         });
+        _nfts = this.state.nfts;
       }
     } 
 
@@ -84,7 +138,35 @@ class PageInvoice extends Component {
     }
   };
 
+
+
   render() {
+
+    const chartEvents = [
+      {
+        eventName: "select",
+        callback({ chartWrapper }) {
+          console.log("Selected ", chartWrapper.getChart().getSelection());
+          const item = chartWrapper.getChart().getSelection()[0];
+          console.log(item)
+          
+         // console.log(this.state.nfts[item.row+1]);
+         console.log(_nfts);
+        }
+      },
+      {
+        eventName: "ready",
+        callback({ chartWrapper }) {
+         // console.log("ready ", chartWrapper.getChart());
+        }
+      },
+      {
+        eventName: "error",
+        callback({ chartWrapper }) {
+          console.log("error ", chartWrapper.getChart());
+        }
+      }
+    ];
     return (
       <React.Fragment>
         <section className="bg-invoice bg-light">
@@ -110,6 +192,14 @@ class PageInvoice extends Component {
                         <Col md="8" className="mt-4 mt-sm-0">
                           <h5>Address :</h5>
                           {this.state.ethereumAddress}
+                          <Chart
+                            chartType="Table"
+                            width="100%"
+                            data={this.state.data}
+                            options={this.state.options}
+                            formatters={this.state.formatters}
+                            chartEvents={chartEvents}
+                          />
                         </Col>
                       </Row>
                     </div>
@@ -152,7 +242,69 @@ class PageInvoice extends Component {
 
                     <div className="invoice-table pb-4">
                       <div className="table-responsive bg-white shadow rounded">
-                        <Table className="mb-0 table-center invoice-tb">
+                      <Chart
+                            chartType="Table"
+                            width="100%"
+                            data={this.state.nfts}
+                            options={{
+                              allowHtml: true,
+                              showRowNumber: false,
+                              width: '100%', 
+                              height: '100%',
+                              pageSize: 3
+                            }}
+                            formatters={[
+                              {
+                                type: "ArrowFormat",
+                                column: 7,
+                              },
+                              {
+                                type: "NumberFormat" ,
+                                column: 6,
+                                options: {
+                                  prefix: "$",
+                                  negativeColor: "red",
+                                  negativeParens: true,
+                                },
+                              },
+                              {
+                                type: "NumberFormat" ,
+                                column: 2,
+                                options: {
+                                  prefix: "$",
+                                  negativeColor: "red",
+                                  negativeParens: true,
+                                },
+                              },
+                              {
+                                type: "NumberFormat" ,
+                                column: 3,
+                                options: {
+                                  prefix: "$",
+                                  negativeColor: "red",
+                                  negativeParens: true,
+                                },
+                              },
+                              {
+                                type: "NumberFormat" ,
+                                column: 4,
+                                options: {
+                                  prefix: "$",
+                                  negativeColor: "red",
+                                  negativeParens: true,
+                                },
+                              },
+                              {
+                                type: "NumberFormat" ,
+                                column: 5,
+                                options: {
+                                  fractionDigits: 6
+                                },
+                              }
+                            ]}
+                            chartEvents={chartEvents}
+                          />
+                        {/* <Table className="mb-0 table-center invoice-tb">
                           <thead className="bg-light">
                             <tr>
                               <th
@@ -199,7 +351,7 @@ class PageInvoice extends Component {
                               </tr>
                             ))}
                           </tbody>
-                        </Table>
+                        </Table> */}
                       </div>
 
                       <Row>

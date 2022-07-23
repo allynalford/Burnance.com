@@ -33,6 +33,7 @@
     "react-fade-in": "^2.0.1",
     "react-flatpickr": "^3.10.7",
     "react-ga": "^3.3.0",
+    "react-google-charts": "^4.0.0",
     "react-image-lightbox": "^5.1.1",
     "react-modal-video": "^1.2.6",
     "react-paginate": "^8.1.3",
