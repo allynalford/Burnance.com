@@ -4,7 +4,155 @@
 "use strict";
 const ethers = require("ethers");
 const endpoint = require('../common/endpoint');
+const dateformat = require("dateformat");
 
+/**
+ * returns transaction data about the purchase of the NFT
+ *
+ * @author Allyn j. Alford <Allyn@tenablylabs.com>
+ * @async
+ * @function getNFTtx
+ * @param {String} chain - ethereum blockchain (for now)
+ * @param {String} address - ethereum wallet address
+ * @param {String} contractAddress - ethereum contract address
+ * @param {String} tokenId - unique identifier for the NFT within the collection
+ * @return {Promise<Array>} Response Array for next step to process.
+ */
+module.exports.getNFTtx = async (chain, address, contractaddress, tokenId) => {
+    let valueETH, valueUSD, costUSD, costETH, gasETH, gasUSD, etherScanTxUrl, hash, price;
+    try {
+
+        //Check if the NFT already exists for this wallet
+        const NFT = await this._getWalletNFT(address, contractaddress + tokenId);
+
+        console.log('NFT Exists',NFT);
+
+        if (typeof NFT !== "undefined" && NFT.length !== 0) {
+            return NFT[0];
+        };
+
+        //Check if the data already exists
+        let tokenNftTx = await this._getNftTxs(address, contractaddress + tokenId);
+
+        console.log('tokenNftTx Exists? ', tokenNftTx);
+
+        if (typeof tokenNftTx === "undefined") {
+            //Grab the NFT transactions from API if we don't have it
+            tokenNftTx = await this._tokenNftTx(contractaddress, address);
+
+            if (typeof tokenNftTx.message !== "undefined" && tokenNftTx.message === "No transactions found") {
+                return {
+                    costETH: 0.0,
+                    costUSD: 0.0,
+                    valueETH: 0.0,
+                    valueUSD: 0.0,
+                    ethTransPriceUSD: 0.0,
+                    etherScanTxUrl: "",
+                    hash,
+                    failed: true
+                }
+            };
+
+            //console.log('tokenNftTx',tokenNftTx);
+
+            const _ = require('lodash');
+
+            tokenNftTx = _.find(tokenNftTx.result, function (o) { return o.tokenID === tokenId; });
+
+            console.log('Filtered', tokenNftTx);
+
+        }else{
+            tokenNftTx = tokenNftTx.result;
+        }
+
+        
+        
+
+        hash = tokenNftTx.hash
+
+
+        //Save the transactions
+        await this._addNftTx(address, contractaddress + tokenId, tokenNftTx);
+  
+        //console.log(tokenNftTx);
+  
+        //Get the transaction date
+        const date = new Date(tokenNftTx.timeStamp * 1000);
+  
+        //Calculate the dates for the price
+        const startAndStop = dateformat(date, "yyyy-mm-dd");
+  
+        //Based on the date of the transaction, lets get the price of ETH
+        price = await this._ethDailyPrice(startAndStop, startAndStop);
+        //console.log('Price',price);
+  
+        //Create a web3 object to convert data
+        var Web3 = require('web3');
+        //add provider to it
+        var web3 = new Web3(process.env.QUICK_NODE_HTTP);
+
+        etherScanTxUrl = `https://etherscan.io/tx/${hash}`;
+
+        //Grab all the transactions based on the hash
+        const txs = await this._txListInternal(hash);
+  
+        //console.log(txs);
+  
+        //Loop thru the transactions and add up the values
+        valueETH = 0.0, gasETH = 0.0;
+        for (const tx of txs.result) {
+  
+          const valueToEth = web3.utils.fromWei(tx.value.toString(), 'ether');
+  
+          const gasToEth = web3.utils.fromWei(tx.gas.toString(), 'ether');
+  
+  
+          valueETH = (Number(valueETH) + Number(valueToEth));//First the value
+          gasETH = (Number(gasETH) + Number(gasToEth));//First the value
+        };
+
+        gasUSD = parseFloat(gasETH * price.result[0].value);
+
+        costETH = (Number(valueETH) + Number(gasETH));//Then the transaction cost in gas
+
+        //Convert ETH to USD based on the price of ETH on that date
+        costUSD = parseFloat(costETH * price.result[0].value);
+        costUSD = (Number(gasUSD.toFixed(2)) + Number(costUSD.toFixed(2)));
+
+
+
+        valueUSD = parseFloat(valueETH * price.result[0].value);
+
+        const saveNFT = await this._addWalletNFT(
+          chain,
+          address,
+          contractaddress + tokenId,
+          costUSD,
+          costETH,
+          valueUSD,
+          valueETH,
+          price.result[0].value,
+          tokenNftTx.hash
+        );
+        console.log("saveNFT", saveNFT);
+       
+
+        //Return the data
+        return {
+            costETH,
+            costUSD,
+            valueETH,
+            valueUSD,
+            ethTransPriceUSD: price.result[0].value,
+            etherScanTxUrl,
+            hash
+        }
+    } catch (err) {
+        console.error(err.message);
+        console.error('module.exports.getNFTtx', err);
+        throw err;
+    }
+};
 
 module.exports._addressTokenNFTBalance = async (address, page, offset) => {
     try {
@@ -326,3 +474,45 @@ module.exports._getWalletNFT = async (owner, contractAddressTokenId) => {
             throw e;
           }
         };
+
+
+/**
+* update NFT fields
+*
+* @author Allyn j. Alford <Allyn@tenablylabs.com>
+* @async
+* @function _updateWalletNFTFields
+* @param {string} chain 
+* @param {string} contractAddressTokenId 
+* @param {list} fields 
+*/
+ module.exports._updateWalletNFTFields = async (chain, contractAddressTokenId, fields) => {
+    try {
+      const dateFormat = require('dateformat');
+      var ExpressionAttributeValues = {}, ExpressionAttributeNames = {}
+      var UpdateExpression = "set #dt = :dt";
+  
+      for (const f of fields) {
+        ExpressionAttributeValues[`:${f.name}`] = f.value;
+        ExpressionAttributeNames[`#${f.name}`] = f.name;
+        UpdateExpression = UpdateExpression + `, #${f.name} = :${f.name}`
+      };
+  
+      ExpressionAttributeNames["#dt"] = "updatedAt";
+      ExpressionAttributeValues[":dt"] = dateFormat(new Date(), "isoUtcDateTime");
+  
+      //Save the profile to dynamoDB
+      return await dynamo.updateDB({
+        TableName: process.env.DYNAMODB_TABLE_WALLET_NFT,
+        Key: { chain, contractAddressTokenId},
+        UpdateExpression,
+        ExpressionAttributeValues,
+        ExpressionAttributeNames,
+        ReturnValues: "UPDATED_NEW"
+      });
+    } catch (err) {
+      console.error(JSON.stringify(err));
+      log.error(err);
+      throw err;
+    };
+  };

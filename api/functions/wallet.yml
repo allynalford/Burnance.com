@@ -5,26 +5,20 @@
           path: shopify/workflow/language/start
           method: post
     environment:
-      state_machine_arn : arn:aws:states:${opt:region, self:provider.region}:${self:provider.environment.ACCOUNTID}:stateMachine:shopifyLanguageTagStateMachineArn
-  languageStart:
-    handler: shopify/language/steps.start
-    # events:
-    #   - http:
-    #       path: shopify/step/language/start
-    #       method: post  
-  languageCheckTag:
-    handler: shopify/language/steps.check  
-    # events:
-    #   - http:
-    #       path: shopify/step/language/checkTag
-    #       method: post
-  languageAddTag:
-    handler: shopify/language/steps.add
-    # events:
-    #   - http:
-    #       path: shopify/step/language/addTag
-    #       method: post
-  languageStop:
-    handler: shopify/language/steps.stop   
-  languageNotification:
-    handler: shopify/language/steps.notification
+      state_machine_arn : arn:aws:states:${opt:region, self:provider.region}:${self:provider.environment.ACCOUNTID}:stateMachine:walletDetailsStateMachineArn
+  walletStart:
+    handler: wallet/steps.start
+    events:
+      - http:
+          path: wallet/step/start
+          method: post  
+  walletLoad:
+    handler: wallet/steps.loadWalletData  
+    events:
+      - http:
+          path: wallet/step/details/load
+          method: post
+  walletStop:
+    handler: wallet/steps.stop   
+  walletNotification:
+    handler: wallet/steps.notification

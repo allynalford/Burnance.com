@@ -238,3 +238,48 @@ module.exports.getEthPrice = async (event) => {
     return responses.respond(res, 201);
   }
 };
+
+
+module.exports.getTxTransactionFee = async event => {
+  let dt;
+
+  try {
+    //req = JSON.parse(event.body);
+
+    dt = new Date();
+  } catch (e) {
+    return responses.respond({
+      success: false,
+      error: true,
+      message: e.message,
+      e
+    }, 416);
+  };
+
+  try {
+    //Setup the logging
+    log.options.meta.event = event;
+
+    const pupUtils = require('../pup/utils');
+
+    const resp = await pupUtils.getTxTransactionFee(`https://etherscan.io/tx/0xd1934392e1ef370b0a5523e925a14333f73448e846edc01b35caa620b0fe684f`);
+
+    return responses.respond({
+      success: true,
+      error: false,
+      resp
+    }, 200);
+
+
+
+  } catch (err) {
+    console.error(err);
+    //log.error('module.exports.shopifyCheck', err);
+    return responses.respond({
+      success: false,
+      error: true,
+      message: err.message,
+      e: err
+    }, 416);
+  }
+};

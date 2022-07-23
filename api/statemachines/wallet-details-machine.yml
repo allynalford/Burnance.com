@@ -1,8 +1,8 @@
-name: shopifyLangStateMachine-${self:service}-${opt:stage, self:provider.stage}
-id: ShopifyLangStateMachine
+name: walletDetailsStateMachine-${self:service}-${opt:stage, self:provider.stage}
+id: WalletDetailsStateMachine
 definition:
-  Comment: "Shopify Auto remediation Workflow to add language tag to the HTML element of the theme"
-  StartAt: StartLanguageTagWorkflow
+  Comment: "Wallet loading business process"
+  StartAt: WalletDetailsWorkflow
   States:
     StartLanguageTagWorkflow:
       Type: Task

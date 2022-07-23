@@ -6,6 +6,8 @@ logs
 
 
 # dependencies
+/api/cache*
+/api/pup/cache*
 /api/.serverless*
 /node_modules*
 /api/node_modules*

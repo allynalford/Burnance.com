@@ -50,6 +50,30 @@ module.exports._isCacheExpired = (timestamp) =>{
  };
 
  /**
+ * Returns full list of wallet NFTs for a given wallet.
+ *
+ * @author Allyn j. Alford <Allyn@tenablylabs.com>
+ * @async
+ * @function _qn_fetchFullNFTs
+ * @param {String} wallet - ethereum wallet address
+ * @return {Promise<Array>} Response Array for next step to process.
+ */
+  module.exports._qn_fetchFullNFTs = async (wallet) => {
+    try {
+      const provider = new ethers.providers.JsonRpcProvider(
+        process.env.QUICK_NODE_HTTP
+      );
+      return await provider.send("qn_fetchNFTs", {
+        wallet,
+        omitFields: ["provenance", "traits"],
+      });
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  };
+
+ /**
  * Returns aggregated data on NFTs for a given wallet.
  *
  * @author Allyn j. Alford <Allyn@tenablylabs.com>
