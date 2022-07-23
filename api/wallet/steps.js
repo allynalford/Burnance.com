@@ -178,8 +178,12 @@ module.exports.loadWalletData = async event => {
             console.log('processing: ',nft);
             //Get the data from API txs
             const tx = await etherUtils.getNFTtx(chain, address, nft.address, nft.tokenId);
-
             console.log('txs', tx);
+
+            const imageURL = await walletUtils.getNFTImage(chain, nft.address, nft.tokenId);
+            console.log('imageURL', imageURL);
+
+            
 
             // costETH,
             // costUSD,

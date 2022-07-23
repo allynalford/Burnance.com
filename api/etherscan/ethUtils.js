@@ -40,6 +40,8 @@ module.exports.getNFTtx = async (chain, address, contractaddress, tokenId) => {
             //Grab the NFT transactions from API if we don't have it
             tokenNftTx = await this._tokenNftTx(contractaddress, address);
 
+            //What happens when i can't find the data
+
             if (typeof tokenNftTx.message !== "undefined" && tokenNftTx.message === "No transactions found") {
                 return {
                     costETH: 0.0,

@@ -75,89 +75,136 @@ module.exports.start = async event => {
 };
 
 
-module.exports.Add = async event => {
-
-
-    let req, dt, lang, domainglobaluuid, companyglobaluuid, html, themeId;
-  
-    try{
-      req = JSON.parse(event.body);
-      dt = dateFormat(new Date(), "isoUtcDateTime");
-      domainglobaluuid  = req.domainglobaluuid;
-      companyglobaluuid  = req.companyglobaluuid;
-      lang  = req.lang;
-      if(typeof domainglobaluuid  === 'undefined') throw new Error("domainglobaluuid is undefined");
-      if(typeof companyglobaluuid  === 'undefined') throw new Error("companyglobaluuid is undefined");
-      if(typeof lang  === 'undefined') throw new Error("lang is undefined");
-  }catch(e){
+module.exports.AddWallet = async (event) => {
+  let req, dt, chain, address;
+  try {
+    req = JSON.parse(event.body);
+    dt = dateFormat(new Date(), "isoUtcDateTime");
+    chain = req.chain;
+    address = req.address;
+    if (typeof chain === "undefined") throw new Error("chain is undefined");
+    if (typeof address === "undefined") throw new Error("address is undefined");
+  } catch (e) {
     console.error(e);
-      return respond({
-          success: false,
-          error: true,
-          message: e.message,
-          e
-        }, 416);
-  };
-  
-  
-    try {
-      
-     
-  
-      return responses.respond({ error: false, success: true}, 200);
-    } catch (err) {
-      console.error(err);
-      const res = {
-        error: true,
+    return respond(
+      {
         success: false,
-        message: err.message,
-        e: err,
-        code: 201
-      };
-      console.error('module.exports.add', res);
-      return responses.respond(res, 201);
-    }
+        error: true,
+        message: e.message,
+        e,
+      },
+      416
+    );
   }
 
-  module.exports.Remove = async event => {
+  try {
+    const walletUtils = require('./utils');
 
+    //Add the wallet
+    const add = walletUtils._addWallet(chain, address);
 
-    let req, dt, lang, domainglobaluuid, companyglobaluuid, html, themeId;
-  
-    try{
-      req = JSON.parse(event.body);
-      dt = dateFormat(new Date(), "isoUtcDateTime");
-      domainglobaluuid  = req.domainglobaluuid;
-      companyglobaluuid  = req.companyglobaluuid;
-      if(typeof domainglobaluuid  === 'undefined') throw new Error("domainglobaluuid is undefined");
-      if(typeof companyglobaluuid  === 'undefined') throw new Error("companyglobaluuid is undefined");
-  }catch(e){
-    console.error(e);
-      return respond({
-          success: false,
-          error: true,
-          message: e.message,
-          e
-        }, 416);
-  };
-  
-  
-    try {
-      
-     
-  
-      return responses.respond({ error: false, success: true}, 200);
-
-    } catch (err) {
-      console.error(err);
-      const res = {
-        error: true,
-        success: false,
-        message: err.message,
-        e: err,
-        code: 201
-      };
-      console.error('module.exports.remove', res);
-      return responses.respond(res, 201);
-    }
+    return responses.respond({ error: false, success: true, add }, 200);
+  } catch (err) {
+    console.error(err);
+    const res = {
+      error: true,
+      success: false,
+      message: err.message,
+      e: err,
+      code: 201,
+    };
+    console.error("module.exports.AddWallet", res);
+    return responses.respond(res, 201);
   }
+};
+
+module.exports.GetWallet = async (event) => {
+  let dt, chain, address;
+  try {
+    dt = dateFormat(new Date(), "isoUtcDateTime");
+
+    chain = event.pathParameters.chain;
+    address = event.pathParameters.address;
+
+    if (typeof chain === "undefined") throw new Error("chain is undefined");
+    if (typeof address === "undefined") throw new Error("address is undefined");
+
+  } catch (e) {
+    console.error(e);
+    return respond(
+      {
+        success: false,
+        error: true,
+        message: e.message,
+        e,
+      },
+      416
+    );
+  }
+
+  try {
+    const walletUtils = require('./utils');
+
+    //Add the wallet
+    const wallet = walletUtils._getWallet(chain, address);
+
+    return responses.respond({ error: false, success: true, wallet }, 200);
+  } catch (err) {
+    console.error(err);
+    const res = {
+      error: true,
+      success: false,
+      message: err.message,
+      e: err,
+      code: 201,
+    };
+    console.error("module.exports.GetWallet", res);
+    return responses.respond(res, 201);
+  }
+};
+
+module.exports.DeleteWallet = async (event) => {
+  let req, dt, chain, address;
+  try {
+    req = JSON.parse(event.body);
+    dt = dateFormat(new Date(), "isoUtcDateTime");
+
+    chain = req.chain;
+    address = req.address;
+
+    if (typeof chain === "undefined") throw new Error("chain is undefined");
+    if (typeof address === "undefined") throw new Error("address is undefined");
+
+  } catch (e) {
+    console.error(e);
+    return respond(
+      {
+        success: false,
+        error: true,
+        message: e.message,
+        e,
+      },
+      416
+    );
+  }
+
+  try {
+    const walletUtils = require('./utils');
+
+    //Add the wallet
+    const wallet = walletUtils._deleteWallet(chain, address);
+
+    return responses.respond({ error: false, success: true, wallet }, 200);
+  } catch (err) {
+    console.error(err);
+    const res = {
+      error: true,
+      success: false,
+      message: err.message,
+      e: err,
+      code: 201,
+    };
+    console.error("module.exports.GetWallet", res);
+    return responses.respond(res, 201);
+  }
+};

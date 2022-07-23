@@ -241,6 +241,66 @@ module.exports._getNftTxs = async (owner, contractAddressTokenId) => {
 };
 
 /**
+* Add wallet
+*
+* @author Allyn j. Alford <Allyn@tenablylabs.com>
+* @async
+* @function _addWallet
+* @param {String} chain - blockchain of address
+* @param {String} owner - nft owner ethereum wallet address
+* @return {Promise<Array>} Response Array for next step to process.
+*/
+module.exports._addWallet = async (chain, address) => {
+    try {
+        const dynamo = require('../common/dynamo');
+        const dateformat = require("dateformat");
+        return await dynamo.saveItemInDB({
+            TableName: process.env.DYNAMODB_TABLE_WALLET,
+            Item: {
+                chain,
+                address,
+                dt: dateformat(new Date(), "isoUtcDateTime"),
+                timestamp: new Date().getTime(),
+            },
+        });
+    } catch (e) {
+        console.error(e);
+        throw e;
+    }
+};
+
+
+
+
+
+/**
+* Returns a wallet
+*
+* @author Allyn j. Alford <Allyn@tenablylabs.com>
+* @async
+* @function _getWallet
+* @param {String} chain - blockchain of address
+* @param {String} owner - nft owner ethereum wallet address
+* @return {Promise<Array>} Response Array for next step to process.
+*/
+module.exports._getWallet = async (chain, address) => {
+    try {
+        const dynamo = require('../common/dynamo');
+        const wallet = await dynamo.qetFromDB({
+            TableName: process.env.DYNAMODB_TABLE_WALLET,
+            Key: {
+                chain, 
+                address
+            }
+        });
+        return wallet;
+    } catch (e) {
+        console.error(e);
+        throw e;
+    }
+};
+
+/**
 * Add NFT transaction
 *
 * @author Allyn j. Alford <Allyn@tenablylabs.com>
@@ -272,7 +332,32 @@ module.exports._addNftTx = async (owner, contractAddressTokenId, result) => {
         throw e;
     }
 };
-
+/**
+* delete a wallet
+*
+* @author Allyn j. Alford <Allyn@tenablylabs.com>
+* @async
+* @function _deleteWallet
+* @param {String} chain - blockchain of address
+* @param {String} owner - nft owner ethereum wallet address
+* @return {Promise<Array>} Response Array for next step to process.
+*/
+module.exports._deleteWallet = async (chain, address) => {
+    try {
+        const dynamo = require('../common/dynamo');
+        const wallet = await dynamo.deleteItemFromDB({
+            TableName: process.env.DYNAMODB_TABLE_WALLET,
+            Key: {
+                chain, 
+                address
+            }
+        });
+        return wallet;
+    } catch (e) {
+        console.error(e);
+        throw e;
+    }
+};
 
 /**
 * Returns Wallet NFT data

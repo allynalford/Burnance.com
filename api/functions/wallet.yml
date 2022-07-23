@@ -4,8 +4,6 @@
       - http:
           path: shopify/workflow/language/start
           method: post
-    environment:
-      state_machine_arn : arn:aws:states:${opt:region, self:provider.region}:${self:provider.environment.ACCOUNTID}:stateMachine:walletDetailsStateMachineArn
   walletStart:
     handler: wallet/steps.start
     events:
@@ -22,3 +20,21 @@
     handler: wallet/steps.stop   
   walletNotification:
     handler: wallet/steps.notification
+  walletAdd:
+    handler: wallet/wallet.AddWallet
+    events:
+      - http:
+          path: wallet
+          method: post 
+  walletGet:
+    handler: wallet/wallet.GetWallet
+    events:
+      - http:
+          path: wallet/{chain}/{address}
+          method: get
+  walletDelete:
+    handler: wallet/wallet.DeleteWallet
+    events:
+      - http:
+          path: wallet/{chain}/{address}
+          method: delete 
