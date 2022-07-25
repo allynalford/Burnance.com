@@ -112,6 +112,7 @@ class PageInvoice extends Component {
 
     //document.getElementById('button').onclick = this.reply_click;
 
+
   }
   // Make sure to remove the DOM listener when the component is unmounted.
   componentWillUnmount() {

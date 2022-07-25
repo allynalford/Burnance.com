@@ -33,10 +33,12 @@ module.exports.start = async event => {
         //Check Parameters are valid and pass them along
         
         //Init the quickNode utils module
-        const quickNodeUtils = require('../quicknode/quickNodeUtils');
+        //const quickNodeUtils = require('../quicknode/quickNodeUtils');
+        const alchemyUtils = require('../alchemy/utils');
 
-        //Load the full list of NFTs
-        let walletNFTs = await quickNodeUtils._qn_fetchFullNFTs(address);
+        //Add the wallet
+        var walletNFTs = await alchemyUtils.getNFTs(chain, address);
+
 
         //Loop the NFTs and check which are loaded
         let nfts = [], exists = [];
@@ -49,7 +51,7 @@ module.exports.start = async event => {
         const totalItems = walletNFTs.totalItems;
 
         //Starting page number 1
-        let pageNumber = walletNFTs.pageNumber;
+        let pageNumber = walletNFTs.pageNumber, collections = [];
 
          //Loop and call a new page
         while (pageNumber < pages) {
@@ -57,17 +59,29 @@ module.exports.start = async event => {
             console.info('Processing Page:',pageNumber);
 
             //Loop the page contents
-            for (const nft of walletNFTs.assets) {
+            for (const nft of walletNFTs.ownedNfts) {
 
                 //Check if the NFT exists within the data
-                exists = await walletUtils._getWalletNFT(address, nft.collectionAddress + nft.collectionTokenId);
+                exists = await walletUtils._getWalletNFT(address, nft.contract.address + nft.tokenId);
 
                 if (exists.length === 0) {
                     //Since it's not in the database, add to the list for loading
-                    nfts.push({address: nft.collectionAddress, tokenId: nft.collectionTokenId});
+                    nfts.push({address: nft.contract.address, tokenId: nft.tokenId, media: nft.media});
                 };
 
             };
+
+            //Get the collections from the page
+            const uniques = walletNFTs.ownedNfts.map((item) => item.contract.address).filter((value, index, self) => self.indexOf(value) === index);
+
+            // _.uniq(_.map(data, 'usernames'));
+            // _.chain(data).map('usernames').uniq().value()
+
+
+            console.log(uniques);
+
+
+            collections.append(uniques);
 
             //Increase the page Number
             pageNumber++;
@@ -180,8 +194,8 @@ module.exports.loadWalletData = async event => {
             const tx = await etherUtils.getNFTtx(chain, address, nft.address, nft.tokenId);
             console.log('txs', tx);
 
-            const imageURL = await walletUtils.getNFTImage(chain, nft.address, nft.tokenId);
-            console.log('imageURL', imageURL);
+            //const imageURL = await walletUtils.getNFTImage(chain, nft.address, nft.tokenId);
+            //console.log('imageURL', imageURL);
 
             
 

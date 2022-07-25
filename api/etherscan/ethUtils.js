@@ -63,6 +63,9 @@ module.exports.getNFTtx = async (chain, address, contractaddress, tokenId) => {
 
             console.log('Filtered', tokenNftTx);
 
+            //If there is multiple in the transaction, it was a multiple mint
+            //this should be flagged
+
         }else{
             tokenNftTx = tokenNftTx.result;
         }

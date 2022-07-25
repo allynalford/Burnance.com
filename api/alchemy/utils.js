@@ -154,7 +154,17 @@ module.exports.getContractMetadata = async (chain, contractAddress) => {
 
         const results = await endpoint._get(`${baseURL}/getContractMetadata/?contractAddress=${contractAddress}`);
 
-        return results;
+        // {
+        //     "address": "0x004dd1904b75b7e8a46711dde8a0c608578e0302",
+        //     "contractMetadata": {
+        //         "name": "JetPack420",
+        //         "symbol": "DCL-JTPCK420",
+        //         "totalSupply": "307",
+        //         "tokenType": "erc721"
+        //     }
+        // }
+
+        return results.data;
 
     } catch (e) {
         console.error(e);
