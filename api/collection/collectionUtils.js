@@ -2,133 +2,374 @@
 /* jshint -W117 */
 /* jshint -W097 */
 "use strict";
-const ethers = require("ethers");
-const log = require('lambda-log');
-const dynamo = require('../common/dynamo');
-const dateformat = require("dateformat");
 
-module.exports._isCacheExpired = (timestamp) =>{
-    var today = new Date();
-    var timeStamp = new Date(timestamp);
-    var diffMs = (today - timeStamp); // milliseconds between now & Christmas
-    var diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000); // minutes
-    console.log(diffMins + " minutes until expired)");
-    if(diffMins > 10){
-        return true;
-    }else{
-        return false;
+
+module.exports._getStats = () => {
+  return {
+    one_day_volume: 76.7,
+    one_day_change: -0.1403272808787267,
+    one_day_sales: 7,
+    one_day_average_price: 10.957142857142857,
+    seven_day_volume: 973.7173372500002,
+    seven_day_change: 0.1315901135044749,
+    seven_day_sales: 75,
+    seven_day_average_price: 12.982897830000002,
+    thirty_day_volume: 5490.415687249995,
+    thirty_day_change: -0.28995701096720417,
+    thirty_day_sales: 336,
+    thirty_day_average_price: 16.340522878720225,
+    total_volume: 143535.03114919487,
+    total_sales: 23272,
+    total_supply: 10000,
+    count: 10000,
+    num_owners: 5213,
+    average_price: 6.167713610742303,
+    num_reports: 1,
+    market_cap: 129828.97830000003,
+    floor_price: 10.84,
+  };
+};
+
+/**
+* Returns NFT collection
+*
+* @author Allyn j. Alford <Allyn@tenablylabs.com>
+* @async
+* @function _getCollection
+* @param {String} owner - nft owner ethereum wallet address
+* @param {String} contractAddress -  NFT Collection contract address
+* @return {Promise<Array>} Response Array for next step to process.
+*/
+module.exports._getCollection = async (chain, contractAddress) => {
+    try {
+        const dynamo = require('../common/dynamo');
+        const assets = await dynamo.qetFromDB({
+            TableName: process.env.DYNAMODB_TABLE_NFT_COLLECTION,
+            Key: {
+              chain,
+                contractAddress
+            }
+        });
+        return assets;
+    } catch (e) {
+        console.error(e);
+        throw e;
     }
 };
 
 /**
- * Returns aggregated data on NFTs for a given wallet.
- *
- * @author Allyn j. Alford <Allyn@tenablylabs.com>
- * @async
- * @function _qn_fetchNFTs
- * @param {String} wallet - ethereum wallet address
- * @return {Promise<Array>} Response Array for next step to process.
- */
- module.exports._qn_fetchNFTs  = async (wallet, page) => {
-   try {
-     const provider = new ethers.providers.JsonRpcProvider(
-       process.env.QUICK_NODE_HTTP
-     );
-     //provider.connection.headers = { "x-qn-api-version": 1 };
-     const payload = {
-      wallet,
-      omitFields: ["provenance", "traits"],
-      page,
-      perPage: 5,
-    };
-    console.log(payload)
-     return await provider.send("qn_fetchNFTs", payload);
-   } catch (e) {
-     console.error(e);
-     throw e;
-   }
- };
-
- /**
- * Returns aggregated data on NFTs for a given wallet.
- *
- * @author Allyn j. Alford <Allyn@tenablylabs.com>
- * @async
- * @function _qn_fetchNFTs
- * @param {String} wallet - ethereum wallet address
- * @param {Number} page - the page to return
- * @param {Number} perPage - quamtity of NFT's per page
- * @return {Promise<Array>} Response Array for next step to process.
- */
-  module.exports._qn_fetchNFTs  = async (wallet, page, perPage) => {
-    try {
-      const provider = new ethers.providers.JsonRpcProvider(
-        process.env.QUICK_NODE_HTTP
-      );
-      //provider.connection.headers = { "x-qn-api-version": 1 };
-      const heads = await provider.send("qn_fetchNFTs", {
-        wallet,
-        omitFields: ["provenance", "traits"],
-        page,
-        perPage
+* Returns NFT collection Floor price
+*
+* @author Allyn j. Alford <Allyn@tenablylabs.com>
+* @async
+* @function _getCollectionFloor
+* @param {String} owner - nft owner ethereum wallet address
+* @param {String} contractAddress -  NFT Collection contract address
+* @return {Promise<Array>} Response Array for next step to process.
+*/
+module.exports._getCollectionFloorPrice = async (chain, contractAddress) => {
+  try {
+      const dynamo = require('../common/dynamo');
+      const assets = await dynamo.qetFromDB({
+          TableName: process.env.DYNAMODB_TABLE_NFT_COLLECTION,
+          Key: {
+            chain,
+            contractAddress
+          },
+          ProjectionExpression: "floorPrice, floorUpdated"
       });
-      return heads;
-    } catch (e) {
+      return assets;
+  } catch (e) {
       console.error(e);
       throw e;
-    }
-  };
+  }
+};
 
-   /**
- * Returns aggregated data on NFTs for a given wallet from a cache.
- *
- * @author Allyn j. Alford <Allyn@tenablylabs.com>
- * @async
- * @function _qn_fetchNFTsCache
- * @param {String} address - ethereum wallet address
- * @param {Number} page - the page to return
- * @return {Promise<Array>} Response Array for next step to process.
- */
-    module.exports._qn_fetchNFTsCache  = async (address, page) => {
-        try {
-            const assets = await dynamo.qetFromDB({
-                TableName: process.env.DYNAMODB_TABLE_WALLET_NFT_CACHE,
-                Key: {
-                    address,
-                    page
-                }
-            });
-          return assets;
-        } catch (e) {
-          console.error(e);
-          throw e;
-        }
+/**
+* load floor price from rariable, opensea and looksrare
+*
+* @author Allyn j. Alford <Allyn@tenablylabs.com>
+* @async
+* @function _loadCollectionFloorPrice
+* @param {String} owner - nft owner ethereum wallet address
+* @param {String} contractAddress -  NFT Collection contract address
+* @return {Promise<Array>} Response Array for next step to process.
+*/
+module.exports._loadCollectionFloorPrice = async (chain, contractAddress) => {
+  try {
+      const alchemyUtils = require('../alchemy/utils');
+      const rariable = require('../rarible/utils');
+      const dateformat = require("dateformat");
+      const etherscanUtils = require('../etherscan/ethUtils');
+
+      const results = await alchemyUtils.getFloorPrice(chain, contractAddress);
+      //console.info(alchemyResults);
+
+      results.price = await etherscanUtils._ethPrice();
+      console.log(results.price);
+
+      results.looksRare.floorPriceUSD = parseFloat(results.looksRare.floorPrice * results.price.result.ethusd);
+
+      if(typeof results.openSea.floorPrice !== "undefined"){
+        results.openSea.floorPriceUSD = parseFloat(results.openSea.floorPrice * results.price.result.ethusd);
+      }
+
+      
+
+      const rariableResults = await rariable.getFloorPrice(chain, contractAddress);
+      console.info('USD to ETH', (results.price.result.ethusd / rariableResults.currentValue).toFixed(2))
+
+    
+      results.rariable = {
+        floorPrice: rariableResults.currentValue,
+        floorPriceUSD: rariableResults.currentValue,
+        priceCurrency: "USD",
+        retrievedAt: dateformat(new Date(), "isoUtcDateTime"),
       };
 
-         /**
- * Add address NFT page to cache
- *
- * @author Allyn j. Alford <Allyn@tenablylabs.com>
- * @async
- * @function _addfetchNFTsToCache
- * @param {String} address - ethereum wallet address
- * @param {Number} page - the page to return
- * @return {Promise<Array>} Response Array for next step to process.
- */
-    module.exports._addfetchNFTsToCache = async (address, page, assets) => {
-      try {
-        return await dynamo.saveItemInDB({
-          TableName: process.env.DYNAMODB_TABLE_WALLET_NFT_CACHE,
-          Item: {
-            address,
-            page,
-            assets,
-            dt: dateformat(new Date(), "isoUtcDateTime"),
-            timestamp: new Date().getTime(),
+      if(typeof results.openSea.floorPrice !== "undefined"){
+        results.avgFloorPrice = (results.rariable.floorPriceUSD + results.looksRare.floorPriceUSD + results.openSea.floorPriceUSD) / 3;
+      }else{
+        results.avgFloorPrice = (results.rariable.floorPriceUSD + results.looksRare.floorPriceUSD) / 2;
+      }
+
+
+      return results;
+  } catch (e) {
+      console.error(e);
+      throw e;
+  }
+};
+
+/**
+* Returns NFT collection volume
+*
+* @author Allyn j. Alford <Allyn@tenablylabs.com>
+* @async
+* @function _getCollectionVolume
+* @param {String} owner - nft owner ethereum wallet address
+* @param {String} contractAddress -  NFT Collection contract address
+* @return {Promise<Array>} Response Array for next step to process.
+*/
+module.exports._getCollectionVolume = async (chain, contractAddress) => {
+  try {
+      const dynamo = require('../common/dynamo');
+      const assets = await dynamo.qetFromDB({
+          TableName: process.env.DYNAMODB_TABLE_NFT_COLLECTION,
+          Key: {
+            chain,
+            contractAddress
           },
+          ProjectionExpression: "volume, volumeUpdated"
+      });
+      return assets;
+  } catch (e) {
+      console.error(e);
+      throw e;
+  }
+};
+
+/**
+* Returns NFT collection details of floor price and volume
+*
+* @author Allyn j. Alford <Allyn@tenablylabs.com>
+* @async
+* @function _getCollectionDetails
+* @param {String} owner - nft owner ethereum wallet address
+* @param {String} contractAddress -  NFT Collection contract address
+* @return {Promise<Array>} Response Array for next step to process.
+*/
+module.exports._getCollectionDetails = async (chain, contractAddress) => {
+  try {
+      const dynamo = require('../common/dynamo');
+      const assets = await dynamo.qetFromDB({
+          TableName: process.env.DYNAMODB_TABLE_NFT_COLLECTION,
+          Key: {
+            chain,
+            contractAddress
+          },
+          ProjectionExpression: "name, floorPrice, floorUpdated, volume, volumeUpdated"
+      });
+      return assets;
+  } catch (e) {
+      console.error(e);
+      throw e;
+  }
+};
+
+/**
+* Add NFT Collection
+*
+* @author Allyn j. Alford <Allyn@tenablylabs.com>
+* @async
+* @function _addCollection
+* @param {String} chain - blockchain of address
+* @param {String} contractAddress - NFT Collection contract address
+* @return {Promise<Array>} Response Array for next step to process.
+*/
+module.exports._addCollection = async (chain, contractAddress) => {
+    try {
+        const dynamo = require('../common/dynamo');
+        const dateformat = require("dateformat");
+        return await dynamo.saveItemInDB({
+            TableName: process.env.DYNAMODB_TABLE_NFT_COLLECTION,
+            Item: {
+                chain,
+                contractAddress,
+                dt: dateformat(new Date(), "isoUtcDateTime"),
+                timestamp: new Date().getTime(),
+            },
         });
-      } catch (e) {
+    } catch (e) {
         console.error(e);
         throw e;
-      }
-    };
+    }
+};
+
+/**
+* delete a wallet
+*
+* @author Allyn j. Alford <Allyn@tenablylabs.com>
+* @async
+* @function _deleteWallet
+* @param {String} chain - blockchain of address
+* @param {String} contractAddress - NFT Collection contract address
+* @return {Promise<Array>} Response Array for next step to process.
+*/
+module.exports._deleteCollection = async (chain, contractAddress) => {
+    try {
+        const dynamo = require('../common/dynamo');
+        const wallet = await dynamo.deleteItemFromDB({
+            TableName: process.env.DYNAMODB_TABLE_NFT_COLLECTION,
+            Key: {
+                chain, 
+                contractAddress
+            }
+        });
+        return wallet;
+    } catch (e) {
+        console.error(e);
+        throw e;
+    }
+};
+
+/**
+* Returns Wallet NFT data
+*
+* @author Allyn j. Alford <Allyn@tenablylabs.com>
+* @async
+* @function _getWalletNFT
+* @param {String} owner - nft owner ethereum wallet address
+* @param {String} contractAddressTokenId - NFT Contract Address combined with tokenId
+* @return {Promise<Array>} Response Array for next step to process.
+*/
+
+module.exports._getWalletNFT = async (owner, contractAddress) => {
+    try {
+        const dynamo = require('../common/dynamo');
+        return await dynamo.queryDB({
+            TableName: process.env.DYNAMODB_TABLE_NFT_COLLECTION,
+            IndexName: 'InstanceIdIndex',
+            KeyConditionExpression: "#owner = :owner and #contractAddress = :contractAddress",
+            ExpressionAttributeNames: {
+                "#owner": "owner",
+                "#contractAddress": "contractAddress"
+            },
+            ExpressionAttributeValues: {
+                ":owner": owner,
+                ":contractAddress": contractAddress
+            },
+        });
+
+    } catch (e) {
+        console.error(e.message);
+        throw e;
+    }
+};
+
+
+
+/**
+* update NFT Collection Floor Price
+*
+* @author Allyn j. Alford <Allyn@tenablylabs.com>
+* @async
+* @function _updateCollectionFloorPrice
+* @param {string} chain 
+* @param {string} contractAddress
+* @param {Number} floorPrice 
+*/
+module.exports._updateCollectionFloorPrice = async (
+  chain,
+  contractAddress,
+  floorPrice
+) => {
+  try {
+    const dateFormat = require("dateformat");
+    const dynamo = require("../common/dynamo");
+
+    //Save the profile to dynamoDB
+    return await dynamo.updateDB({
+      TableName: process.env.DYNAMODB_TABLE_NFT_COLLECTION,
+      Key: { chain, contractAddress },
+      UpdateExpression:
+        "set #floorPrice = :floorPrice, #floorUpdated = :floorUpdated",
+      ExpressionAttributeNames: {
+        "#floorPrice": "floorPrice",
+        "#floorUpdated": "floorUpdated",
+      },
+      ExpressionAttributeValues: {
+        ":floorUpdated": dateFormat(new Date(), "isoUtcDateTime"),
+        ":floorPrice": floorPrice,
+      },
+      ReturnValues: "UPDATED_NEW",
+    });
+  } catch (err) {
+    console.error(JSON.stringify(err));
+    throw err;
+  }
+};
+
+
+
+/**
+* update NFT Collection fields
+*
+* @author Allyn j. Alford <Allyn@tenablylabs.com>
+* @async
+* @function _updateCollectionFields
+* @param {string} chain 
+* @param {string} contractAddress
+* @param {list} fields 
+*/
+module.exports._updateCollectionFields = async (chain, contractAddress, fields) => {
+  try {
+      const dateFormat = require('dateformat');
+      const dynamo = require('../common/dynamo');
+
+      var ExpressionAttributeValues = {}, ExpressionAttributeNames = {}
+      var UpdateExpression = "set #dt = :dt";
+
+      for (const f of fields) {
+          ExpressionAttributeValues[`:${f.name}`] = f.value;
+          ExpressionAttributeNames[`#${f.name}`] = f.name;
+          UpdateExpression = UpdateExpression + `, #${f.name} = :${f.name}`
+      };
+
+      ExpressionAttributeNames["#dt"] = "updatedAt";
+      ExpressionAttributeValues[":dt"] = dateFormat(new Date(), "isoUtcDateTime");
+
+      //Save the profile to dynamoDB
+      return await dynamo.updateDB({
+          TableName: process.env.DYNAMODB_TABLE_NFT_COLLECTION,
+          Key: { chain, contractAddress },
+          UpdateExpression,
+          ExpressionAttributeValues,
+          ExpressionAttributeNames,
+          ReturnValues: "UPDATED_NEW"
+      });
+  } catch (err) {
+      console.error(JSON.stringify(err));
+      throw err;
+  };
+};

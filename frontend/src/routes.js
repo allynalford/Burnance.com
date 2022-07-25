@@ -17,6 +17,8 @@ const PageInvoice = React.lazy(() =>
   import("./pages/Pages/Account/AccountView")
 );
 
+const Dashboard = React.lazy(() => import('./pages/Dashboard/index'));
+
 const routes = [
   
 
@@ -32,6 +34,7 @@ const routes = [
 
   { path: "/profile", component: Shop, isTopbarDark: true },
   { path: "/account", component: PageInvoice, isTopbarDark: true },
+  { path: "/dashboard", component: Dashboard },
 
   //Index Main
   { path: "/index", component: OnlineLearning, isTopbarDark: true },

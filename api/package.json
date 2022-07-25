@@ -11,6 +11,7 @@
   "author": "Allyn j. Alford",
   "license": "ISC",
   "dependencies": {
+    "@alch/alchemy-sdk": "^1.2.0",
     "axios": "^0.24.0",
     "chrome-aws-lambda": "^10.1.0",
     "crypto-js": "^4.1.1",

@@ -5,6 +5,7 @@ import logodark from "../../../assets/images/burnance_logo.png";
 //Import Icons
 import dateFormat from "dateformat";
 import { Chart } from "react-google-charts";
+import './tableCss.css';
 
 var formatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
@@ -52,11 +53,11 @@ class PageInvoice extends Component {
       walletConnected: false,
       nfts : [
         ["Item", "Date", "Floor", "Gas", "USD", "ETH", "ETH Price", "Change", "Burn"],
-        ["One Day Bae #7925", "2/28/08", 0.1, 10.15, 0.25548, 0.25348, 1573.00, { v: 12, f: "12.0%" }, `<Input type="checkbox" id={1} name="check1"></Input>`],
-        ["Loopy Donuts #7257", "2/28/08", 0.1, 10.15, 0.25548, 0.25348, 2412.23,{ v: -7.3, f: "-7.3%" }, `<Input type="checkbox" id={1} name="check1" ></Input>`],
-        ["Jailed Baby Ape Club #5940","2/28/08", 0.1, 10.15, 0.25548, 0.25348, 2570.15, { v: 0, f: "0%" }, `<Input type="checkbox" id={1} name="check1"></Input>`],
-        ["The Donut Shop #3090", "2/28/08", 0.1, 10.15, 0.25548, 0.25348, 1573.00,{ v: -2.1, f: "-2.1%" }, `<Input type="checkbox" id={1} name="check1"></Input>`],
-        ["Loopy Cups #7257", "2/28/08", 0.1, 10.15, 0.25548, 0.25348, 1573.00, { v: 22, f: "22.0%" }, `<input type="checkbox" id={1} name="check1" onClick={e=>{console.log(e.target.name)}}></input>`],
+        ["One Day Bae #7925", "2/28/08", 0.1, 10.15, 0.25548, 0.25348, 1573.00, { v: 12, f: "12.0%" }, `<input id="button" type="submit" name="button" value="enter"/>`],
+        ["Loopy Donuts #7257", "2/28/08", 0.1, 10.15, 0.25548, 0.25348, 2412.23,{ v: -7.3, f: "-7.3%" }, `<input id="button" type="submit" name="button" value="enter"/>`],
+        ["Jailed Baby Ape Club #5940","2/28/08", 0.1, 10.15, 0.25548, 0.25348, 2570.15, { v: 0, f: "0%" }, `<input id="button" type="submit" name="button" value="enter"/>`],
+        ["The Donut Shop #3090", "2/28/08", 0.1, 10.15, 0.25548, 0.25348, 1573.00,{ v: -2.1, f: "-2.1%" }, `<input id="button" type="submit" name="button" value="enter"/>`],
+        ["Loopy Cups #7257", "2/28/08", 0.1, 10.15, 0.25548, 0.25348, 1573.00, { v: 22, f: "22.0%" }, `<input id="button" type="submit" name="button" value="enter"/>`],
       ],
       data : [
         ["Collection", "Change"],
@@ -80,7 +81,7 @@ class PageInvoice extends Component {
     this.sendMail.bind(this);
     this.callNumber.bind(this);
     this.accountsChanged.bind(this);
-    //this.chartEvents.bind(this);
+    this.reply_click.bind(this);
 
 
   }
@@ -108,6 +109,8 @@ class PageInvoice extends Component {
         _nfts = this.state.nfts;
       }
     } 
+
+    //document.getElementById('button').onclick = this.reply_click;
 
   }
   // Make sure to remove the DOM listener when the component is unmounted.
@@ -138,9 +141,15 @@ class PageInvoice extends Component {
     }
   };
 
+  reply_click = () =>
+    {
+        console.log("Test");
+    }
+
 
 
   render() {
+
 
     const chartEvents = [
       {
@@ -167,6 +176,17 @@ class PageInvoice extends Component {
         }
       }
     ];
+
+    var cssClassNames = {
+      'headerRow': 'cssHeaderRow',
+      'tableRow': 'cssTableRow',
+      'oddTableRow': 'cssOddTableRow',
+      'selectedTableRow': 'cssSelectedTableRow',
+      'hoverTableRow': 'cssHoverTableRow',
+      'headerCell': 'cssHeaderCell',
+      'tableCell': 'cssTableCell',
+      'rowNumberCell': 'cssRowNumberCell'
+  };
     return (
       <React.Fragment>
         <section className="bg-invoice bg-light">
@@ -251,7 +271,8 @@ class PageInvoice extends Component {
                               showRowNumber: false,
                               width: '100%', 
                               height: '100%',
-                              pageSize: 3
+                              pageSize: 3,
+                              'cssClassNames': cssClassNames
                             }}
                             formatters={[
                               {

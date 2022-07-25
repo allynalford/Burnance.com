@@ -1,0 +1,36 @@
+collectionAdd:
+  handler: collection/handler.AddCollection
+  events:
+    - http:
+        path: collection
+        method: post 
+collectionGet:
+  handler: collection/handler.GetCollection
+  events:
+    - http:
+        path: collection/{chain}/{address}
+        method: get
+collectionGetDetails:
+  handler: collection/handler.GetCollectionDetails
+  events:
+    - http:
+        path: collection/details/{chain}/{address}
+        method: get
+collectionGetFloorPrice:
+  handler: collection/handler.GetCollectionFloorPrice
+  events:
+    - http:
+        path: collection/floor/{chain}/{address}
+        method: get
+collectionGetVolume:
+  handler: collection/handler.GetCollectionFloorPrice
+  events:
+    - http:
+        path: collection/volume/{chain}/{address}
+        method: get
+collectionDelete:
+  handler: collection/handler.DeleteCollection
+  events:
+    - http:
+        path: collection/{chain}/{address}
+        method: delete 

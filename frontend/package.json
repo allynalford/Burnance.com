@@ -6,6 +6,7 @@
   "author": "The Burnance Team",
   "homepage": "https://burnance.io/",
   "dependencies": {
+    "@alch/alchemy-sdk": "^1.2.0",
     "@iconscout/react-unicons": "^1.1.6",
     "aos": "^2.3.4",
     "availity-reactstrap-validation": "^2.7.1",

@@ -19,6 +19,7 @@ provider:
     QUICK_NODE_HTTP: ${file(config.${self:provider.stage}.json):QUICK_NODE_HTTP}
     QUICK_NODE_WSS: ${file(config.${self:provider.stage}.json):QUICK_NODE_WSS}
     ETHERSCAN_API_URL: ${file(config.${self:provider.stage}.json):ETHERSCAN_API_URL}
+    ALCHEMY_API_KEY: ${file(config.${self:provider.stage}.json):ALCHEMY_API_KEY}
     API_KEY_TOKEN: ${file(config.${self:provider.stage}.json):API_KEY_TOKEN}
     PRO_API_KEY: ${file(config.${self:provider.stage}.json):PRO_API_KEY}
     ETHERSCAN_ABI_PARAMS: ${file(config.${self:provider.stage}.json):ETHERSCAN_ABI_PARAMS}
@@ -77,6 +78,7 @@ functions:
   - ${file(./functions/waitlist.yml)}  
   - ${file(./functions/quicknode.yml)} 
   - ${file(./functions/wallet.yml)}
+  - ${file(./functions/collection.yml)}
 stepFunctions: 
   validate: false
   stateMachines:

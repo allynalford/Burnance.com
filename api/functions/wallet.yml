@@ -32,6 +32,12 @@
       - http:
           path: wallet/{chain}/{address}
           method: get
+  walletGetNFTs:
+    handler: wallet/wallet.GetWalletNFTs
+    events:
+      - http:
+          path: wallet/nfts/{chain}/{address}
+          method: get
   walletDelete:
     handler: wallet/wallet.DeleteWallet
     events:
