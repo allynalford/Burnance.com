@@ -35,6 +35,7 @@ provider:
     DYNAMODB_TABLE_WALLET: ${self:service}-${opt:stage, self:provider.stage}-wallet
     DYNAMODB_TABLE_WALLET_NFT: ${self:service}-${opt:stage, self:provider.stage}-wallet-nft
     DYNAMODB_TABLE_WALLET_NFT_CACHE: ${self:service}-${opt:stage, self:provider.stage}-wallet-nft-cache
+    DYNAMODB_TABLE_WALLET_COLLECTION_CACHE: ${self:service}-${opt:stage, self:provider.stage}-wallet-collection-cache
     DYNAMODB_TABLE_WALLET_NFT_TX: ${self:service}-${opt:stage, self:provider.stage}-wallet-nft-tx
     DYNAMODB_TABLE_NFT_COLLECTION: ${self:service}-${opt:stage, self:provider.stage}-nft-collection
     NODE: ${file(config.${self:provider.stage}.json):NODE}
@@ -70,6 +71,7 @@ provider:
         - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE_WALLET_NFT_TX}"
         - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE_NFT_IMAGE}"
         - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE_NFT_COLLECTION}"
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE_WALLET_COLLECTION_CACHE}" 
 package:
   individually: false
 functions:
@@ -103,6 +105,28 @@ resources:
     #     RestApiId:
     #       Ref: 'ApiGatewayRestApi'
     #     StatusCode: '401'
+    NFTImageDynamoDBTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: chain
+            AttributeType: S
+          -  
+            AttributeName: address
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: chain
+            KeyType: HASH
+          -
+            AttributeName: address
+            KeyType: RANGE      
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.environment.DYNAMODB_TABLE_WALLET_COLLECTION_CACHE}
     # NFTImageDynamoDBTable:
     #   Type: 'AWS::DynamoDB::Table'
     #   DeletionPolicy: Retain

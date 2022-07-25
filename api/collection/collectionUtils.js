@@ -57,6 +57,8 @@ module.exports._getCollection = async (chain, contractAddress) => {
     }
 };
 
+
+
 /**
 * Returns NFT collection Floor price
 *

@@ -168,12 +168,13 @@ module.exports.GetWallet = async (event) => {
 };
 
 module.exports.GetWalletNFTs = async (event) => {
-  let dt, chain, address;
+  let dt, chain, address, pageNumber;
   try {
     dt = dateFormat(new Date(), "isoUtcDateTime");
 
     chain = event.pathParameters.chain;
     address = event.pathParameters.address;
+    pageNumber = event.pathParameters.pageNumber;
 
     if (typeof chain === "undefined") throw new Error("chain is undefined");
     if (typeof address === "undefined") throw new Error("address is undefined");
@@ -195,12 +196,21 @@ module.exports.GetWalletNFTs = async (event) => {
     const alchemyUtils = require('../alchemy/utils');
 
     //Add the wallet
-    var wallet = await alchemyUtils.getNFTs(chain, address);
+    var nfts = await alchemyUtils.getNFTs(chain, address);
+    var wallet = [nfts.ownedNfts];
+    //console.log(nfts.ownedNfts);
 
-    console.log(wallet);
+    //Check if the list has more NFTs
+    if(typeof nfts.pageKey !== "undefined"){
+      const page = await alchemyUtils.getNFTsByPageKey(chain, address, nfts.pageKey);
+      console.log('Next Page',page);
+      wallet.push(...page.ownedNfts)
+    }
+
+    //console.log(nfts);
 
     if(typeof wallet === "undefined"){
-      wallet = {};
+      wallet = [];
     }
 
     return responses.respond({ error: false, success: true, wallet }, 200);

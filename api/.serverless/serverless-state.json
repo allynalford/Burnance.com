@@ -23,6 +23,7 @@
         "QUICK_NODE_HTTP": "https://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
         "QUICK_NODE_WSS": "wss://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
         "ETHERSCAN_API_URL": "https://api.etherscan.io/api",
+        "ALCHEMY_API_KEY": "SExwOepdX3Gy9l-FZQVVITPkIf9sfzNJ",
         "API_KEY_TOKEN": "WWY6WGBKZCG5U8JEY2RNTXT1YWMMER6SPN",
         "PRO_API_KEY": "TFSZVPV8PUQ2HZWWJAI6TPSASX72HRYNWS",
         "ETHERSCAN_ABI_PARAMS": "module=contract&action=getabi",
@@ -38,6 +39,7 @@
         "DYNAMODB_TABLE_WALLET": "burnance-dev-wallet",
         "DYNAMODB_TABLE_WALLET_NFT": "burnance-dev-wallet-nft",
         "DYNAMODB_TABLE_WALLET_NFT_CACHE": "burnance-dev-wallet-nft-cache",
+        "DYNAMODB_TABLE_WALLET_COLLECTION_CACHE": "burnance-dev-wallet-collection-cache",
         "DYNAMODB_TABLE_WALLET_NFT_TX": "burnance-dev-wallet-nft-tx",
         "DYNAMODB_TABLE_NFT_COLLECTION": "burnance-dev-nft-collection",
         "NODE": "wss://mainnet.infura.io/ws/v3/5d683ea6270a44d4996ad65529057982",
@@ -79,7 +81,8 @@
             "arn:aws:dynamodb:us-east-1:*:table/burnance-dev-wallet-nft-cache",
             "arn:aws:dynamodb:us-east-1:*:table/burnance-dev-wallet-nft-tx",
             "arn:aws:dynamodb:us-east-1:*:table/burnance-dev-nfts-image",
-            "arn:aws:dynamodb:us-east-1:*:table/burnance-dev-nft-collection"
+            "arn:aws:dynamodb:us-east-1:*:table/burnance-dev-nft-collection",
+            "arn:aws:dynamodb:us-east-1:*:table/burnance-dev-wallet-collection-cache"
           ]
         }
       ],
@@ -133,10 +136,10 @@
               "LogGroupName": "/aws/lambda/burnance-dev-qn_fetchNFTs"
             }
           },
-          "LanguageExecuteLogGroup": {
+          "WalletExecuteLogGroup": {
             "Type": "AWS::Logs::LogGroup",
             "Properties": {
-              "LogGroupName": "/aws/lambda/burnance-dev-languageExecute"
+              "LogGroupName": "/aws/lambda/burnance-dev-walletExecute"
             }
           },
           "WalletStartLogGroup": {
@@ -175,10 +178,52 @@
               "LogGroupName": "/aws/lambda/burnance-dev-walletGet"
             }
           },
+          "WalletGetNFTsLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/burnance-dev-walletGetNFTs"
+            }
+          },
           "WalletDeleteLogGroup": {
             "Type": "AWS::Logs::LogGroup",
             "Properties": {
               "LogGroupName": "/aws/lambda/burnance-dev-walletDelete"
+            }
+          },
+          "CollectionAddLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/burnance-dev-collectionAdd"
+            }
+          },
+          "CollectionGetLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/burnance-dev-collectionGet"
+            }
+          },
+          "CollectionGetDetailsLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/burnance-dev-collectionGetDetails"
+            }
+          },
+          "CollectionGetFloorPriceLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/burnance-dev-collectionGetFloorPrice"
+            }
+          },
+          "CollectionGetVolumeLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/burnance-dev-collectionGetVolume"
+            }
+          },
+          "CollectionDeleteLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/burnance-dev-collectionDelete"
             }
           },
           "IamRoleLambdaExecution": {
@@ -269,7 +314,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "service.burnance.nodejs.lambdas.dev",
-                "S3Key": "serverless/burnance/dev/1658619667849-2022-07-23T23:41:07.849Z/burnance.zip"
+                "S3Key": "serverless/burnance/dev/1658735543074-2022-07-25T07:52:23.074Z/burnance.zip"
               },
               "Handler": "actions.getNFTImage",
               "Runtime": "nodejs12.x",
@@ -287,6 +332,7 @@
                   "QUICK_NODE_HTTP": "https://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
                   "QUICK_NODE_WSS": "wss://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
                   "ETHERSCAN_API_URL": "https://api.etherscan.io/api",
+                  "ALCHEMY_API_KEY": "SExwOepdX3Gy9l-FZQVVITPkIf9sfzNJ",
                   "API_KEY_TOKEN": "WWY6WGBKZCG5U8JEY2RNTXT1YWMMER6SPN",
                   "PRO_API_KEY": "TFSZVPV8PUQ2HZWWJAI6TPSASX72HRYNWS",
                   "ETHERSCAN_ABI_PARAMS": "module=contract&action=getabi",
@@ -302,6 +348,7 @@
                   "DYNAMODB_TABLE_WALLET": "burnance-dev-wallet",
                   "DYNAMODB_TABLE_WALLET_NFT": "burnance-dev-wallet-nft",
                   "DYNAMODB_TABLE_WALLET_NFT_CACHE": "burnance-dev-wallet-nft-cache",
+                  "DYNAMODB_TABLE_WALLET_COLLECTION_CACHE": "burnance-dev-wallet-collection-cache",
                   "DYNAMODB_TABLE_WALLET_NFT_TX": "burnance-dev-wallet-nft-tx",
                   "DYNAMODB_TABLE_NFT_COLLECTION": "burnance-dev-nft-collection",
                   "NODE": "wss://mainnet.infura.io/ws/v3/5d683ea6270a44d4996ad65529057982",
@@ -325,7 +372,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "service.burnance.nodejs.lambdas.dev",
-                "S3Key": "serverless/burnance/dev/1658619667849-2022-07-23T23:41:07.849Z/burnance.zip"
+                "S3Key": "serverless/burnance/dev/1658735543074-2022-07-25T07:52:23.074Z/burnance.zip"
               },
               "Handler": "actions.view",
               "Runtime": "nodejs12.x",
@@ -343,6 +390,7 @@
                   "QUICK_NODE_HTTP": "https://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
                   "QUICK_NODE_WSS": "wss://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
                   "ETHERSCAN_API_URL": "https://api.etherscan.io/api",
+                  "ALCHEMY_API_KEY": "SExwOepdX3Gy9l-FZQVVITPkIf9sfzNJ",
                   "API_KEY_TOKEN": "WWY6WGBKZCG5U8JEY2RNTXT1YWMMER6SPN",
                   "PRO_API_KEY": "TFSZVPV8PUQ2HZWWJAI6TPSASX72HRYNWS",
                   "ETHERSCAN_ABI_PARAMS": "module=contract&action=getabi",
@@ -358,6 +406,7 @@
                   "DYNAMODB_TABLE_WALLET": "burnance-dev-wallet",
                   "DYNAMODB_TABLE_WALLET_NFT": "burnance-dev-wallet-nft",
                   "DYNAMODB_TABLE_WALLET_NFT_CACHE": "burnance-dev-wallet-nft-cache",
+                  "DYNAMODB_TABLE_WALLET_COLLECTION_CACHE": "burnance-dev-wallet-collection-cache",
                   "DYNAMODB_TABLE_WALLET_NFT_TX": "burnance-dev-wallet-nft-tx",
                   "DYNAMODB_TABLE_NFT_COLLECTION": "burnance-dev-nft-collection",
                   "NODE": "wss://mainnet.infura.io/ws/v3/5d683ea6270a44d4996ad65529057982",
@@ -381,7 +430,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "service.burnance.nodejs.lambdas.dev",
-                "S3Key": "serverless/burnance/dev/1658619667849-2022-07-23T23:41:07.849Z/burnance.zip"
+                "S3Key": "serverless/burnance/dev/1658735543074-2022-07-25T07:52:23.074Z/burnance.zip"
               },
               "Handler": "etherscan/handler.tokenNftTx",
               "Runtime": "nodejs12.x",
@@ -399,6 +448,7 @@
                   "QUICK_NODE_HTTP": "https://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
                   "QUICK_NODE_WSS": "wss://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
                   "ETHERSCAN_API_URL": "https://api.etherscan.io/api",
+                  "ALCHEMY_API_KEY": "SExwOepdX3Gy9l-FZQVVITPkIf9sfzNJ",
                   "API_KEY_TOKEN": "WWY6WGBKZCG5U8JEY2RNTXT1YWMMER6SPN",
                   "PRO_API_KEY": "TFSZVPV8PUQ2HZWWJAI6TPSASX72HRYNWS",
                   "ETHERSCAN_ABI_PARAMS": "module=contract&action=getabi",
@@ -414,6 +464,7 @@
                   "DYNAMODB_TABLE_WALLET": "burnance-dev-wallet",
                   "DYNAMODB_TABLE_WALLET_NFT": "burnance-dev-wallet-nft",
                   "DYNAMODB_TABLE_WALLET_NFT_CACHE": "burnance-dev-wallet-nft-cache",
+                  "DYNAMODB_TABLE_WALLET_COLLECTION_CACHE": "burnance-dev-wallet-collection-cache",
                   "DYNAMODB_TABLE_WALLET_NFT_TX": "burnance-dev-wallet-nft-tx",
                   "DYNAMODB_TABLE_NFT_COLLECTION": "burnance-dev-nft-collection",
                   "NODE": "wss://mainnet.infura.io/ws/v3/5d683ea6270a44d4996ad65529057982",
@@ -437,7 +488,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "service.burnance.nodejs.lambdas.dev",
-                "S3Key": "serverless/burnance/dev/1658619667849-2022-07-23T23:41:07.849Z/burnance.zip"
+                "S3Key": "serverless/burnance/dev/1658735543074-2022-07-25T07:52:23.074Z/burnance.zip"
               },
               "Handler": "etherscan/handler.getEthPrice",
               "Runtime": "nodejs12.x",
@@ -455,6 +506,7 @@
                   "QUICK_NODE_HTTP": "https://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
                   "QUICK_NODE_WSS": "wss://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
                   "ETHERSCAN_API_URL": "https://api.etherscan.io/api",
+                  "ALCHEMY_API_KEY": "SExwOepdX3Gy9l-FZQVVITPkIf9sfzNJ",
                   "API_KEY_TOKEN": "WWY6WGBKZCG5U8JEY2RNTXT1YWMMER6SPN",
                   "PRO_API_KEY": "TFSZVPV8PUQ2HZWWJAI6TPSASX72HRYNWS",
                   "ETHERSCAN_ABI_PARAMS": "module=contract&action=getabi",
@@ -470,6 +522,7 @@
                   "DYNAMODB_TABLE_WALLET": "burnance-dev-wallet",
                   "DYNAMODB_TABLE_WALLET_NFT": "burnance-dev-wallet-nft",
                   "DYNAMODB_TABLE_WALLET_NFT_CACHE": "burnance-dev-wallet-nft-cache",
+                  "DYNAMODB_TABLE_WALLET_COLLECTION_CACHE": "burnance-dev-wallet-collection-cache",
                   "DYNAMODB_TABLE_WALLET_NFT_TX": "burnance-dev-wallet-nft-tx",
                   "DYNAMODB_TABLE_NFT_COLLECTION": "burnance-dev-nft-collection",
                   "NODE": "wss://mainnet.infura.io/ws/v3/5d683ea6270a44d4996ad65529057982",
@@ -493,7 +546,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "service.burnance.nodejs.lambdas.dev",
-                "S3Key": "serverless/burnance/dev/1658619667849-2022-07-23T23:41:07.849Z/burnance.zip"
+                "S3Key": "serverless/burnance/dev/1658735543074-2022-07-25T07:52:23.074Z/burnance.zip"
               },
               "Handler": "etherscan/handler.getTxTransactionFee",
               "Runtime": "nodejs12.x",
@@ -511,6 +564,7 @@
                   "QUICK_NODE_HTTP": "https://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
                   "QUICK_NODE_WSS": "wss://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
                   "ETHERSCAN_API_URL": "https://api.etherscan.io/api",
+                  "ALCHEMY_API_KEY": "SExwOepdX3Gy9l-FZQVVITPkIf9sfzNJ",
                   "API_KEY_TOKEN": "WWY6WGBKZCG5U8JEY2RNTXT1YWMMER6SPN",
                   "PRO_API_KEY": "TFSZVPV8PUQ2HZWWJAI6TPSASX72HRYNWS",
                   "ETHERSCAN_ABI_PARAMS": "module=contract&action=getabi",
@@ -526,6 +580,7 @@
                   "DYNAMODB_TABLE_WALLET": "burnance-dev-wallet",
                   "DYNAMODB_TABLE_WALLET_NFT": "burnance-dev-wallet-nft",
                   "DYNAMODB_TABLE_WALLET_NFT_CACHE": "burnance-dev-wallet-nft-cache",
+                  "DYNAMODB_TABLE_WALLET_COLLECTION_CACHE": "burnance-dev-wallet-collection-cache",
                   "DYNAMODB_TABLE_WALLET_NFT_TX": "burnance-dev-wallet-nft-tx",
                   "DYNAMODB_TABLE_NFT_COLLECTION": "burnance-dev-nft-collection",
                   "NODE": "wss://mainnet.infura.io/ws/v3/5d683ea6270a44d4996ad65529057982",
@@ -549,7 +604,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "service.burnance.nodejs.lambdas.dev",
-                "S3Key": "serverless/burnance/dev/1658619667849-2022-07-23T23:41:07.849Z/burnance.zip"
+                "S3Key": "serverless/burnance/dev/1658735543074-2022-07-25T07:52:23.074Z/burnance.zip"
               },
               "Handler": "waitlist/handler.add",
               "Runtime": "nodejs12.x",
@@ -567,6 +622,7 @@
                   "QUICK_NODE_HTTP": "https://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
                   "QUICK_NODE_WSS": "wss://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
                   "ETHERSCAN_API_URL": "https://api.etherscan.io/api",
+                  "ALCHEMY_API_KEY": "SExwOepdX3Gy9l-FZQVVITPkIf9sfzNJ",
                   "API_KEY_TOKEN": "WWY6WGBKZCG5U8JEY2RNTXT1YWMMER6SPN",
                   "PRO_API_KEY": "TFSZVPV8PUQ2HZWWJAI6TPSASX72HRYNWS",
                   "ETHERSCAN_ABI_PARAMS": "module=contract&action=getabi",
@@ -582,6 +638,7 @@
                   "DYNAMODB_TABLE_WALLET": "burnance-dev-wallet",
                   "DYNAMODB_TABLE_WALLET_NFT": "burnance-dev-wallet-nft",
                   "DYNAMODB_TABLE_WALLET_NFT_CACHE": "burnance-dev-wallet-nft-cache",
+                  "DYNAMODB_TABLE_WALLET_COLLECTION_CACHE": "burnance-dev-wallet-collection-cache",
                   "DYNAMODB_TABLE_WALLET_NFT_TX": "burnance-dev-wallet-nft-tx",
                   "DYNAMODB_TABLE_NFT_COLLECTION": "burnance-dev-nft-collection",
                   "NODE": "wss://mainnet.infura.io/ws/v3/5d683ea6270a44d4996ad65529057982",
@@ -605,7 +662,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "service.burnance.nodejs.lambdas.dev",
-                "S3Key": "serverless/burnance/dev/1658619667849-2022-07-23T23:41:07.849Z/burnance.zip"
+                "S3Key": "serverless/burnance/dev/1658735543074-2022-07-25T07:52:23.074Z/burnance.zip"
               },
               "Handler": "quicknode/handler.qn_fetchNFTs",
               "Runtime": "nodejs12.x",
@@ -623,6 +680,7 @@
                   "QUICK_NODE_HTTP": "https://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
                   "QUICK_NODE_WSS": "wss://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
                   "ETHERSCAN_API_URL": "https://api.etherscan.io/api",
+                  "ALCHEMY_API_KEY": "SExwOepdX3Gy9l-FZQVVITPkIf9sfzNJ",
                   "API_KEY_TOKEN": "WWY6WGBKZCG5U8JEY2RNTXT1YWMMER6SPN",
                   "PRO_API_KEY": "TFSZVPV8PUQ2HZWWJAI6TPSASX72HRYNWS",
                   "ETHERSCAN_ABI_PARAMS": "module=contract&action=getabi",
@@ -638,6 +696,7 @@
                   "DYNAMODB_TABLE_WALLET": "burnance-dev-wallet",
                   "DYNAMODB_TABLE_WALLET_NFT": "burnance-dev-wallet-nft",
                   "DYNAMODB_TABLE_WALLET_NFT_CACHE": "burnance-dev-wallet-nft-cache",
+                  "DYNAMODB_TABLE_WALLET_COLLECTION_CACHE": "burnance-dev-wallet-collection-cache",
                   "DYNAMODB_TABLE_WALLET_NFT_TX": "burnance-dev-wallet-nft-tx",
                   "DYNAMODB_TABLE_NFT_COLLECTION": "burnance-dev-nft-collection",
                   "NODE": "wss://mainnet.infura.io/ws/v3/5d683ea6270a44d4996ad65529057982",
@@ -656,16 +715,16 @@
               "QnUnderscorefetchNFTsLogGroup"
             ]
           },
-          "LanguageExecuteLambdaFunction": {
+          "WalletExecuteLambdaFunction": {
             "Type": "AWS::Lambda::Function",
             "Properties": {
               "Code": {
                 "S3Bucket": "service.burnance.nodejs.lambdas.dev",
-                "S3Key": "serverless/burnance/dev/1658619667849-2022-07-23T23:41:07.849Z/burnance.zip"
+                "S3Key": "serverless/burnance/dev/1658735543074-2022-07-25T07:52:23.074Z/burnance.zip"
               },
               "Handler": "shopify/language/themelanguage.start",
               "Runtime": "nodejs12.x",
-              "FunctionName": "burnance-dev-languageExecute",
+              "FunctionName": "burnance-dev-walletExecute",
               "MemorySize": 128,
               "Timeout": 30,
               "Environment": {
@@ -679,6 +738,7 @@
                   "QUICK_NODE_HTTP": "https://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
                   "QUICK_NODE_WSS": "wss://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
                   "ETHERSCAN_API_URL": "https://api.etherscan.io/api",
+                  "ALCHEMY_API_KEY": "SExwOepdX3Gy9l-FZQVVITPkIf9sfzNJ",
                   "API_KEY_TOKEN": "WWY6WGBKZCG5U8JEY2RNTXT1YWMMER6SPN",
                   "PRO_API_KEY": "TFSZVPV8PUQ2HZWWJAI6TPSASX72HRYNWS",
                   "ETHERSCAN_ABI_PARAMS": "module=contract&action=getabi",
@@ -694,6 +754,7 @@
                   "DYNAMODB_TABLE_WALLET": "burnance-dev-wallet",
                   "DYNAMODB_TABLE_WALLET_NFT": "burnance-dev-wallet-nft",
                   "DYNAMODB_TABLE_WALLET_NFT_CACHE": "burnance-dev-wallet-nft-cache",
+                  "DYNAMODB_TABLE_WALLET_COLLECTION_CACHE": "burnance-dev-wallet-collection-cache",
                   "DYNAMODB_TABLE_WALLET_NFT_TX": "burnance-dev-wallet-nft-tx",
                   "DYNAMODB_TABLE_NFT_COLLECTION": "burnance-dev-nft-collection",
                   "NODE": "wss://mainnet.infura.io/ws/v3/5d683ea6270a44d4996ad65529057982",
@@ -709,7 +770,7 @@
               }
             },
             "DependsOn": [
-              "LanguageExecuteLogGroup"
+              "WalletExecuteLogGroup"
             ]
           },
           "WalletStartLambdaFunction": {
@@ -717,7 +778,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "service.burnance.nodejs.lambdas.dev",
-                "S3Key": "serverless/burnance/dev/1658619667849-2022-07-23T23:41:07.849Z/burnance.zip"
+                "S3Key": "serverless/burnance/dev/1658735543074-2022-07-25T07:52:23.074Z/burnance.zip"
               },
               "Handler": "wallet/steps.start",
               "Runtime": "nodejs12.x",
@@ -735,6 +796,7 @@
                   "QUICK_NODE_HTTP": "https://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
                   "QUICK_NODE_WSS": "wss://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
                   "ETHERSCAN_API_URL": "https://api.etherscan.io/api",
+                  "ALCHEMY_API_KEY": "SExwOepdX3Gy9l-FZQVVITPkIf9sfzNJ",
                   "API_KEY_TOKEN": "WWY6WGBKZCG5U8JEY2RNTXT1YWMMER6SPN",
                   "PRO_API_KEY": "TFSZVPV8PUQ2HZWWJAI6TPSASX72HRYNWS",
                   "ETHERSCAN_ABI_PARAMS": "module=contract&action=getabi",
@@ -750,6 +812,7 @@
                   "DYNAMODB_TABLE_WALLET": "burnance-dev-wallet",
                   "DYNAMODB_TABLE_WALLET_NFT": "burnance-dev-wallet-nft",
                   "DYNAMODB_TABLE_WALLET_NFT_CACHE": "burnance-dev-wallet-nft-cache",
+                  "DYNAMODB_TABLE_WALLET_COLLECTION_CACHE": "burnance-dev-wallet-collection-cache",
                   "DYNAMODB_TABLE_WALLET_NFT_TX": "burnance-dev-wallet-nft-tx",
                   "DYNAMODB_TABLE_NFT_COLLECTION": "burnance-dev-nft-collection",
                   "NODE": "wss://mainnet.infura.io/ws/v3/5d683ea6270a44d4996ad65529057982",
@@ -773,7 +836,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "service.burnance.nodejs.lambdas.dev",
-                "S3Key": "serverless/burnance/dev/1658619667849-2022-07-23T23:41:07.849Z/burnance.zip"
+                "S3Key": "serverless/burnance/dev/1658735543074-2022-07-25T07:52:23.074Z/burnance.zip"
               },
               "Handler": "wallet/steps.loadWalletData",
               "Runtime": "nodejs12.x",
@@ -791,6 +854,7 @@
                   "QUICK_NODE_HTTP": "https://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
                   "QUICK_NODE_WSS": "wss://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
                   "ETHERSCAN_API_URL": "https://api.etherscan.io/api",
+                  "ALCHEMY_API_KEY": "SExwOepdX3Gy9l-FZQVVITPkIf9sfzNJ",
                   "API_KEY_TOKEN": "WWY6WGBKZCG5U8JEY2RNTXT1YWMMER6SPN",
                   "PRO_API_KEY": "TFSZVPV8PUQ2HZWWJAI6TPSASX72HRYNWS",
                   "ETHERSCAN_ABI_PARAMS": "module=contract&action=getabi",
@@ -806,6 +870,7 @@
                   "DYNAMODB_TABLE_WALLET": "burnance-dev-wallet",
                   "DYNAMODB_TABLE_WALLET_NFT": "burnance-dev-wallet-nft",
                   "DYNAMODB_TABLE_WALLET_NFT_CACHE": "burnance-dev-wallet-nft-cache",
+                  "DYNAMODB_TABLE_WALLET_COLLECTION_CACHE": "burnance-dev-wallet-collection-cache",
                   "DYNAMODB_TABLE_WALLET_NFT_TX": "burnance-dev-wallet-nft-tx",
                   "DYNAMODB_TABLE_NFT_COLLECTION": "burnance-dev-nft-collection",
                   "NODE": "wss://mainnet.infura.io/ws/v3/5d683ea6270a44d4996ad65529057982",
@@ -829,7 +894,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "service.burnance.nodejs.lambdas.dev",
-                "S3Key": "serverless/burnance/dev/1658619667849-2022-07-23T23:41:07.849Z/burnance.zip"
+                "S3Key": "serverless/burnance/dev/1658735543074-2022-07-25T07:52:23.074Z/burnance.zip"
               },
               "Handler": "wallet/steps.stop",
               "Runtime": "nodejs12.x",
@@ -847,6 +912,7 @@
                   "QUICK_NODE_HTTP": "https://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
                   "QUICK_NODE_WSS": "wss://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
                   "ETHERSCAN_API_URL": "https://api.etherscan.io/api",
+                  "ALCHEMY_API_KEY": "SExwOepdX3Gy9l-FZQVVITPkIf9sfzNJ",
                   "API_KEY_TOKEN": "WWY6WGBKZCG5U8JEY2RNTXT1YWMMER6SPN",
                   "PRO_API_KEY": "TFSZVPV8PUQ2HZWWJAI6TPSASX72HRYNWS",
                   "ETHERSCAN_ABI_PARAMS": "module=contract&action=getabi",
@@ -862,6 +928,7 @@
                   "DYNAMODB_TABLE_WALLET": "burnance-dev-wallet",
                   "DYNAMODB_TABLE_WALLET_NFT": "burnance-dev-wallet-nft",
                   "DYNAMODB_TABLE_WALLET_NFT_CACHE": "burnance-dev-wallet-nft-cache",
+                  "DYNAMODB_TABLE_WALLET_COLLECTION_CACHE": "burnance-dev-wallet-collection-cache",
                   "DYNAMODB_TABLE_WALLET_NFT_TX": "burnance-dev-wallet-nft-tx",
                   "DYNAMODB_TABLE_NFT_COLLECTION": "burnance-dev-nft-collection",
                   "NODE": "wss://mainnet.infura.io/ws/v3/5d683ea6270a44d4996ad65529057982",
@@ -885,7 +952,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "service.burnance.nodejs.lambdas.dev",
-                "S3Key": "serverless/burnance/dev/1658619667849-2022-07-23T23:41:07.849Z/burnance.zip"
+                "S3Key": "serverless/burnance/dev/1658735543074-2022-07-25T07:52:23.074Z/burnance.zip"
               },
               "Handler": "wallet/steps.notification",
               "Runtime": "nodejs12.x",
@@ -903,6 +970,7 @@
                   "QUICK_NODE_HTTP": "https://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
                   "QUICK_NODE_WSS": "wss://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
                   "ETHERSCAN_API_URL": "https://api.etherscan.io/api",
+                  "ALCHEMY_API_KEY": "SExwOepdX3Gy9l-FZQVVITPkIf9sfzNJ",
                   "API_KEY_TOKEN": "WWY6WGBKZCG5U8JEY2RNTXT1YWMMER6SPN",
                   "PRO_API_KEY": "TFSZVPV8PUQ2HZWWJAI6TPSASX72HRYNWS",
                   "ETHERSCAN_ABI_PARAMS": "module=contract&action=getabi",
@@ -918,6 +986,7 @@
                   "DYNAMODB_TABLE_WALLET": "burnance-dev-wallet",
                   "DYNAMODB_TABLE_WALLET_NFT": "burnance-dev-wallet-nft",
                   "DYNAMODB_TABLE_WALLET_NFT_CACHE": "burnance-dev-wallet-nft-cache",
+                  "DYNAMODB_TABLE_WALLET_COLLECTION_CACHE": "burnance-dev-wallet-collection-cache",
                   "DYNAMODB_TABLE_WALLET_NFT_TX": "burnance-dev-wallet-nft-tx",
                   "DYNAMODB_TABLE_NFT_COLLECTION": "burnance-dev-nft-collection",
                   "NODE": "wss://mainnet.infura.io/ws/v3/5d683ea6270a44d4996ad65529057982",
@@ -941,7 +1010,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "service.burnance.nodejs.lambdas.dev",
-                "S3Key": "serverless/burnance/dev/1658619667849-2022-07-23T23:41:07.849Z/burnance.zip"
+                "S3Key": "serverless/burnance/dev/1658735543074-2022-07-25T07:52:23.074Z/burnance.zip"
               },
               "Handler": "wallet/wallet.AddWallet",
               "Runtime": "nodejs12.x",
@@ -959,6 +1028,7 @@
                   "QUICK_NODE_HTTP": "https://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
                   "QUICK_NODE_WSS": "wss://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
                   "ETHERSCAN_API_URL": "https://api.etherscan.io/api",
+                  "ALCHEMY_API_KEY": "SExwOepdX3Gy9l-FZQVVITPkIf9sfzNJ",
                   "API_KEY_TOKEN": "WWY6WGBKZCG5U8JEY2RNTXT1YWMMER6SPN",
                   "PRO_API_KEY": "TFSZVPV8PUQ2HZWWJAI6TPSASX72HRYNWS",
                   "ETHERSCAN_ABI_PARAMS": "module=contract&action=getabi",
@@ -974,6 +1044,7 @@
                   "DYNAMODB_TABLE_WALLET": "burnance-dev-wallet",
                   "DYNAMODB_TABLE_WALLET_NFT": "burnance-dev-wallet-nft",
                   "DYNAMODB_TABLE_WALLET_NFT_CACHE": "burnance-dev-wallet-nft-cache",
+                  "DYNAMODB_TABLE_WALLET_COLLECTION_CACHE": "burnance-dev-wallet-collection-cache",
                   "DYNAMODB_TABLE_WALLET_NFT_TX": "burnance-dev-wallet-nft-tx",
                   "DYNAMODB_TABLE_NFT_COLLECTION": "burnance-dev-nft-collection",
                   "NODE": "wss://mainnet.infura.io/ws/v3/5d683ea6270a44d4996ad65529057982",
@@ -997,7 +1068,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "service.burnance.nodejs.lambdas.dev",
-                "S3Key": "serverless/burnance/dev/1658619667849-2022-07-23T23:41:07.849Z/burnance.zip"
+                "S3Key": "serverless/burnance/dev/1658735543074-2022-07-25T07:52:23.074Z/burnance.zip"
               },
               "Handler": "wallet/wallet.GetWallet",
               "Runtime": "nodejs12.x",
@@ -1015,6 +1086,7 @@
                   "QUICK_NODE_HTTP": "https://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
                   "QUICK_NODE_WSS": "wss://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
                   "ETHERSCAN_API_URL": "https://api.etherscan.io/api",
+                  "ALCHEMY_API_KEY": "SExwOepdX3Gy9l-FZQVVITPkIf9sfzNJ",
                   "API_KEY_TOKEN": "WWY6WGBKZCG5U8JEY2RNTXT1YWMMER6SPN",
                   "PRO_API_KEY": "TFSZVPV8PUQ2HZWWJAI6TPSASX72HRYNWS",
                   "ETHERSCAN_ABI_PARAMS": "module=contract&action=getabi",
@@ -1030,6 +1102,7 @@
                   "DYNAMODB_TABLE_WALLET": "burnance-dev-wallet",
                   "DYNAMODB_TABLE_WALLET_NFT": "burnance-dev-wallet-nft",
                   "DYNAMODB_TABLE_WALLET_NFT_CACHE": "burnance-dev-wallet-nft-cache",
+                  "DYNAMODB_TABLE_WALLET_COLLECTION_CACHE": "burnance-dev-wallet-collection-cache",
                   "DYNAMODB_TABLE_WALLET_NFT_TX": "burnance-dev-wallet-nft-tx",
                   "DYNAMODB_TABLE_NFT_COLLECTION": "burnance-dev-nft-collection",
                   "NODE": "wss://mainnet.infura.io/ws/v3/5d683ea6270a44d4996ad65529057982",
@@ -1048,12 +1121,70 @@
               "WalletGetLogGroup"
             ]
           },
+          "WalletGetNFTsLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": "service.burnance.nodejs.lambdas.dev",
+                "S3Key": "serverless/burnance/dev/1658735543074-2022-07-25T07:52:23.074Z/burnance.zip"
+              },
+              "Handler": "wallet/wallet.GetWalletNFTs",
+              "Runtime": "nodejs12.x",
+              "FunctionName": "burnance-dev-walletGetNFTs",
+              "MemorySize": 128,
+              "Timeout": 30,
+              "Environment": {
+                "Variables": {
+                  "STAGE": "dev",
+                  "REGION": "us-east-1",
+                  "ACCOUNTID": "297677912558",
+                  "USER_AGENT": "dev.nft.burnance.io",
+                  "CDN_BUCKET": "dev.nft.burnance.io",
+                  "NFT_IMAGE_CDN_BUCKET": "dev.image.nft.burnance.io",
+                  "QUICK_NODE_HTTP": "https://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
+                  "QUICK_NODE_WSS": "wss://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
+                  "ETHERSCAN_API_URL": "https://api.etherscan.io/api",
+                  "ALCHEMY_API_KEY": "SExwOepdX3Gy9l-FZQVVITPkIf9sfzNJ",
+                  "API_KEY_TOKEN": "WWY6WGBKZCG5U8JEY2RNTXT1YWMMER6SPN",
+                  "PRO_API_KEY": "TFSZVPV8PUQ2HZWWJAI6TPSASX72HRYNWS",
+                  "ETHERSCAN_ABI_PARAMS": "module=contract&action=getabi",
+                  "OPEN": "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",
+                  "SLACK_API_WAITLIST_WEBHOOK": "https://hooks.slack.com/services/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",
+                  "DRIP": "d19af8d64382261d9cbd9762fdd07356",
+                  "DRIP_ID": "4947055",
+                  "S3_DRIP_CDN_BUCKET": "events.nft.burnance.io",
+                  "DYNAMODB_TABLE_CONTRACT_ABI": "burnance-dev-contract-abi",
+                  "DYNAMODB_TABLE_NFT_METADATA": "burnance-dev-nfts-metadata",
+                  "DYNAMODB_TABLE_NFT_IMAGE": "burnance-dev-nfts-image",
+                  "DYNAMODB_TABLE_WAITLIST": "burnance-dev-waitlist",
+                  "DYNAMODB_TABLE_WALLET": "burnance-dev-wallet",
+                  "DYNAMODB_TABLE_WALLET_NFT": "burnance-dev-wallet-nft",
+                  "DYNAMODB_TABLE_WALLET_NFT_CACHE": "burnance-dev-wallet-nft-cache",
+                  "DYNAMODB_TABLE_WALLET_COLLECTION_CACHE": "burnance-dev-wallet-collection-cache",
+                  "DYNAMODB_TABLE_WALLET_NFT_TX": "burnance-dev-wallet-nft-tx",
+                  "DYNAMODB_TABLE_NFT_COLLECTION": "burnance-dev-nft-collection",
+                  "NODE": "wss://mainnet.infura.io/ws/v3/5d683ea6270a44d4996ad65529057982",
+                  "KEY": "adfb72ce9754e3cbc1e79e44a8e20804cebd3c4a347605c6a3462a8de05b8783",
+                  "STATE_MACHINE_WALLET_ARN": "arn:aws:states:us-east-1:297677912558:stateMachine:walletDetailsStateMachineArn"
+                }
+              },
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              }
+            },
+            "DependsOn": [
+              "WalletGetNFTsLogGroup"
+            ]
+          },
           "WalletDeleteLambdaFunction": {
             "Type": "AWS::Lambda::Function",
             "Properties": {
               "Code": {
                 "S3Bucket": "service.burnance.nodejs.lambdas.dev",
-                "S3Key": "serverless/burnance/dev/1658619667849-2022-07-23T23:41:07.849Z/burnance.zip"
+                "S3Key": "serverless/burnance/dev/1658735543074-2022-07-25T07:52:23.074Z/burnance.zip"
               },
               "Handler": "wallet/wallet.DeleteWallet",
               "Runtime": "nodejs12.x",
@@ -1071,6 +1202,7 @@
                   "QUICK_NODE_HTTP": "https://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
                   "QUICK_NODE_WSS": "wss://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
                   "ETHERSCAN_API_URL": "https://api.etherscan.io/api",
+                  "ALCHEMY_API_KEY": "SExwOepdX3Gy9l-FZQVVITPkIf9sfzNJ",
                   "API_KEY_TOKEN": "WWY6WGBKZCG5U8JEY2RNTXT1YWMMER6SPN",
                   "PRO_API_KEY": "TFSZVPV8PUQ2HZWWJAI6TPSASX72HRYNWS",
                   "ETHERSCAN_ABI_PARAMS": "module=contract&action=getabi",
@@ -1086,6 +1218,7 @@
                   "DYNAMODB_TABLE_WALLET": "burnance-dev-wallet",
                   "DYNAMODB_TABLE_WALLET_NFT": "burnance-dev-wallet-nft",
                   "DYNAMODB_TABLE_WALLET_NFT_CACHE": "burnance-dev-wallet-nft-cache",
+                  "DYNAMODB_TABLE_WALLET_COLLECTION_CACHE": "burnance-dev-wallet-collection-cache",
                   "DYNAMODB_TABLE_WALLET_NFT_TX": "burnance-dev-wallet-nft-tx",
                   "DYNAMODB_TABLE_NFT_COLLECTION": "burnance-dev-nft-collection",
                   "NODE": "wss://mainnet.infura.io/ws/v3/5d683ea6270a44d4996ad65529057982",
@@ -1104,154 +1237,572 @@
               "WalletDeleteLogGroup"
             ]
           },
-          "GetEthPriceLambdaVersionNGBZcnKsbMVJACRPNgebLi3YV4xwxCbydK0OfnqC8": {
-            "Type": "AWS::Lambda::Version",
-            "DeletionPolicy": "Retain",
+          "CollectionAddLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
             "Properties": {
-              "FunctionName": {
-                "Ref": "GetEthPriceLambdaFunction"
+              "Code": {
+                "S3Bucket": "service.burnance.nodejs.lambdas.dev",
+                "S3Key": "serverless/burnance/dev/1658735543074-2022-07-25T07:52:23.074Z/burnance.zip"
               },
-              "CodeSha256": "jsyRb+8ZRzb8Bizw6I268yDOUKzkedi9mtrHxKiv/4U="
-            }
+              "Handler": "collection/handler.AddCollection",
+              "Runtime": "nodejs12.x",
+              "FunctionName": "burnance-dev-collectionAdd",
+              "MemorySize": 128,
+              "Timeout": 30,
+              "Environment": {
+                "Variables": {
+                  "STAGE": "dev",
+                  "REGION": "us-east-1",
+                  "ACCOUNTID": "297677912558",
+                  "USER_AGENT": "dev.nft.burnance.io",
+                  "CDN_BUCKET": "dev.nft.burnance.io",
+                  "NFT_IMAGE_CDN_BUCKET": "dev.image.nft.burnance.io",
+                  "QUICK_NODE_HTTP": "https://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
+                  "QUICK_NODE_WSS": "wss://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
+                  "ETHERSCAN_API_URL": "https://api.etherscan.io/api",
+                  "ALCHEMY_API_KEY": "SExwOepdX3Gy9l-FZQVVITPkIf9sfzNJ",
+                  "API_KEY_TOKEN": "WWY6WGBKZCG5U8JEY2RNTXT1YWMMER6SPN",
+                  "PRO_API_KEY": "TFSZVPV8PUQ2HZWWJAI6TPSASX72HRYNWS",
+                  "ETHERSCAN_ABI_PARAMS": "module=contract&action=getabi",
+                  "OPEN": "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",
+                  "SLACK_API_WAITLIST_WEBHOOK": "https://hooks.slack.com/services/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",
+                  "DRIP": "d19af8d64382261d9cbd9762fdd07356",
+                  "DRIP_ID": "4947055",
+                  "S3_DRIP_CDN_BUCKET": "events.nft.burnance.io",
+                  "DYNAMODB_TABLE_CONTRACT_ABI": "burnance-dev-contract-abi",
+                  "DYNAMODB_TABLE_NFT_METADATA": "burnance-dev-nfts-metadata",
+                  "DYNAMODB_TABLE_NFT_IMAGE": "burnance-dev-nfts-image",
+                  "DYNAMODB_TABLE_WAITLIST": "burnance-dev-waitlist",
+                  "DYNAMODB_TABLE_WALLET": "burnance-dev-wallet",
+                  "DYNAMODB_TABLE_WALLET_NFT": "burnance-dev-wallet-nft",
+                  "DYNAMODB_TABLE_WALLET_NFT_CACHE": "burnance-dev-wallet-nft-cache",
+                  "DYNAMODB_TABLE_WALLET_COLLECTION_CACHE": "burnance-dev-wallet-collection-cache",
+                  "DYNAMODB_TABLE_WALLET_NFT_TX": "burnance-dev-wallet-nft-tx",
+                  "DYNAMODB_TABLE_NFT_COLLECTION": "burnance-dev-nft-collection",
+                  "NODE": "wss://mainnet.infura.io/ws/v3/5d683ea6270a44d4996ad65529057982",
+                  "KEY": "adfb72ce9754e3cbc1e79e44a8e20804cebd3c4a347605c6a3462a8de05b8783",
+                  "STATE_MACHINE_WALLET_ARN": "arn:aws:states:us-east-1:297677912558:stateMachine:walletDetailsStateMachineArn"
+                }
+              },
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              }
+            },
+            "DependsOn": [
+              "CollectionAddLogGroup"
+            ]
           },
-          "AddToWaitlistLambdaVersioncxjflyi6CxF8uVZXMd3uJ8kbsDNi4PfQsRbCiUjmMhY": {
-            "Type": "AWS::Lambda::Version",
-            "DeletionPolicy": "Retain",
+          "CollectionGetLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
             "Properties": {
-              "FunctionName": {
-                "Ref": "AddToWaitlistLambdaFunction"
+              "Code": {
+                "S3Bucket": "service.burnance.nodejs.lambdas.dev",
+                "S3Key": "serverless/burnance/dev/1658735543074-2022-07-25T07:52:23.074Z/burnance.zip"
               },
-              "CodeSha256": "jsyRb+8ZRzb8Bizw6I268yDOUKzkedi9mtrHxKiv/4U="
-            }
+              "Handler": "collection/handler.GetCollection",
+              "Runtime": "nodejs12.x",
+              "FunctionName": "burnance-dev-collectionGet",
+              "MemorySize": 128,
+              "Timeout": 30,
+              "Environment": {
+                "Variables": {
+                  "STAGE": "dev",
+                  "REGION": "us-east-1",
+                  "ACCOUNTID": "297677912558",
+                  "USER_AGENT": "dev.nft.burnance.io",
+                  "CDN_BUCKET": "dev.nft.burnance.io",
+                  "NFT_IMAGE_CDN_BUCKET": "dev.image.nft.burnance.io",
+                  "QUICK_NODE_HTTP": "https://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
+                  "QUICK_NODE_WSS": "wss://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
+                  "ETHERSCAN_API_URL": "https://api.etherscan.io/api",
+                  "ALCHEMY_API_KEY": "SExwOepdX3Gy9l-FZQVVITPkIf9sfzNJ",
+                  "API_KEY_TOKEN": "WWY6WGBKZCG5U8JEY2RNTXT1YWMMER6SPN",
+                  "PRO_API_KEY": "TFSZVPV8PUQ2HZWWJAI6TPSASX72HRYNWS",
+                  "ETHERSCAN_ABI_PARAMS": "module=contract&action=getabi",
+                  "OPEN": "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",
+                  "SLACK_API_WAITLIST_WEBHOOK": "https://hooks.slack.com/services/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",
+                  "DRIP": "d19af8d64382261d9cbd9762fdd07356",
+                  "DRIP_ID": "4947055",
+                  "S3_DRIP_CDN_BUCKET": "events.nft.burnance.io",
+                  "DYNAMODB_TABLE_CONTRACT_ABI": "burnance-dev-contract-abi",
+                  "DYNAMODB_TABLE_NFT_METADATA": "burnance-dev-nfts-metadata",
+                  "DYNAMODB_TABLE_NFT_IMAGE": "burnance-dev-nfts-image",
+                  "DYNAMODB_TABLE_WAITLIST": "burnance-dev-waitlist",
+                  "DYNAMODB_TABLE_WALLET": "burnance-dev-wallet",
+                  "DYNAMODB_TABLE_WALLET_NFT": "burnance-dev-wallet-nft",
+                  "DYNAMODB_TABLE_WALLET_NFT_CACHE": "burnance-dev-wallet-nft-cache",
+                  "DYNAMODB_TABLE_WALLET_COLLECTION_CACHE": "burnance-dev-wallet-collection-cache",
+                  "DYNAMODB_TABLE_WALLET_NFT_TX": "burnance-dev-wallet-nft-tx",
+                  "DYNAMODB_TABLE_NFT_COLLECTION": "burnance-dev-nft-collection",
+                  "NODE": "wss://mainnet.infura.io/ws/v3/5d683ea6270a44d4996ad65529057982",
+                  "KEY": "adfb72ce9754e3cbc1e79e44a8e20804cebd3c4a347605c6a3462a8de05b8783",
+                  "STATE_MACHINE_WALLET_ARN": "arn:aws:states:us-east-1:297677912558:stateMachine:walletDetailsStateMachineArn"
+                }
+              },
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              }
+            },
+            "DependsOn": [
+              "CollectionGetLogGroup"
+            ]
           },
-          "WalletStartLambdaVersionb8wq6cqvKm5s6ST36AD8YuZLB0NVwAQZVTbbW3eulFc": {
-            "Type": "AWS::Lambda::Version",
-            "DeletionPolicy": "Retain",
+          "CollectionGetDetailsLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
             "Properties": {
-              "FunctionName": {
-                "Ref": "WalletStartLambdaFunction"
+              "Code": {
+                "S3Bucket": "service.burnance.nodejs.lambdas.dev",
+                "S3Key": "serverless/burnance/dev/1658735543074-2022-07-25T07:52:23.074Z/burnance.zip"
               },
-              "CodeSha256": "jsyRb+8ZRzb8Bizw6I268yDOUKzkedi9mtrHxKiv/4U="
-            }
+              "Handler": "collection/handler.GetCollectionDetails",
+              "Runtime": "nodejs12.x",
+              "FunctionName": "burnance-dev-collectionGetDetails",
+              "MemorySize": 128,
+              "Timeout": 30,
+              "Environment": {
+                "Variables": {
+                  "STAGE": "dev",
+                  "REGION": "us-east-1",
+                  "ACCOUNTID": "297677912558",
+                  "USER_AGENT": "dev.nft.burnance.io",
+                  "CDN_BUCKET": "dev.nft.burnance.io",
+                  "NFT_IMAGE_CDN_BUCKET": "dev.image.nft.burnance.io",
+                  "QUICK_NODE_HTTP": "https://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
+                  "QUICK_NODE_WSS": "wss://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
+                  "ETHERSCAN_API_URL": "https://api.etherscan.io/api",
+                  "ALCHEMY_API_KEY": "SExwOepdX3Gy9l-FZQVVITPkIf9sfzNJ",
+                  "API_KEY_TOKEN": "WWY6WGBKZCG5U8JEY2RNTXT1YWMMER6SPN",
+                  "PRO_API_KEY": "TFSZVPV8PUQ2HZWWJAI6TPSASX72HRYNWS",
+                  "ETHERSCAN_ABI_PARAMS": "module=contract&action=getabi",
+                  "OPEN": "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",
+                  "SLACK_API_WAITLIST_WEBHOOK": "https://hooks.slack.com/services/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",
+                  "DRIP": "d19af8d64382261d9cbd9762fdd07356",
+                  "DRIP_ID": "4947055",
+                  "S3_DRIP_CDN_BUCKET": "events.nft.burnance.io",
+                  "DYNAMODB_TABLE_CONTRACT_ABI": "burnance-dev-contract-abi",
+                  "DYNAMODB_TABLE_NFT_METADATA": "burnance-dev-nfts-metadata",
+                  "DYNAMODB_TABLE_NFT_IMAGE": "burnance-dev-nfts-image",
+                  "DYNAMODB_TABLE_WAITLIST": "burnance-dev-waitlist",
+                  "DYNAMODB_TABLE_WALLET": "burnance-dev-wallet",
+                  "DYNAMODB_TABLE_WALLET_NFT": "burnance-dev-wallet-nft",
+                  "DYNAMODB_TABLE_WALLET_NFT_CACHE": "burnance-dev-wallet-nft-cache",
+                  "DYNAMODB_TABLE_WALLET_COLLECTION_CACHE": "burnance-dev-wallet-collection-cache",
+                  "DYNAMODB_TABLE_WALLET_NFT_TX": "burnance-dev-wallet-nft-tx",
+                  "DYNAMODB_TABLE_NFT_COLLECTION": "burnance-dev-nft-collection",
+                  "NODE": "wss://mainnet.infura.io/ws/v3/5d683ea6270a44d4996ad65529057982",
+                  "KEY": "adfb72ce9754e3cbc1e79e44a8e20804cebd3c4a347605c6a3462a8de05b8783",
+                  "STATE_MACHINE_WALLET_ARN": "arn:aws:states:us-east-1:297677912558:stateMachine:walletDetailsStateMachineArn"
+                }
+              },
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              }
+            },
+            "DependsOn": [
+              "CollectionGetDetailsLogGroup"
+            ]
           },
-          "ViewNFTLambdaVersion2XRfxrUcEXDjegxEhatWNSathnrGqFr7n9EwmJrEzg": {
-            "Type": "AWS::Lambda::Version",
-            "DeletionPolicy": "Retain",
+          "CollectionGetFloorPriceLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
             "Properties": {
-              "FunctionName": {
-                "Ref": "ViewNFTLambdaFunction"
+              "Code": {
+                "S3Bucket": "service.burnance.nodejs.lambdas.dev",
+                "S3Key": "serverless/burnance/dev/1658735543074-2022-07-25T07:52:23.074Z/burnance.zip"
               },
-              "CodeSha256": "jsyRb+8ZRzb8Bizw6I268yDOUKzkedi9mtrHxKiv/4U="
-            }
+              "Handler": "collection/handler.GetCollectionFloorPrice",
+              "Runtime": "nodejs12.x",
+              "FunctionName": "burnance-dev-collectionGetFloorPrice",
+              "MemorySize": 128,
+              "Timeout": 30,
+              "Environment": {
+                "Variables": {
+                  "STAGE": "dev",
+                  "REGION": "us-east-1",
+                  "ACCOUNTID": "297677912558",
+                  "USER_AGENT": "dev.nft.burnance.io",
+                  "CDN_BUCKET": "dev.nft.burnance.io",
+                  "NFT_IMAGE_CDN_BUCKET": "dev.image.nft.burnance.io",
+                  "QUICK_NODE_HTTP": "https://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
+                  "QUICK_NODE_WSS": "wss://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
+                  "ETHERSCAN_API_URL": "https://api.etherscan.io/api",
+                  "ALCHEMY_API_KEY": "SExwOepdX3Gy9l-FZQVVITPkIf9sfzNJ",
+                  "API_KEY_TOKEN": "WWY6WGBKZCG5U8JEY2RNTXT1YWMMER6SPN",
+                  "PRO_API_KEY": "TFSZVPV8PUQ2HZWWJAI6TPSASX72HRYNWS",
+                  "ETHERSCAN_ABI_PARAMS": "module=contract&action=getabi",
+                  "OPEN": "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",
+                  "SLACK_API_WAITLIST_WEBHOOK": "https://hooks.slack.com/services/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",
+                  "DRIP": "d19af8d64382261d9cbd9762fdd07356",
+                  "DRIP_ID": "4947055",
+                  "S3_DRIP_CDN_BUCKET": "events.nft.burnance.io",
+                  "DYNAMODB_TABLE_CONTRACT_ABI": "burnance-dev-contract-abi",
+                  "DYNAMODB_TABLE_NFT_METADATA": "burnance-dev-nfts-metadata",
+                  "DYNAMODB_TABLE_NFT_IMAGE": "burnance-dev-nfts-image",
+                  "DYNAMODB_TABLE_WAITLIST": "burnance-dev-waitlist",
+                  "DYNAMODB_TABLE_WALLET": "burnance-dev-wallet",
+                  "DYNAMODB_TABLE_WALLET_NFT": "burnance-dev-wallet-nft",
+                  "DYNAMODB_TABLE_WALLET_NFT_CACHE": "burnance-dev-wallet-nft-cache",
+                  "DYNAMODB_TABLE_WALLET_COLLECTION_CACHE": "burnance-dev-wallet-collection-cache",
+                  "DYNAMODB_TABLE_WALLET_NFT_TX": "burnance-dev-wallet-nft-tx",
+                  "DYNAMODB_TABLE_NFT_COLLECTION": "burnance-dev-nft-collection",
+                  "NODE": "wss://mainnet.infura.io/ws/v3/5d683ea6270a44d4996ad65529057982",
+                  "KEY": "adfb72ce9754e3cbc1e79e44a8e20804cebd3c4a347605c6a3462a8de05b8783",
+                  "STATE_MACHINE_WALLET_ARN": "arn:aws:states:us-east-1:297677912558:stateMachine:walletDetailsStateMachineArn"
+                }
+              },
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              }
+            },
+            "DependsOn": [
+              "CollectionGetFloorPriceLogGroup"
+            ]
           },
-          "GetTxFeeLambdaVersionY4oBlqKajwGaN0Y2JZQwL8cHNqeVX1cve3argrRkY9Q": {
-            "Type": "AWS::Lambda::Version",
-            "DeletionPolicy": "Retain",
+          "CollectionGetVolumeLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
             "Properties": {
-              "FunctionName": {
-                "Ref": "GetTxFeeLambdaFunction"
+              "Code": {
+                "S3Bucket": "service.burnance.nodejs.lambdas.dev",
+                "S3Key": "serverless/burnance/dev/1658735543074-2022-07-25T07:52:23.074Z/burnance.zip"
               },
-              "CodeSha256": "jsyRb+8ZRzb8Bizw6I268yDOUKzkedi9mtrHxKiv/4U="
-            }
+              "Handler": "collection/handler.GetCollectionFloorPrice",
+              "Runtime": "nodejs12.x",
+              "FunctionName": "burnance-dev-collectionGetVolume",
+              "MemorySize": 128,
+              "Timeout": 30,
+              "Environment": {
+                "Variables": {
+                  "STAGE": "dev",
+                  "REGION": "us-east-1",
+                  "ACCOUNTID": "297677912558",
+                  "USER_AGENT": "dev.nft.burnance.io",
+                  "CDN_BUCKET": "dev.nft.burnance.io",
+                  "NFT_IMAGE_CDN_BUCKET": "dev.image.nft.burnance.io",
+                  "QUICK_NODE_HTTP": "https://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
+                  "QUICK_NODE_WSS": "wss://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
+                  "ETHERSCAN_API_URL": "https://api.etherscan.io/api",
+                  "ALCHEMY_API_KEY": "SExwOepdX3Gy9l-FZQVVITPkIf9sfzNJ",
+                  "API_KEY_TOKEN": "WWY6WGBKZCG5U8JEY2RNTXT1YWMMER6SPN",
+                  "PRO_API_KEY": "TFSZVPV8PUQ2HZWWJAI6TPSASX72HRYNWS",
+                  "ETHERSCAN_ABI_PARAMS": "module=contract&action=getabi",
+                  "OPEN": "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",
+                  "SLACK_API_WAITLIST_WEBHOOK": "https://hooks.slack.com/services/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",
+                  "DRIP": "d19af8d64382261d9cbd9762fdd07356",
+                  "DRIP_ID": "4947055",
+                  "S3_DRIP_CDN_BUCKET": "events.nft.burnance.io",
+                  "DYNAMODB_TABLE_CONTRACT_ABI": "burnance-dev-contract-abi",
+                  "DYNAMODB_TABLE_NFT_METADATA": "burnance-dev-nfts-metadata",
+                  "DYNAMODB_TABLE_NFT_IMAGE": "burnance-dev-nfts-image",
+                  "DYNAMODB_TABLE_WAITLIST": "burnance-dev-waitlist",
+                  "DYNAMODB_TABLE_WALLET": "burnance-dev-wallet",
+                  "DYNAMODB_TABLE_WALLET_NFT": "burnance-dev-wallet-nft",
+                  "DYNAMODB_TABLE_WALLET_NFT_CACHE": "burnance-dev-wallet-nft-cache",
+                  "DYNAMODB_TABLE_WALLET_COLLECTION_CACHE": "burnance-dev-wallet-collection-cache",
+                  "DYNAMODB_TABLE_WALLET_NFT_TX": "burnance-dev-wallet-nft-tx",
+                  "DYNAMODB_TABLE_NFT_COLLECTION": "burnance-dev-nft-collection",
+                  "NODE": "wss://mainnet.infura.io/ws/v3/5d683ea6270a44d4996ad65529057982",
+                  "KEY": "adfb72ce9754e3cbc1e79e44a8e20804cebd3c4a347605c6a3462a8de05b8783",
+                  "STATE_MACHINE_WALLET_ARN": "arn:aws:states:us-east-1:297677912558:stateMachine:walletDetailsStateMachineArn"
+                }
+              },
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              }
+            },
+            "DependsOn": [
+              "CollectionGetVolumeLogGroup"
+            ]
           },
-          "QnUnderscorefetchNFTsLambdaVersionLhmoNjebxEKHhf5xxysMFUt8seua1FlT3HleghNruc": {
-            "Type": "AWS::Lambda::Version",
-            "DeletionPolicy": "Retain",
+          "CollectionDeleteLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
             "Properties": {
-              "FunctionName": {
-                "Ref": "QnUnderscorefetchNFTsLambdaFunction"
+              "Code": {
+                "S3Bucket": "service.burnance.nodejs.lambdas.dev",
+                "S3Key": "serverless/burnance/dev/1658735543074-2022-07-25T07:52:23.074Z/burnance.zip"
               },
-              "CodeSha256": "jsyRb+8ZRzb8Bizw6I268yDOUKzkedi9mtrHxKiv/4U="
-            }
-          },
-          "LanguageExecuteLambdaVersionOu48fzG76ZbVhX7hnjCN2wrRsDMnZezkElQNPHOy7E": {
-            "Type": "AWS::Lambda::Version",
-            "DeletionPolicy": "Retain",
-            "Properties": {
-              "FunctionName": {
-                "Ref": "LanguageExecuteLambdaFunction"
+              "Handler": "collection/handler.DeleteCollection",
+              "Runtime": "nodejs12.x",
+              "FunctionName": "burnance-dev-collectionDelete",
+              "MemorySize": 128,
+              "Timeout": 30,
+              "Environment": {
+                "Variables": {
+                  "STAGE": "dev",
+                  "REGION": "us-east-1",
+                  "ACCOUNTID": "297677912558",
+                  "USER_AGENT": "dev.nft.burnance.io",
+                  "CDN_BUCKET": "dev.nft.burnance.io",
+                  "NFT_IMAGE_CDN_BUCKET": "dev.image.nft.burnance.io",
+                  "QUICK_NODE_HTTP": "https://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
+                  "QUICK_NODE_WSS": "wss://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
+                  "ETHERSCAN_API_URL": "https://api.etherscan.io/api",
+                  "ALCHEMY_API_KEY": "SExwOepdX3Gy9l-FZQVVITPkIf9sfzNJ",
+                  "API_KEY_TOKEN": "WWY6WGBKZCG5U8JEY2RNTXT1YWMMER6SPN",
+                  "PRO_API_KEY": "TFSZVPV8PUQ2HZWWJAI6TPSASX72HRYNWS",
+                  "ETHERSCAN_ABI_PARAMS": "module=contract&action=getabi",
+                  "OPEN": "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",
+                  "SLACK_API_WAITLIST_WEBHOOK": "https://hooks.slack.com/services/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",
+                  "DRIP": "d19af8d64382261d9cbd9762fdd07356",
+                  "DRIP_ID": "4947055",
+                  "S3_DRIP_CDN_BUCKET": "events.nft.burnance.io",
+                  "DYNAMODB_TABLE_CONTRACT_ABI": "burnance-dev-contract-abi",
+                  "DYNAMODB_TABLE_NFT_METADATA": "burnance-dev-nfts-metadata",
+                  "DYNAMODB_TABLE_NFT_IMAGE": "burnance-dev-nfts-image",
+                  "DYNAMODB_TABLE_WAITLIST": "burnance-dev-waitlist",
+                  "DYNAMODB_TABLE_WALLET": "burnance-dev-wallet",
+                  "DYNAMODB_TABLE_WALLET_NFT": "burnance-dev-wallet-nft",
+                  "DYNAMODB_TABLE_WALLET_NFT_CACHE": "burnance-dev-wallet-nft-cache",
+                  "DYNAMODB_TABLE_WALLET_COLLECTION_CACHE": "burnance-dev-wallet-collection-cache",
+                  "DYNAMODB_TABLE_WALLET_NFT_TX": "burnance-dev-wallet-nft-tx",
+                  "DYNAMODB_TABLE_NFT_COLLECTION": "burnance-dev-nft-collection",
+                  "NODE": "wss://mainnet.infura.io/ws/v3/5d683ea6270a44d4996ad65529057982",
+                  "KEY": "adfb72ce9754e3cbc1e79e44a8e20804cebd3c4a347605c6a3462a8de05b8783",
+                  "STATE_MACHINE_WALLET_ARN": "arn:aws:states:us-east-1:297677912558:stateMachine:walletDetailsStateMachineArn"
+                }
               },
-              "CodeSha256": "jsyRb+8ZRzb8Bizw6I268yDOUKzkedi9mtrHxKiv/4U="
-            }
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              }
+            },
+            "DependsOn": [
+              "CollectionDeleteLogGroup"
+            ]
           },
-          "WalletLoadLambdaVersionhsSvDxp9fxb8WBPOKq0ibtzXQSLRaDdCBJZuHCcf9hI": {
-            "Type": "AWS::Lambda::Version",
-            "DeletionPolicy": "Retain",
-            "Properties": {
-              "FunctionName": {
-                "Ref": "WalletLoadLambdaFunction"
-              },
-              "CodeSha256": "jsyRb+8ZRzb8Bizw6I268yDOUKzkedi9mtrHxKiv/4U="
-            }
-          },
-          "ViewNFTtxLambdaVersion7M8tyDU6tZvXsYXtlnlL3jrTIeOdVTuz8rpAWLxeBbI": {
-            "Type": "AWS::Lambda::Version",
-            "DeletionPolicy": "Retain",
-            "Properties": {
-              "FunctionName": {
-                "Ref": "ViewNFTtxLambdaFunction"
-              },
-              "CodeSha256": "jsyRb+8ZRzb8Bizw6I268yDOUKzkedi9mtrHxKiv/4U="
-            }
-          },
-          "WalletNotificationLambdaVersionasmkgVzmtI4BwxwRfDdDjRpwxdTsF6dvcW3L6R1pYZ0": {
-            "Type": "AWS::Lambda::Version",
-            "DeletionPolicy": "Retain",
-            "Properties": {
-              "FunctionName": {
-                "Ref": "WalletNotificationLambdaFunction"
-              },
-              "CodeSha256": "jsyRb+8ZRzb8Bizw6I268yDOUKzkedi9mtrHxKiv/4U="
-            }
-          },
-          "WalletStopLambdaVersion3tBK6A6WMtO2ZlwwmR6NDVLpm7AA5Dh1kBGY8uhQ3c": {
-            "Type": "AWS::Lambda::Version",
-            "DeletionPolicy": "Retain",
-            "Properties": {
-              "FunctionName": {
-                "Ref": "WalletStopLambdaFunction"
-              },
-              "CodeSha256": "jsyRb+8ZRzb8Bizw6I268yDOUKzkedi9mtrHxKiv/4U="
-            }
-          },
-          "WalletDeleteLambdaVersionCqjMAO9ugkGZ4MLAtEc5rzGyR4I2IPKGpTkOjN6s8": {
-            "Type": "AWS::Lambda::Version",
-            "DeletionPolicy": "Retain",
-            "Properties": {
-              "FunctionName": {
-                "Ref": "WalletDeleteLambdaFunction"
-              },
-              "CodeSha256": "jsyRb+8ZRzb8Bizw6I268yDOUKzkedi9mtrHxKiv/4U="
-            }
-          },
-          "WalletGetLambdaVersionebrN0Vip3R9e5awvKFTPctrkS3xU93w53FZUwnHo": {
-            "Type": "AWS::Lambda::Version",
-            "DeletionPolicy": "Retain",
-            "Properties": {
-              "FunctionName": {
-                "Ref": "WalletGetLambdaFunction"
-              },
-              "CodeSha256": "jsyRb+8ZRzb8Bizw6I268yDOUKzkedi9mtrHxKiv/4U="
-            }
-          },
-          "WalletAddLambdaVersioniglYEXFrnfnN3GJCh4397twl0x4PPiEj8bqDx9Kz2w": {
-            "Type": "AWS::Lambda::Version",
-            "DeletionPolicy": "Retain",
-            "Properties": {
-              "FunctionName": {
-                "Ref": "WalletAddLambdaFunction"
-              },
-              "CodeSha256": "jsyRb+8ZRzb8Bizw6I268yDOUKzkedi9mtrHxKiv/4U="
-            }
-          },
-          "NftImageLambdaVersionjkYAj6mSXjyTAdWqLjQL1lA9VzaEWSMpCfDLxfpaQiA": {
+          "NftImageLambdaVersioncExfqWZD0E3AQoRmIoHiA6OhLToeKdknWjza0Jgo": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "NftImageLambdaFunction"
               },
-              "CodeSha256": "jsyRb+8ZRzb8Bizw6I268yDOUKzkedi9mtrHxKiv/4U="
+              "CodeSha256": "FR3Z6Ej/E7YtPLWhGbnpCgPravrV3zkxXJZNdEPPqdQ="
+            }
+          },
+          "ViewNFTtxLambdaVersion4uJ8schPS37lrTpRmqxOfTPSlrh2prpbMCVmX5JoKEk": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "ViewNFTtxLambdaFunction"
+              },
+              "CodeSha256": "FR3Z6Ej/E7YtPLWhGbnpCgPravrV3zkxXJZNdEPPqdQ="
+            }
+          },
+          "GetTxFeeLambdaVersionJJQX74zjU7SE8YmcIZTfENWeBaindN6Y41jy4hOS08Y": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "GetTxFeeLambdaFunction"
+              },
+              "CodeSha256": "FR3Z6Ej/E7YtPLWhGbnpCgPravrV3zkxXJZNdEPPqdQ="
+            }
+          },
+          "AddToWaitlistLambdaVersionsHJJSaSksfiuVLG69uNt9KuF3aAjkkVUkZk00qZRppo": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "AddToWaitlistLambdaFunction"
+              },
+              "CodeSha256": "FR3Z6Ej/E7YtPLWhGbnpCgPravrV3zkxXJZNdEPPqdQ="
+            }
+          },
+          "ViewNFTLambdaVersionNilGJ1xyqUf89Kd9MMPADesGlpQfowdrqVSQTqQCTg": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "ViewNFTLambdaFunction"
+              },
+              "CodeSha256": "FR3Z6Ej/E7YtPLWhGbnpCgPravrV3zkxXJZNdEPPqdQ="
+            }
+          },
+          "WalletStartLambdaVersionximY64Kq0o7ldc7fixCxgGa1qbs8274k245xq4hIA": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "WalletStartLambdaFunction"
+              },
+              "CodeSha256": "FR3Z6Ej/E7YtPLWhGbnpCgPravrV3zkxXJZNdEPPqdQ="
+            }
+          },
+          "QnUnderscorefetchNFTsLambdaVersionDBHVY1rPXS5DHqgtCVzAmKK4tTKxXHFipJ7pKMmTU0": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "QnUnderscorefetchNFTsLambdaFunction"
+              },
+              "CodeSha256": "FR3Z6Ej/E7YtPLWhGbnpCgPravrV3zkxXJZNdEPPqdQ="
+            }
+          },
+          "GetEthPriceLambdaVersion1xq1JDQSp2RYbWtIv2UaZNT5llg4tvII6mSnxc9J5E0": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "GetEthPriceLambdaFunction"
+              },
+              "CodeSha256": "FR3Z6Ej/E7YtPLWhGbnpCgPravrV3zkxXJZNdEPPqdQ="
+            }
+          },
+          "WalletLoadLambdaVersion1mbGsX20p36gymWFLqiF6JVjMcQHGAuqsf8KTzDfU": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "WalletLoadLambdaFunction"
+              },
+              "CodeSha256": "FR3Z6Ej/E7YtPLWhGbnpCgPravrV3zkxXJZNdEPPqdQ="
+            }
+          },
+          "WalletExecuteLambdaVersioneJ9CEwicibmMJsW4ChPJtByLVEzHM4BmzbOWcjkkdE": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "WalletExecuteLambdaFunction"
+              },
+              "CodeSha256": "FR3Z6Ej/E7YtPLWhGbnpCgPravrV3zkxXJZNdEPPqdQ="
+            }
+          },
+          "WalletAddLambdaVersionUMooqIfFDkhncQpDbqpISALx7X7IVmOEMX5D3N3lNw": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "WalletAddLambdaFunction"
+              },
+              "CodeSha256": "FR3Z6Ej/E7YtPLWhGbnpCgPravrV3zkxXJZNdEPPqdQ="
+            }
+          },
+          "WalletNotificationLambdaVersion0tbM2KQ7mzSbLF2ZEHSYtjwMZfE1nirwdDlif4GJ4": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "WalletNotificationLambdaFunction"
+              },
+              "CodeSha256": "FR3Z6Ej/E7YtPLWhGbnpCgPravrV3zkxXJZNdEPPqdQ="
+            }
+          },
+          "WalletStopLambdaVersionQTQsFJ7NXg52xgbe7RWnjPM8HfzFNA2MFZjBwsPJSA": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "WalletStopLambdaFunction"
+              },
+              "CodeSha256": "FR3Z6Ej/E7YtPLWhGbnpCgPravrV3zkxXJZNdEPPqdQ="
+            }
+          },
+          "WalletGetNFTsLambdaVersionYaLIxLnJsgKJUnHxQdcfE0KdcsqvZpuNkVhtEPSJeYw": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "WalletGetNFTsLambdaFunction"
+              },
+              "CodeSha256": "FR3Z6Ej/E7YtPLWhGbnpCgPravrV3zkxXJZNdEPPqdQ="
+            }
+          },
+          "WalletGetLambdaVersionBvhu7yJKfRYdYYPVUEx4ccSLE0j59Ad2gBHrqjFTI": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "WalletGetLambdaFunction"
+              },
+              "CodeSha256": "FR3Z6Ej/E7YtPLWhGbnpCgPravrV3zkxXJZNdEPPqdQ="
+            }
+          },
+          "CollectionAddLambdaVersion5v5HUV5t7871Jn2C6LcXyF5ha1vsStCRUWJ53wEW57A": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "CollectionAddLambdaFunction"
+              },
+              "CodeSha256": "FR3Z6Ej/E7YtPLWhGbnpCgPravrV3zkxXJZNdEPPqdQ="
+            }
+          },
+          "CollectionGetVolumeLambdaVersion8xeL10XBuUfr6lNMCC1qGCdiNPhkdLX9X0IJ5jWCmc": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "CollectionGetVolumeLambdaFunction"
+              },
+              "CodeSha256": "FR3Z6Ej/E7YtPLWhGbnpCgPravrV3zkxXJZNdEPPqdQ="
+            }
+          },
+          "CollectionGetFloorPriceLambdaVersionTPGglUgyMV63p4GLFoNt4jnMP0UwWBujvCTIaboetg": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "CollectionGetFloorPriceLambdaFunction"
+              },
+              "CodeSha256": "FR3Z6Ej/E7YtPLWhGbnpCgPravrV3zkxXJZNdEPPqdQ="
+            }
+          },
+          "CollectionGetLambdaVersionmNokhi4EUqAtqLIhNK2Z4jjo83j3FSovu668coUBs": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "CollectionGetLambdaFunction"
+              },
+              "CodeSha256": "FR3Z6Ej/E7YtPLWhGbnpCgPravrV3zkxXJZNdEPPqdQ="
+            }
+          },
+          "WalletDeleteLambdaVersionC1sj29eeXlE78oyKxPCPnpXDzQWdR4Cc4s8AtIj8E": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "WalletDeleteLambdaFunction"
+              },
+              "CodeSha256": "FR3Z6Ej/E7YtPLWhGbnpCgPravrV3zkxXJZNdEPPqdQ="
+            }
+          },
+          "CollectionGetDetailsLambdaVersioncxxfygPbCSRYTKH2Pf3KqzL0ihlSPKWuaCosk2Cf0s": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "CollectionGetDetailsLambdaFunction"
+              },
+              "CodeSha256": "FR3Z6Ej/E7YtPLWhGbnpCgPravrV3zkxXJZNdEPPqdQ="
+            }
+          },
+          "CollectionDeleteLambdaVersions7JPJNaNpsQ4jmZwtYJdAURXPx1B73ChrwQwCcBklOk": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "CollectionDeleteLambdaFunction"
+              },
+              "CodeSha256": "FR3Z6Ej/E7YtPLWhGbnpCgPravrV3zkxXJZNdEPPqdQ="
             }
           },
           "ApiGatewayRestApi": {
@@ -1556,6 +2107,189 @@
             "Properties": {
               "ParentId": {
                 "Ref": "ApiGatewayResourceWalletChainVar"
+              },
+              "PathPart": "{address}",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayResourceWalletNfts": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Ref": "ApiGatewayResourceWallet"
+              },
+              "PathPart": "nfts",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayResourceWalletNftsChainVar": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Ref": "ApiGatewayResourceWalletNfts"
+              },
+              "PathPart": "{chain}",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayResourceWalletNftsChainVarAddressVar": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Ref": "ApiGatewayResourceWalletNftsChainVar"
+              },
+              "PathPart": "{address}",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayResourceCollection": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Fn::GetAtt": [
+                  "ApiGatewayRestApi",
+                  "RootResourceId"
+                ]
+              },
+              "PathPart": "collection",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayResourceCollectionChainVar": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Ref": "ApiGatewayResourceCollection"
+              },
+              "PathPart": "{chain}",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayResourceCollectionChainVarAddressVar": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Ref": "ApiGatewayResourceCollectionChainVar"
+              },
+              "PathPart": "{address}",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayResourceCollectionDetails": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Ref": "ApiGatewayResourceCollection"
+              },
+              "PathPart": "details",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayResourceCollectionDetailsChainVar": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Ref": "ApiGatewayResourceCollectionDetails"
+              },
+              "PathPart": "{chain}",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayResourceCollectionDetailsChainVarAddressVar": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Ref": "ApiGatewayResourceCollectionDetailsChainVar"
+              },
+              "PathPart": "{address}",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayResourceCollectionFloor": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Ref": "ApiGatewayResourceCollection"
+              },
+              "PathPart": "floor",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayResourceCollectionFloorChainVar": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Ref": "ApiGatewayResourceCollectionFloor"
+              },
+              "PathPart": "{chain}",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayResourceCollectionFloorChainVarAddressVar": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Ref": "ApiGatewayResourceCollectionFloorChainVar"
+              },
+              "PathPart": "{address}",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayResourceCollectionVolume": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Ref": "ApiGatewayResourceCollection"
+              },
+              "PathPart": "volume",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayResourceCollectionVolumeChainVar": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Ref": "ApiGatewayResourceCollectionVolume"
+              },
+              "PathPart": "{chain}",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayResourceCollectionVolumeChainVarAddressVar": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Ref": "ApiGatewayResourceCollectionVolumeChainVar"
               },
               "PathPart": "{address}",
               "RestApiId": {
@@ -2212,7 +2946,7 @@
                 "Ref": "ApiGatewayRestApi"
               },
               "ApiKeyRequired": false,
-              "AuthorizationType": "NONE",
+              "AuthorizationType": "AWS_IAM",
               "Integration": {
                 "IntegrationHttpMethod": "POST",
                 "Type": "AWS_PROXY",
@@ -2231,7 +2965,7 @@
                       ":lambda:path/2015-03-31/functions/",
                       {
                         "Fn::GetAtt": [
-                          "LanguageExecuteLambdaFunction",
+                          "WalletExecuteLambdaFunction",
                           "Arn"
                         ]
                       },
@@ -2243,7 +2977,7 @@
               "MethodResponses": []
             },
             "DependsOn": [
-              "LanguageExecuteLambdaPermissionApiGateway"
+              "WalletExecuteLambdaPermissionApiGateway"
             ]
           },
           "ApiGatewayMethodWalletStepStartPost": {
@@ -2350,7 +3084,7 @@
                 "Ref": "ApiGatewayRestApi"
               },
               "ApiKeyRequired": false,
-              "AuthorizationType": "NONE",
+              "AuthorizationType": "AWS_IAM",
               "Integration": {
                 "IntegrationHttpMethod": "POST",
                 "Type": "AWS_PROXY",
@@ -2396,7 +3130,7 @@
                 "Ref": "ApiGatewayRestApi"
               },
               "ApiKeyRequired": false,
-              "AuthorizationType": "NONE",
+              "AuthorizationType": "AWS_IAM",
               "Integration": {
                 "IntegrationHttpMethod": "POST",
                 "Type": "AWS_PROXY",
@@ -2430,6 +3164,52 @@
               "WalletGetLambdaPermissionApiGateway"
             ]
           },
+          "ApiGatewayMethodWalletNftsChainVarAddressVarGet": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "HttpMethod": "GET",
+              "RequestParameters": {},
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceWalletNftsChainVarAddressVar"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "ApiKeyRequired": false,
+              "AuthorizationType": "AWS_IAM",
+              "Integration": {
+                "IntegrationHttpMethod": "POST",
+                "Type": "AWS_PROXY",
+                "Uri": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":lambda:path/2015-03-31/functions/",
+                      {
+                        "Fn::GetAtt": [
+                          "WalletGetNFTsLambdaFunction",
+                          "Arn"
+                        ]
+                      },
+                      "/invocations"
+                    ]
+                  ]
+                }
+              },
+              "MethodResponses": []
+            },
+            "DependsOn": [
+              "WalletGetNFTsLambdaPermissionApiGateway"
+            ]
+          },
           "ApiGatewayMethodWalletChainVarAddressVarDelete": {
             "Type": "AWS::ApiGateway::Method",
             "Properties": {
@@ -2442,7 +3222,7 @@
                 "Ref": "ApiGatewayRestApi"
               },
               "ApiKeyRequired": false,
-              "AuthorizationType": "NONE",
+              "AuthorizationType": "AWS_IAM",
               "Integration": {
                 "IntegrationHttpMethod": "POST",
                 "Type": "AWS_PROXY",
@@ -2476,7 +3256,283 @@
               "WalletDeleteLambdaPermissionApiGateway"
             ]
           },
-          "ApiGatewayDeployment1658619591777": {
+          "ApiGatewayMethodCollectionPost": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "HttpMethod": "POST",
+              "RequestParameters": {},
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceCollection"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "ApiKeyRequired": false,
+              "AuthorizationType": "AWS_IAM",
+              "Integration": {
+                "IntegrationHttpMethod": "POST",
+                "Type": "AWS_PROXY",
+                "Uri": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":lambda:path/2015-03-31/functions/",
+                      {
+                        "Fn::GetAtt": [
+                          "CollectionAddLambdaFunction",
+                          "Arn"
+                        ]
+                      },
+                      "/invocations"
+                    ]
+                  ]
+                }
+              },
+              "MethodResponses": []
+            },
+            "DependsOn": [
+              "CollectionAddLambdaPermissionApiGateway"
+            ]
+          },
+          "ApiGatewayMethodCollectionChainVarAddressVarGet": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "HttpMethod": "GET",
+              "RequestParameters": {},
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceCollectionChainVarAddressVar"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "ApiKeyRequired": false,
+              "AuthorizationType": "AWS_IAM",
+              "Integration": {
+                "IntegrationHttpMethod": "POST",
+                "Type": "AWS_PROXY",
+                "Uri": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":lambda:path/2015-03-31/functions/",
+                      {
+                        "Fn::GetAtt": [
+                          "CollectionGetLambdaFunction",
+                          "Arn"
+                        ]
+                      },
+                      "/invocations"
+                    ]
+                  ]
+                }
+              },
+              "MethodResponses": []
+            },
+            "DependsOn": [
+              "CollectionGetLambdaPermissionApiGateway"
+            ]
+          },
+          "ApiGatewayMethodCollectionDetailsChainVarAddressVarGet": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "HttpMethod": "GET",
+              "RequestParameters": {},
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceCollectionDetailsChainVarAddressVar"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "ApiKeyRequired": false,
+              "AuthorizationType": "AWS_IAM",
+              "Integration": {
+                "IntegrationHttpMethod": "POST",
+                "Type": "AWS_PROXY",
+                "Uri": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":lambda:path/2015-03-31/functions/",
+                      {
+                        "Fn::GetAtt": [
+                          "CollectionGetDetailsLambdaFunction",
+                          "Arn"
+                        ]
+                      },
+                      "/invocations"
+                    ]
+                  ]
+                }
+              },
+              "MethodResponses": []
+            },
+            "DependsOn": [
+              "CollectionGetDetailsLambdaPermissionApiGateway"
+            ]
+          },
+          "ApiGatewayMethodCollectionFloorChainVarAddressVarGet": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "HttpMethod": "GET",
+              "RequestParameters": {},
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceCollectionFloorChainVarAddressVar"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "ApiKeyRequired": false,
+              "AuthorizationType": "AWS_IAM",
+              "Integration": {
+                "IntegrationHttpMethod": "POST",
+                "Type": "AWS_PROXY",
+                "Uri": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":lambda:path/2015-03-31/functions/",
+                      {
+                        "Fn::GetAtt": [
+                          "CollectionGetFloorPriceLambdaFunction",
+                          "Arn"
+                        ]
+                      },
+                      "/invocations"
+                    ]
+                  ]
+                }
+              },
+              "MethodResponses": []
+            },
+            "DependsOn": [
+              "CollectionGetFloorPriceLambdaPermissionApiGateway"
+            ]
+          },
+          "ApiGatewayMethodCollectionVolumeChainVarAddressVarGet": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "HttpMethod": "GET",
+              "RequestParameters": {},
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceCollectionVolumeChainVarAddressVar"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "ApiKeyRequired": false,
+              "AuthorizationType": "AWS_IAM",
+              "Integration": {
+                "IntegrationHttpMethod": "POST",
+                "Type": "AWS_PROXY",
+                "Uri": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":lambda:path/2015-03-31/functions/",
+                      {
+                        "Fn::GetAtt": [
+                          "CollectionGetVolumeLambdaFunction",
+                          "Arn"
+                        ]
+                      },
+                      "/invocations"
+                    ]
+                  ]
+                }
+              },
+              "MethodResponses": []
+            },
+            "DependsOn": [
+              "CollectionGetVolumeLambdaPermissionApiGateway"
+            ]
+          },
+          "ApiGatewayMethodCollectionChainVarAddressVarDelete": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "HttpMethod": "DELETE",
+              "RequestParameters": {},
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceCollectionChainVarAddressVar"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "ApiKeyRequired": false,
+              "AuthorizationType": "AWS_IAM",
+              "Integration": {
+                "IntegrationHttpMethod": "POST",
+                "Type": "AWS_PROXY",
+                "Uri": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":lambda:path/2015-03-31/functions/",
+                      {
+                        "Fn::GetAtt": [
+                          "CollectionDeleteLambdaFunction",
+                          "Arn"
+                        ]
+                      },
+                      "/invocations"
+                    ]
+                  ]
+                }
+              },
+              "MethodResponses": []
+            },
+            "DependsOn": [
+              "CollectionDeleteLambdaPermissionApiGateway"
+            ]
+          },
+          "ApiGatewayDeployment1658735498282": {
             "Type": "AWS::ApiGateway::Deployment",
             "Properties": {
               "RestApiId": {
@@ -2504,7 +3560,14 @@
               "ApiGatewayMethodWalletStepDetailsLoadPost",
               "ApiGatewayMethodWalletPost",
               "ApiGatewayMethodWalletChainVarAddressVarGet",
-              "ApiGatewayMethodWalletChainVarAddressVarDelete"
+              "ApiGatewayMethodWalletNftsChainVarAddressVarGet",
+              "ApiGatewayMethodWalletChainVarAddressVarDelete",
+              "ApiGatewayMethodCollectionPost",
+              "ApiGatewayMethodCollectionChainVarAddressVarGet",
+              "ApiGatewayMethodCollectionDetailsChainVarAddressVarGet",
+              "ApiGatewayMethodCollectionFloorChainVarAddressVarGet",
+              "ApiGatewayMethodCollectionVolumeChainVarAddressVarGet",
+              "ApiGatewayMethodCollectionChainVarAddressVarDelete"
             ]
           },
           "NftImageLambdaPermissionApiGateway": {
@@ -2766,12 +3829,12 @@
               }
             }
           },
-          "LanguageExecuteLambdaPermissionApiGateway": {
+          "WalletExecuteLambdaPermissionApiGateway": {
             "Type": "AWS::Lambda::Permission",
             "Properties": {
               "FunctionName": {
                 "Fn::GetAtt": [
-                  "LanguageExecuteLambdaFunction",
+                  "WalletExecuteLambdaFunction",
                   "Arn"
                 ]
               },
@@ -2951,6 +4014,43 @@
               }
             }
           },
+          "WalletGetNFTsLambdaPermissionApiGateway": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "WalletGetNFTsLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "ApiGatewayRestApi"
+                    },
+                    "/*/*"
+                  ]
+                ]
+              }
+            }
+          },
           "WalletDeleteLambdaPermissionApiGateway": {
             "Type": "AWS::Lambda::Permission",
             "Properties": {
@@ -2986,6 +4086,259 @@
                   ]
                 ]
               }
+            }
+          },
+          "CollectionAddLambdaPermissionApiGateway": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "CollectionAddLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "ApiGatewayRestApi"
+                    },
+                    "/*/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "CollectionGetLambdaPermissionApiGateway": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "CollectionGetLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "ApiGatewayRestApi"
+                    },
+                    "/*/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "CollectionGetDetailsLambdaPermissionApiGateway": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "CollectionGetDetailsLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "ApiGatewayRestApi"
+                    },
+                    "/*/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "CollectionGetFloorPriceLambdaPermissionApiGateway": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "CollectionGetFloorPriceLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "ApiGatewayRestApi"
+                    },
+                    "/*/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "CollectionGetVolumeLambdaPermissionApiGateway": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "CollectionGetVolumeLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "ApiGatewayRestApi"
+                    },
+                    "/*/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "CollectionDeleteLambdaPermissionApiGateway": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "CollectionDeleteLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "ApiGatewayRestApi"
+                    },
+                    "/*/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "NFTImageDynamoDBTable": {
+            "Type": "AWS::DynamoDB::Table",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "AttributeDefinitions": [
+                {
+                  "AttributeName": "chain",
+                  "AttributeType": "S"
+                },
+                {
+                  "AttributeName": "address",
+                  "AttributeType": "S"
+                }
+              ],
+              "KeySchema": [
+                {
+                  "AttributeName": "chain",
+                  "KeyType": "HASH"
+                },
+                {
+                  "AttributeName": "address",
+                  "KeyType": "RANGE"
+                }
+              ],
+              "ProvisionedThroughput": {
+                "ReadCapacityUnits": 1,
+                "WriteCapacityUnits": 1
+              },
+              "TableName": "burnance-dev-wallet-collection-cache"
             }
           },
           "WalletNFTDynamoDBTable": {
@@ -3067,91 +4420,109 @@
               "Name": "sls-burnance-dev-ServerlessDeploymentBucketName"
             }
           },
-          "GetEthPriceLambdaFunctionQualifiedArn": {
+          "NftImageLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "GetEthPriceLambdaVersionNGBZcnKsbMVJACRPNgebLi3YV4xwxCbydK0OfnqC8"
+              "Ref": "NftImageLambdaVersioncExfqWZD0E3AQoRmIoHiA6OhLToeKdknWjza0Jgo"
             },
             "Export": {
-              "Name": "sls-burnance-dev-GetEthPriceLambdaFunctionQualifiedArn"
-            }
-          },
-          "AddToWaitlistLambdaFunctionQualifiedArn": {
-            "Description": "Current Lambda function version",
-            "Value": {
-              "Ref": "AddToWaitlistLambdaVersioncxjflyi6CxF8uVZXMd3uJ8kbsDNi4PfQsRbCiUjmMhY"
-            },
-            "Export": {
-              "Name": "sls-burnance-dev-AddToWaitlistLambdaFunctionQualifiedArn"
-            }
-          },
-          "WalletStartLambdaFunctionQualifiedArn": {
-            "Description": "Current Lambda function version",
-            "Value": {
-              "Ref": "WalletStartLambdaVersionb8wq6cqvKm5s6ST36AD8YuZLB0NVwAQZVTbbW3eulFc"
-            },
-            "Export": {
-              "Name": "sls-burnance-dev-WalletStartLambdaFunctionQualifiedArn"
-            }
-          },
-          "ViewNFTLambdaFunctionQualifiedArn": {
-            "Description": "Current Lambda function version",
-            "Value": {
-              "Ref": "ViewNFTLambdaVersion2XRfxrUcEXDjegxEhatWNSathnrGqFr7n9EwmJrEzg"
-            },
-            "Export": {
-              "Name": "sls-burnance-dev-ViewNFTLambdaFunctionQualifiedArn"
-            }
-          },
-          "GetTxFeeLambdaFunctionQualifiedArn": {
-            "Description": "Current Lambda function version",
-            "Value": {
-              "Ref": "GetTxFeeLambdaVersionY4oBlqKajwGaN0Y2JZQwL8cHNqeVX1cve3argrRkY9Q"
-            },
-            "Export": {
-              "Name": "sls-burnance-dev-GetTxFeeLambdaFunctionQualifiedArn"
-            }
-          },
-          "QnUnderscorefetchNFTsLambdaFunctionQualifiedArn": {
-            "Description": "Current Lambda function version",
-            "Value": {
-              "Ref": "QnUnderscorefetchNFTsLambdaVersionLhmoNjebxEKHhf5xxysMFUt8seua1FlT3HleghNruc"
-            },
-            "Export": {
-              "Name": "sls-burnance-dev-QnUnderscorefetchNFTsLambdaFunctionQualifiedArn"
-            }
-          },
-          "LanguageExecuteLambdaFunctionQualifiedArn": {
-            "Description": "Current Lambda function version",
-            "Value": {
-              "Ref": "LanguageExecuteLambdaVersionOu48fzG76ZbVhX7hnjCN2wrRsDMnZezkElQNPHOy7E"
-            },
-            "Export": {
-              "Name": "sls-burnance-dev-LanguageExecuteLambdaFunctionQualifiedArn"
-            }
-          },
-          "WalletLoadLambdaFunctionQualifiedArn": {
-            "Description": "Current Lambda function version",
-            "Value": {
-              "Ref": "WalletLoadLambdaVersionhsSvDxp9fxb8WBPOKq0ibtzXQSLRaDdCBJZuHCcf9hI"
-            },
-            "Export": {
-              "Name": "sls-burnance-dev-WalletLoadLambdaFunctionQualifiedArn"
+              "Name": "sls-burnance-dev-NftImageLambdaFunctionQualifiedArn"
             }
           },
           "ViewNFTtxLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "ViewNFTtxLambdaVersion7M8tyDU6tZvXsYXtlnlL3jrTIeOdVTuz8rpAWLxeBbI"
+              "Ref": "ViewNFTtxLambdaVersion4uJ8schPS37lrTpRmqxOfTPSlrh2prpbMCVmX5JoKEk"
             },
             "Export": {
               "Name": "sls-burnance-dev-ViewNFTtxLambdaFunctionQualifiedArn"
             }
           },
+          "GetTxFeeLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "GetTxFeeLambdaVersionJJQX74zjU7SE8YmcIZTfENWeBaindN6Y41jy4hOS08Y"
+            },
+            "Export": {
+              "Name": "sls-burnance-dev-GetTxFeeLambdaFunctionQualifiedArn"
+            }
+          },
+          "AddToWaitlistLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "AddToWaitlistLambdaVersionsHJJSaSksfiuVLG69uNt9KuF3aAjkkVUkZk00qZRppo"
+            },
+            "Export": {
+              "Name": "sls-burnance-dev-AddToWaitlistLambdaFunctionQualifiedArn"
+            }
+          },
+          "ViewNFTLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "ViewNFTLambdaVersionNilGJ1xyqUf89Kd9MMPADesGlpQfowdrqVSQTqQCTg"
+            },
+            "Export": {
+              "Name": "sls-burnance-dev-ViewNFTLambdaFunctionQualifiedArn"
+            }
+          },
+          "WalletStartLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "WalletStartLambdaVersionximY64Kq0o7ldc7fixCxgGa1qbs8274k245xq4hIA"
+            },
+            "Export": {
+              "Name": "sls-burnance-dev-WalletStartLambdaFunctionQualifiedArn"
+            }
+          },
+          "QnUnderscorefetchNFTsLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "QnUnderscorefetchNFTsLambdaVersionDBHVY1rPXS5DHqgtCVzAmKK4tTKxXHFipJ7pKMmTU0"
+            },
+            "Export": {
+              "Name": "sls-burnance-dev-QnUnderscorefetchNFTsLambdaFunctionQualifiedArn"
+            }
+          },
+          "GetEthPriceLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "GetEthPriceLambdaVersion1xq1JDQSp2RYbWtIv2UaZNT5llg4tvII6mSnxc9J5E0"
+            },
+            "Export": {
+              "Name": "sls-burnance-dev-GetEthPriceLambdaFunctionQualifiedArn"
+            }
+          },
+          "WalletLoadLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "WalletLoadLambdaVersion1mbGsX20p36gymWFLqiF6JVjMcQHGAuqsf8KTzDfU"
+            },
+            "Export": {
+              "Name": "sls-burnance-dev-WalletLoadLambdaFunctionQualifiedArn"
+            }
+          },
+          "WalletExecuteLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "WalletExecuteLambdaVersioneJ9CEwicibmMJsW4ChPJtByLVEzHM4BmzbOWcjkkdE"
+            },
+            "Export": {
+              "Name": "sls-burnance-dev-WalletExecuteLambdaFunctionQualifiedArn"
+            }
+          },
+          "WalletAddLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "WalletAddLambdaVersionUMooqIfFDkhncQpDbqpISALx7X7IVmOEMX5D3N3lNw"
+            },
+            "Export": {
+              "Name": "sls-burnance-dev-WalletAddLambdaFunctionQualifiedArn"
+            }
+          },
           "WalletNotificationLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "WalletNotificationLambdaVersionasmkgVzmtI4BwxwRfDdDjRpwxdTsF6dvcW3L6R1pYZ0"
+              "Ref": "WalletNotificationLambdaVersion0tbM2KQ7mzSbLF2ZEHSYtjwMZfE1nirwdDlif4GJ4"
             },
             "Export": {
               "Name": "sls-burnance-dev-WalletNotificationLambdaFunctionQualifiedArn"
@@ -3160,46 +4531,91 @@
           "WalletStopLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "WalletStopLambdaVersion3tBK6A6WMtO2ZlwwmR6NDVLpm7AA5Dh1kBGY8uhQ3c"
+              "Ref": "WalletStopLambdaVersionQTQsFJ7NXg52xgbe7RWnjPM8HfzFNA2MFZjBwsPJSA"
             },
             "Export": {
               "Name": "sls-burnance-dev-WalletStopLambdaFunctionQualifiedArn"
             }
           },
-          "WalletDeleteLambdaFunctionQualifiedArn": {
+          "WalletGetNFTsLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "WalletDeleteLambdaVersionCqjMAO9ugkGZ4MLAtEc5rzGyR4I2IPKGpTkOjN6s8"
+              "Ref": "WalletGetNFTsLambdaVersionYaLIxLnJsgKJUnHxQdcfE0KdcsqvZpuNkVhtEPSJeYw"
             },
             "Export": {
-              "Name": "sls-burnance-dev-WalletDeleteLambdaFunctionQualifiedArn"
+              "Name": "sls-burnance-dev-WalletGetNFTsLambdaFunctionQualifiedArn"
             }
           },
           "WalletGetLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "WalletGetLambdaVersionebrN0Vip3R9e5awvKFTPctrkS3xU93w53FZUwnHo"
+              "Ref": "WalletGetLambdaVersionBvhu7yJKfRYdYYPVUEx4ccSLE0j59Ad2gBHrqjFTI"
             },
             "Export": {
               "Name": "sls-burnance-dev-WalletGetLambdaFunctionQualifiedArn"
             }
           },
-          "WalletAddLambdaFunctionQualifiedArn": {
+          "CollectionAddLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "WalletAddLambdaVersioniglYEXFrnfnN3GJCh4397twl0x4PPiEj8bqDx9Kz2w"
+              "Ref": "CollectionAddLambdaVersion5v5HUV5t7871Jn2C6LcXyF5ha1vsStCRUWJ53wEW57A"
             },
             "Export": {
-              "Name": "sls-burnance-dev-WalletAddLambdaFunctionQualifiedArn"
+              "Name": "sls-burnance-dev-CollectionAddLambdaFunctionQualifiedArn"
             }
           },
-          "NftImageLambdaFunctionQualifiedArn": {
+          "CollectionGetVolumeLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "NftImageLambdaVersionjkYAj6mSXjyTAdWqLjQL1lA9VzaEWSMpCfDLxfpaQiA"
+              "Ref": "CollectionGetVolumeLambdaVersion8xeL10XBuUfr6lNMCC1qGCdiNPhkdLX9X0IJ5jWCmc"
             },
             "Export": {
-              "Name": "sls-burnance-dev-NftImageLambdaFunctionQualifiedArn"
+              "Name": "sls-burnance-dev-CollectionGetVolumeLambdaFunctionQualifiedArn"
+            }
+          },
+          "CollectionGetFloorPriceLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "CollectionGetFloorPriceLambdaVersionTPGglUgyMV63p4GLFoNt4jnMP0UwWBujvCTIaboetg"
+            },
+            "Export": {
+              "Name": "sls-burnance-dev-CollectionGetFloorPriceLambdaFunctionQualifiedArn"
+            }
+          },
+          "CollectionGetLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "CollectionGetLambdaVersionmNokhi4EUqAtqLIhNK2Z4jjo83j3FSovu668coUBs"
+            },
+            "Export": {
+              "Name": "sls-burnance-dev-CollectionGetLambdaFunctionQualifiedArn"
+            }
+          },
+          "WalletDeleteLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "WalletDeleteLambdaVersionC1sj29eeXlE78oyKxPCPnpXDzQWdR4Cc4s8AtIj8E"
+            },
+            "Export": {
+              "Name": "sls-burnance-dev-WalletDeleteLambdaFunctionQualifiedArn"
+            }
+          },
+          "CollectionGetDetailsLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "CollectionGetDetailsLambdaVersioncxxfygPbCSRYTKH2Pf3KqzL0ihlSPKWuaCosk2Cf0s"
+            },
+            "Export": {
+              "Name": "sls-burnance-dev-CollectionGetDetailsLambdaFunctionQualifiedArn"
+            }
+          },
+          "CollectionDeleteLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "CollectionDeleteLambdaVersions7JPJNaNpsQ4jmZwtYJdAURXPx1B73ChrwQwCcBklOk"
+            },
+            "Export": {
+              "Name": "sls-burnance-dev-CollectionDeleteLambdaFunctionQualifiedArn"
             }
           },
           "ServiceEndpoint": {
@@ -3284,7 +4700,7 @@
         "memory": 128,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "NftImageLambdaVersionjkYAj6mSXjyTAdWqLjQL1lA9VzaEWSMpCfDLxfpaQiA"
+        "versionLogicalId": "NftImageLambdaVersioncExfqWZD0E3AQoRmIoHiA6OhLToeKdknWjza0Jgo"
       },
       "viewNFT": {
         "handler": "actions.view",
@@ -3325,7 +4741,7 @@
         "memory": 128,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "ViewNFTLambdaVersion2XRfxrUcEXDjegxEhatWNSathnrGqFr7n9EwmJrEzg"
+        "versionLogicalId": "ViewNFTLambdaVersionNilGJ1xyqUf89Kd9MMPADesGlpQfowdrqVSQTqQCTg"
       },
       "viewNFTtx": {
         "handler": "etherscan/handler.tokenNftTx",
@@ -3366,7 +4782,7 @@
         "memory": 128,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "ViewNFTtxLambdaVersion7M8tyDU6tZvXsYXtlnlL3jrTIeOdVTuz8rpAWLxeBbI"
+        "versionLogicalId": "ViewNFTtxLambdaVersion4uJ8schPS37lrTpRmqxOfTPSlrh2prpbMCVmX5JoKEk"
       },
       "getEthPrice": {
         "handler": "etherscan/handler.getEthPrice",
@@ -3407,7 +4823,7 @@
         "memory": 128,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "GetEthPriceLambdaVersionNGBZcnKsbMVJACRPNgebLi3YV4xwxCbydK0OfnqC8"
+        "versionLogicalId": "GetEthPriceLambdaVersion1xq1JDQSp2RYbWtIv2UaZNT5llg4tvII6mSnxc9J5E0"
       },
       "getTxFee": {
         "handler": "etherscan/handler.getTxTransactionFee",
@@ -3448,7 +4864,7 @@
         "memory": 128,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "GetTxFeeLambdaVersionY4oBlqKajwGaN0Y2JZQwL8cHNqeVX1cve3argrRkY9Q"
+        "versionLogicalId": "GetTxFeeLambdaVersionJJQX74zjU7SE8YmcIZTfENWeBaindN6Y41jy4hOS08Y"
       },
       "addToWaitlist": {
         "handler": "waitlist/handler.add",
@@ -3489,7 +4905,7 @@
         "memory": 128,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "AddToWaitlistLambdaVersioncxjflyi6CxF8uVZXMd3uJ8kbsDNi4PfQsRbCiUjmMhY"
+        "versionLogicalId": "AddToWaitlistLambdaVersionsHJJSaSksfiuVLG69uNt9KuF3aAjkkVUkZk00qZRppo"
       },
       "qn_fetchNFTs": {
         "handler": "quicknode/handler.qn_fetchNFTs",
@@ -3530,26 +4946,31 @@
         "memory": 128,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "QnUnderscorefetchNFTsLambdaVersionLhmoNjebxEKHhf5xxysMFUt8seua1FlT3HleghNruc"
+        "versionLogicalId": "QnUnderscorefetchNFTsLambdaVersionDBHVY1rPXS5DHqgtCVzAmKK4tTKxXHFipJ7pKMmTU0"
       },
-      "languageExecute": {
+      "walletExecute": {
         "handler": "shopify/language/themelanguage.start",
         "events": [
           {
             "http": {
               "path": "shopify/workflow/language/start",
               "method": "post",
+              "authorizer": {
+                "type": "AWS_IAM",
+                "managedExternally": false,
+                "identitySource": "method.request.header.Authorization"
+              },
               "integration": "AWS_PROXY"
             }
           }
         ],
-        "name": "burnance-dev-languageExecute",
+        "name": "burnance-dev-walletExecute",
         "package": {},
         "memory": 128,
         "timeout": 30,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "LanguageExecuteLambdaVersionOu48fzG76ZbVhX7hnjCN2wrRsDMnZezkElQNPHOy7E"
+        "versionLogicalId": "WalletExecuteLambdaVersioneJ9CEwicibmMJsW4ChPJtByLVEzHM4BmzbOWcjkkdE"
       },
       "walletStart": {
         "handler": "wallet/steps.start",
@@ -3568,7 +4989,7 @@
         "timeout": 30,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "WalletStartLambdaVersionb8wq6cqvKm5s6ST36AD8YuZLB0NVwAQZVTbbW3eulFc"
+        "versionLogicalId": "WalletStartLambdaVersionximY64Kq0o7ldc7fixCxgGa1qbs8274k245xq4hIA"
       },
       "walletLoad": {
         "handler": "wallet/steps.loadWalletData",
@@ -3587,7 +5008,7 @@
         "timeout": 30,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "WalletLoadLambdaVersionhsSvDxp9fxb8WBPOKq0ibtzXQSLRaDdCBJZuHCcf9hI"
+        "versionLogicalId": "WalletLoadLambdaVersion1mbGsX20p36gymWFLqiF6JVjMcQHGAuqsf8KTzDfU"
       },
       "walletStop": {
         "handler": "wallet/steps.stop",
@@ -3598,7 +5019,7 @@
         "timeout": 30,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "WalletStopLambdaVersion3tBK6A6WMtO2ZlwwmR6NDVLpm7AA5Dh1kBGY8uhQ3c"
+        "versionLogicalId": "WalletStopLambdaVersionQTQsFJ7NXg52xgbe7RWnjPM8HfzFNA2MFZjBwsPJSA"
       },
       "walletNotification": {
         "handler": "wallet/steps.notification",
@@ -3609,7 +5030,7 @@
         "timeout": 30,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "WalletNotificationLambdaVersionasmkgVzmtI4BwxwRfDdDjRpwxdTsF6dvcW3L6R1pYZ0"
+        "versionLogicalId": "WalletNotificationLambdaVersion0tbM2KQ7mzSbLF2ZEHSYtjwMZfE1nirwdDlif4GJ4"
       },
       "walletAdd": {
         "handler": "wallet/wallet.AddWallet",
@@ -3618,6 +5039,11 @@
             "http": {
               "path": "wallet",
               "method": "post",
+              "authorizer": {
+                "type": "AWS_IAM",
+                "managedExternally": false,
+                "identitySource": "method.request.header.Authorization"
+              },
               "integration": "AWS_PROXY"
             }
           }
@@ -3628,7 +5054,7 @@
         "timeout": 30,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "WalletAddLambdaVersioniglYEXFrnfnN3GJCh4397twl0x4PPiEj8bqDx9Kz2w"
+        "versionLogicalId": "WalletAddLambdaVersionUMooqIfFDkhncQpDbqpISALx7X7IVmOEMX5D3N3lNw"
       },
       "walletGet": {
         "handler": "wallet/wallet.GetWallet",
@@ -3637,6 +5063,11 @@
             "http": {
               "path": "wallet/{chain}/{address}",
               "method": "get",
+              "authorizer": {
+                "type": "AWS_IAM",
+                "managedExternally": false,
+                "identitySource": "method.request.header.Authorization"
+              },
               "integration": "AWS_PROXY"
             }
           }
@@ -3647,7 +5078,31 @@
         "timeout": 30,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "WalletGetLambdaVersionebrN0Vip3R9e5awvKFTPctrkS3xU93w53FZUwnHo"
+        "versionLogicalId": "WalletGetLambdaVersionBvhu7yJKfRYdYYPVUEx4ccSLE0j59Ad2gBHrqjFTI"
+      },
+      "walletGetNFTs": {
+        "handler": "wallet/wallet.GetWalletNFTs",
+        "events": [
+          {
+            "http": {
+              "path": "wallet/nfts/{chain}/{address}",
+              "method": "get",
+              "authorizer": {
+                "type": "AWS_IAM",
+                "managedExternally": false,
+                "identitySource": "method.request.header.Authorization"
+              },
+              "integration": "AWS_PROXY"
+            }
+          }
+        ],
+        "name": "burnance-dev-walletGetNFTs",
+        "package": {},
+        "memory": 128,
+        "timeout": 30,
+        "runtime": "nodejs12.x",
+        "vpc": {},
+        "versionLogicalId": "WalletGetNFTsLambdaVersionYaLIxLnJsgKJUnHxQdcfE0KdcsqvZpuNkVhtEPSJeYw"
       },
       "walletDelete": {
         "handler": "wallet/wallet.DeleteWallet",
@@ -3656,6 +5111,11 @@
             "http": {
               "path": "wallet/{chain}/{address}",
               "method": "delete",
+              "authorizer": {
+                "type": "AWS_IAM",
+                "managedExternally": false,
+                "identitySource": "method.request.header.Authorization"
+              },
               "integration": "AWS_PROXY"
             }
           }
@@ -3666,11 +5126,186 @@
         "timeout": 30,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "WalletDeleteLambdaVersionCqjMAO9ugkGZ4MLAtEc5rzGyR4I2IPKGpTkOjN6s8"
+        "versionLogicalId": "WalletDeleteLambdaVersionC1sj29eeXlE78oyKxPCPnpXDzQWdR4Cc4s8AtIj8E"
+      },
+      "collectionAdd": {
+        "handler": "collection/handler.AddCollection",
+        "events": [
+          {
+            "http": {
+              "path": "collection",
+              "method": "post",
+              "authorizer": {
+                "type": "AWS_IAM",
+                "managedExternally": false,
+                "identitySource": "method.request.header.Authorization"
+              },
+              "integration": "AWS_PROXY"
+            }
+          }
+        ],
+        "name": "burnance-dev-collectionAdd",
+        "package": {},
+        "memory": 128,
+        "timeout": 30,
+        "runtime": "nodejs12.x",
+        "vpc": {},
+        "versionLogicalId": "CollectionAddLambdaVersion5v5HUV5t7871Jn2C6LcXyF5ha1vsStCRUWJ53wEW57A"
+      },
+      "collectionGet": {
+        "handler": "collection/handler.GetCollection",
+        "events": [
+          {
+            "http": {
+              "path": "collection/{chain}/{address}",
+              "method": "get",
+              "authorizer": {
+                "type": "AWS_IAM",
+                "managedExternally": false,
+                "identitySource": "method.request.header.Authorization"
+              },
+              "integration": "AWS_PROXY"
+            }
+          }
+        ],
+        "name": "burnance-dev-collectionGet",
+        "package": {},
+        "memory": 128,
+        "timeout": 30,
+        "runtime": "nodejs12.x",
+        "vpc": {},
+        "versionLogicalId": "CollectionGetLambdaVersionmNokhi4EUqAtqLIhNK2Z4jjo83j3FSovu668coUBs"
+      },
+      "collectionGetDetails": {
+        "handler": "collection/handler.GetCollectionDetails",
+        "events": [
+          {
+            "http": {
+              "path": "collection/details/{chain}/{address}",
+              "method": "get",
+              "authorizer": {
+                "type": "AWS_IAM",
+                "managedExternally": false,
+                "identitySource": "method.request.header.Authorization"
+              },
+              "integration": "AWS_PROXY"
+            }
+          }
+        ],
+        "name": "burnance-dev-collectionGetDetails",
+        "package": {},
+        "memory": 128,
+        "timeout": 30,
+        "runtime": "nodejs12.x",
+        "vpc": {},
+        "versionLogicalId": "CollectionGetDetailsLambdaVersioncxxfygPbCSRYTKH2Pf3KqzL0ihlSPKWuaCosk2Cf0s"
+      },
+      "collectionGetFloorPrice": {
+        "handler": "collection/handler.GetCollectionFloorPrice",
+        "events": [
+          {
+            "http": {
+              "path": "collection/floor/{chain}/{address}",
+              "method": "get",
+              "authorizer": {
+                "type": "AWS_IAM",
+                "managedExternally": false,
+                "identitySource": "method.request.header.Authorization"
+              },
+              "integration": "AWS_PROXY"
+            }
+          }
+        ],
+        "name": "burnance-dev-collectionGetFloorPrice",
+        "package": {},
+        "memory": 128,
+        "timeout": 30,
+        "runtime": "nodejs12.x",
+        "vpc": {},
+        "versionLogicalId": "CollectionGetFloorPriceLambdaVersionTPGglUgyMV63p4GLFoNt4jnMP0UwWBujvCTIaboetg"
+      },
+      "collectionGetVolume": {
+        "handler": "collection/handler.GetCollectionFloorPrice",
+        "events": [
+          {
+            "http": {
+              "path": "collection/volume/{chain}/{address}",
+              "method": "get",
+              "authorizer": {
+                "type": "AWS_IAM",
+                "managedExternally": false,
+                "identitySource": "method.request.header.Authorization"
+              },
+              "integration": "AWS_PROXY"
+            }
+          }
+        ],
+        "name": "burnance-dev-collectionGetVolume",
+        "package": {},
+        "memory": 128,
+        "timeout": 30,
+        "runtime": "nodejs12.x",
+        "vpc": {},
+        "versionLogicalId": "CollectionGetVolumeLambdaVersion8xeL10XBuUfr6lNMCC1qGCdiNPhkdLX9X0IJ5jWCmc"
+      },
+      "collectionDelete": {
+        "handler": "collection/handler.DeleteCollection",
+        "events": [
+          {
+            "http": {
+              "path": "collection/{chain}/{address}",
+              "method": "delete",
+              "authorizer": {
+                "type": "AWS_IAM",
+                "managedExternally": false,
+                "identitySource": "method.request.header.Authorization"
+              },
+              "integration": "AWS_PROXY"
+            }
+          }
+        ],
+        "name": "burnance-dev-collectionDelete",
+        "package": {},
+        "memory": 128,
+        "timeout": 30,
+        "runtime": "nodejs12.x",
+        "vpc": {},
+        "versionLogicalId": "CollectionDeleteLambdaVersions7JPJNaNpsQ4jmZwtYJdAURXPx1B73ChrwQwCcBklOk"
       }
     },
     "resources": {
       "Resources": {
+        "NFTImageDynamoDBTable": {
+          "Type": "AWS::DynamoDB::Table",
+          "DeletionPolicy": "Retain",
+          "Properties": {
+            "AttributeDefinitions": [
+              {
+                "AttributeName": "chain",
+                "AttributeType": "S"
+              },
+              {
+                "AttributeName": "address",
+                "AttributeType": "S"
+              }
+            ],
+            "KeySchema": [
+              {
+                "AttributeName": "chain",
+                "KeyType": "HASH"
+              },
+              {
+                "AttributeName": "address",
+                "KeyType": "RANGE"
+              }
+            ],
+            "ProvisionedThroughput": {
+              "ReadCapacityUnits": 1,
+              "WriteCapacityUnits": 1
+            },
+            "TableName": "burnance-dev-wallet-collection-cache"
+          }
+        },
         "WalletNFTDynamoDBTable": {
           "Type": "AWS::DynamoDB::Table",
           "DeletionPolicy": "Retain",
@@ -3758,7 +5393,7 @@
         "individually": false,
         "deploymentBucket": "service.burnance.nodejs.lambdas.dev",
         "artifact": "C:\\Users\\Allyn Alford\\Documents\\Burnance.com\\api\\.serverless\\burnance.zip",
-        "artifactDirectoryName": "serverless/burnance/dev/1658619667849-2022-07-23T23:41:07.849Z"
+        "artifactDirectoryName": "serverless/burnance/dev/1658735543074-2022-07-25T07:52:23.074Z"
       },
       "functions": {
         "$ref": "$[\"service\"][\"functions\"]"
@@ -3894,7 +5529,7 @@
   },
   "package": {
     "individually": false,
-    "artifactDirectoryName": "serverless/burnance/dev/1658619667849-2022-07-23T23:41:07.849Z",
+    "artifactDirectoryName": "serverless/burnance/dev/1658735543074-2022-07-25T07:52:23.074Z",
     "artifact": "burnance.zip"
   }
 }

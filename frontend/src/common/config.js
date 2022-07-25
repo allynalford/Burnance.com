@@ -9,7 +9,9 @@ const serverVars = {
          getWalletNFTsApiUrl: process.env.REACT_APP_BASE_API_URL + '/quicknode/qn_fetchNFTs',
          getNFTImageApiUrl: process.env.REACT_APP_BASE_API_URL + '/nft/image',
          getTokenNftTxApiUrl: process.env.REACT_APP_BASE_API_URL + '/etherscan/tokenNftTx',
-         getEthPriceApiUrl: process.env.REACT_APP_BASE_API_URL + '/etherscan/ethprice'
+         getEthPriceApiUrl: process.env.REACT_APP_BASE_API_URL + '/etherscan/ethprice',
+         getWalletNFTsApiUrl: process.env.REACT_APP_BASE_API_URL + '/wallet/nfts',
+         getWalletCollectionsApiUrl: process.env.REACT_APP_BASE_API_URL + '/collection'
         }
   },
 };
@@ -25,7 +27,9 @@ const localVars = {
          getWalletNFTsApiUrl: process.env.REACT_APP_BASE_API_URL + '/quicknode/qn_fetchNFTs',
          getNFTImageApiUrl: process.env.REACT_APP_BASE_API_URL + '/nft/image',
          getTokenNftTxApiUrl: process.env.REACT_APP_BASE_API_URL + '/etherscan/tokenNftTx',
-         getEthPriceApiUrl: process.env.REACT_APP_BASE_API_URL + '/etherscan/ethprice'
+         getEthPriceApiUrl: process.env.REACT_APP_BASE_API_URL + '/etherscan/ethprice',
+         getWalletNFTsApiUrl: process.env.REACT_APP_BASE_API_URL + '/wallet/nfts',
+         getWalletCollectionsApiUrl: process.env.REACT_APP_BASE_API_URL + '/collection'
         }
   },
 };

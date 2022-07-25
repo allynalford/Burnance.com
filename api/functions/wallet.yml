@@ -1,9 +1,10 @@
-  languageExecute:
+  walletExecute:
     handler: shopify/language/themelanguage.start
     events:
       - http:
           path: shopify/workflow/language/start
           method: post
+          authorizer: aws_iam
   walletStart:
     handler: wallet/steps.start
     events:
@@ -26,21 +27,25 @@
       - http:
           path: wallet
           method: post 
+          authorizer: aws_iam
   walletGet:
     handler: wallet/wallet.GetWallet
     events:
       - http:
           path: wallet/{chain}/{address}
           method: get
+          authorizer: aws_iam
   walletGetNFTs:
     handler: wallet/wallet.GetWalletNFTs
     events:
       - http:
           path: wallet/nfts/{chain}/{address}
           method: get
+          authorizer: aws_iam
   walletDelete:
     handler: wallet/wallet.DeleteWallet
     events:
       - http:
           path: wallet/{chain}/{address}
-          method: delete 
+          method: delete
+          authorizer: aws_iam

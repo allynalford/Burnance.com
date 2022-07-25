@@ -17,7 +17,11 @@ class MostViewedProducts extends Component {
       pageNumber: 1,
       pageSize: 6,
       totalPages: 0,
-      batch: []
+      batch: [],
+      currentItems: 0,
+      pageCount: 0,
+      itemOffset: 0,
+      itemsPerPage: 15
     };
     this.getNFTs.bind(this);
     this.accountsChanged.bind(this);
@@ -79,19 +83,35 @@ accountsChanged = () => {
     //console.log('Loading Page:',pageNumber);
     try {
       //Call the service to get the NFTs
-      const ERC721s = await endpoint._post(getChain()['eth'].getWalletNFTsApiUrl, { address: ethereumAddress, chain: 'ethereum', pageNumber });
-      //console.log('ERC721s', ERC721s);
-      let nfts = ERC721s.data.ERC721s.assets;
+      const Collections = await endpoint._get(getChain()['eth'].getWalletCollectionsApiUrl + `/ethereum/${ethereumAddress}`);
+      console.log('Collections', Collections);
+      //let nfts = ERC721s.data.wallet;
       //Set the NFTs value
-      this.setState({ nfts, pageNumber: ERC721s.data.ERC721s.pageNumber, pageSize: 6, totalPages: ERC721s.data.ERC721s.totalPages });
+      //this.setState({ nfts, pageNumber: ERC721s.data.ERC721s.pageNumber, pageSize: 6, totalPages: ERC721s.data.ERC721s.totalPages });
     } catch (e) {
       console.error(e);
     }
   };
 
   ChangePage = (event) => {
-    const pageNumber = event.selected + 1;
-    this.getNFTs(this.state.ethereumAddress, pageNumber);
+    //const pageNumber = event.selected + 1;
+    //this.getNFTs(this.state.ethereumAddress, pageNumber);
+
+    const newOffset = (event.selected * this.state.itemsPerPage) % this.state.nfts.length;
+
+    const endOffset = newOffset + this.state.itemsPerPage;
+
+    console.log(`Loading items from ${this.state.itemOffset} to ${endOffset}`);
+
+    this.setState({
+      currentItems: this.state.nfts.slice(newOffset, endOffset),
+      pageCount: Math.ceil(this.state.nfts.length / this.state.itemsPerPage),
+    });
+
+
+
+
+
   };
 
   AddToBatch = (contractAddress, tokenId, name) =>{

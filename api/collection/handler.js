@@ -175,15 +175,63 @@ module.exports.GetCollection = async (event) => {
 
   try {
     const collectionUtils = require('./collectionUtils');
+    const walletUtils = require('../wallet/utils');
 
     //Add the wallet
-    var collection = await collectionUtils._getCollection(chain, address);
+    var collections = await walletUtils._getWalletCollectionFromCache(chain, address);
 
-    if(typeof collection === "undefined"){
-      collection = {};
+    if(typeof collections === "undefined"){
+
+      const alchemyUtils = require('../alchemy/utils');
+
+      const addresses = await alchemyUtils.getCollections(chain, address);
+
+      console.info('Addresses to process:', addresses.length);
+
+      collections = [];
+
+      //loop the addresses and add them to the database
+      for(const addr of addresses){
+
+        //Check if the collection exists
+        let collection = await collectionUtils._getCollection(chain, addr.address);
+
+        if(typeof collection === "undefined"){
+          const metaData = await alchemyUtils.getContractMetadata(chain, addr.address);
+
+          collection = metaData.contractMetadata;
+          collection.chain = chain;
+          collection.address = metaData.address;
+
+          //Add the collection
+          await collectionUtils._addCollection(
+            chain,
+            metaData.address,
+            metaData.contractMetadata.name,
+            metaData.contractMetadata.symbol,
+            metaData.contractMetadata.totalSupply,
+            metaData.contractMetadata.tokenType
+          );
+        }
+
+        collection.count = addr.count;
+
+        //Add the collection
+        collections.push(collection);
+      }
+
+      //Push the collection to the cache
+      await walletUtils._addWalletCollectionToCache(chain, address, collections);
+
     }
 
-    return responses.respond({ error: false, success: true, collection }, 200);
+
+
+    if(typeof collections === "undefined"){
+      collections = [];
+    }
+
+    return responses.respond({ error: false, success: true, collections }, 200);
   } catch (err) {
     console.error(err);
     const res = {
