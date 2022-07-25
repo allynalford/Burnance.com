@@ -138,7 +138,7 @@ class MostViewedProducts extends Component {
         ]);
         _collections.push({
           name: collection.name,
-          contractAddress: collection.contractAddress,
+          contractAddress: collection.address,
         });
       }
 
