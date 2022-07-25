@@ -202,6 +202,12 @@
               "LogGroupName": "/aws/lambda/burnance-dev-collectionGet"
             }
           },
+          "CollectionViewLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/burnance-dev-collectionView"
+            }
+          },
           "CollectionGetDetailsLogGroup": {
             "Type": "AWS::Logs::LogGroup",
             "Properties": {
@@ -314,7 +320,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "service.burnance.nodejs.lambdas.dev",
-                "S3Key": "serverless/burnance/dev/1658735543074-2022-07-25T07:52:23.074Z/burnance.zip"
+                "S3Key": "serverless/burnance/dev/1658782896393-2022-07-25T21:01:36.393Z/burnance.zip"
               },
               "Handler": "actions.getNFTImage",
               "Runtime": "nodejs12.x",
@@ -372,7 +378,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "service.burnance.nodejs.lambdas.dev",
-                "S3Key": "serverless/burnance/dev/1658735543074-2022-07-25T07:52:23.074Z/burnance.zip"
+                "S3Key": "serverless/burnance/dev/1658782896393-2022-07-25T21:01:36.393Z/burnance.zip"
               },
               "Handler": "actions.view",
               "Runtime": "nodejs12.x",
@@ -430,7 +436,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "service.burnance.nodejs.lambdas.dev",
-                "S3Key": "serverless/burnance/dev/1658735543074-2022-07-25T07:52:23.074Z/burnance.zip"
+                "S3Key": "serverless/burnance/dev/1658782896393-2022-07-25T21:01:36.393Z/burnance.zip"
               },
               "Handler": "etherscan/handler.tokenNftTx",
               "Runtime": "nodejs12.x",
@@ -488,7 +494,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "service.burnance.nodejs.lambdas.dev",
-                "S3Key": "serverless/burnance/dev/1658735543074-2022-07-25T07:52:23.074Z/burnance.zip"
+                "S3Key": "serverless/burnance/dev/1658782896393-2022-07-25T21:01:36.393Z/burnance.zip"
               },
               "Handler": "etherscan/handler.getEthPrice",
               "Runtime": "nodejs12.x",
@@ -546,7 +552,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "service.burnance.nodejs.lambdas.dev",
-                "S3Key": "serverless/burnance/dev/1658735543074-2022-07-25T07:52:23.074Z/burnance.zip"
+                "S3Key": "serverless/burnance/dev/1658782896393-2022-07-25T21:01:36.393Z/burnance.zip"
               },
               "Handler": "etherscan/handler.getTxTransactionFee",
               "Runtime": "nodejs12.x",
@@ -604,7 +610,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "service.burnance.nodejs.lambdas.dev",
-                "S3Key": "serverless/burnance/dev/1658735543074-2022-07-25T07:52:23.074Z/burnance.zip"
+                "S3Key": "serverless/burnance/dev/1658782896393-2022-07-25T21:01:36.393Z/burnance.zip"
               },
               "Handler": "waitlist/handler.add",
               "Runtime": "nodejs12.x",
@@ -662,7 +668,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "service.burnance.nodejs.lambdas.dev",
-                "S3Key": "serverless/burnance/dev/1658735543074-2022-07-25T07:52:23.074Z/burnance.zip"
+                "S3Key": "serverless/burnance/dev/1658782896393-2022-07-25T21:01:36.393Z/burnance.zip"
               },
               "Handler": "quicknode/handler.qn_fetchNFTs",
               "Runtime": "nodejs12.x",
@@ -720,9 +726,9 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "service.burnance.nodejs.lambdas.dev",
-                "S3Key": "serverless/burnance/dev/1658735543074-2022-07-25T07:52:23.074Z/burnance.zip"
+                "S3Key": "serverless/burnance/dev/1658782896393-2022-07-25T21:01:36.393Z/burnance.zip"
               },
-              "Handler": "shopify/language/themelanguage.start",
+              "Handler": "wallet/wallet.start",
               "Runtime": "nodejs12.x",
               "FunctionName": "burnance-dev-walletExecute",
               "MemorySize": 128,
@@ -778,7 +784,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "service.burnance.nodejs.lambdas.dev",
-                "S3Key": "serverless/burnance/dev/1658735543074-2022-07-25T07:52:23.074Z/burnance.zip"
+                "S3Key": "serverless/burnance/dev/1658782896393-2022-07-25T21:01:36.393Z/burnance.zip"
               },
               "Handler": "wallet/steps.start",
               "Runtime": "nodejs12.x",
@@ -836,7 +842,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "service.burnance.nodejs.lambdas.dev",
-                "S3Key": "serverless/burnance/dev/1658735543074-2022-07-25T07:52:23.074Z/burnance.zip"
+                "S3Key": "serverless/burnance/dev/1658782896393-2022-07-25T21:01:36.393Z/burnance.zip"
               },
               "Handler": "wallet/steps.loadWalletData",
               "Runtime": "nodejs12.x",
@@ -894,7 +900,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "service.burnance.nodejs.lambdas.dev",
-                "S3Key": "serverless/burnance/dev/1658735543074-2022-07-25T07:52:23.074Z/burnance.zip"
+                "S3Key": "serverless/burnance/dev/1658782896393-2022-07-25T21:01:36.393Z/burnance.zip"
               },
               "Handler": "wallet/steps.stop",
               "Runtime": "nodejs12.x",
@@ -952,7 +958,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "service.burnance.nodejs.lambdas.dev",
-                "S3Key": "serverless/burnance/dev/1658735543074-2022-07-25T07:52:23.074Z/burnance.zip"
+                "S3Key": "serverless/burnance/dev/1658782896393-2022-07-25T21:01:36.393Z/burnance.zip"
               },
               "Handler": "wallet/steps.notification",
               "Runtime": "nodejs12.x",
@@ -1010,7 +1016,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "service.burnance.nodejs.lambdas.dev",
-                "S3Key": "serverless/burnance/dev/1658735543074-2022-07-25T07:52:23.074Z/burnance.zip"
+                "S3Key": "serverless/burnance/dev/1658782896393-2022-07-25T21:01:36.393Z/burnance.zip"
               },
               "Handler": "wallet/wallet.AddWallet",
               "Runtime": "nodejs12.x",
@@ -1068,7 +1074,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "service.burnance.nodejs.lambdas.dev",
-                "S3Key": "serverless/burnance/dev/1658735543074-2022-07-25T07:52:23.074Z/burnance.zip"
+                "S3Key": "serverless/burnance/dev/1658782896393-2022-07-25T21:01:36.393Z/burnance.zip"
               },
               "Handler": "wallet/wallet.GetWallet",
               "Runtime": "nodejs12.x",
@@ -1126,7 +1132,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "service.burnance.nodejs.lambdas.dev",
-                "S3Key": "serverless/burnance/dev/1658735543074-2022-07-25T07:52:23.074Z/burnance.zip"
+                "S3Key": "serverless/burnance/dev/1658782896393-2022-07-25T21:01:36.393Z/burnance.zip"
               },
               "Handler": "wallet/wallet.GetWalletNFTs",
               "Runtime": "nodejs12.x",
@@ -1184,7 +1190,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "service.burnance.nodejs.lambdas.dev",
-                "S3Key": "serverless/burnance/dev/1658735543074-2022-07-25T07:52:23.074Z/burnance.zip"
+                "S3Key": "serverless/burnance/dev/1658782896393-2022-07-25T21:01:36.393Z/burnance.zip"
               },
               "Handler": "wallet/wallet.DeleteWallet",
               "Runtime": "nodejs12.x",
@@ -1242,7 +1248,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "service.burnance.nodejs.lambdas.dev",
-                "S3Key": "serverless/burnance/dev/1658735543074-2022-07-25T07:52:23.074Z/burnance.zip"
+                "S3Key": "serverless/burnance/dev/1658782896393-2022-07-25T21:01:36.393Z/burnance.zip"
               },
               "Handler": "collection/handler.AddCollection",
               "Runtime": "nodejs12.x",
@@ -1300,7 +1306,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "service.burnance.nodejs.lambdas.dev",
-                "S3Key": "serverless/burnance/dev/1658735543074-2022-07-25T07:52:23.074Z/burnance.zip"
+                "S3Key": "serverless/burnance/dev/1658782896393-2022-07-25T21:01:36.393Z/burnance.zip"
               },
               "Handler": "collection/handler.GetCollection",
               "Runtime": "nodejs12.x",
@@ -1353,12 +1359,70 @@
               "CollectionGetLogGroup"
             ]
           },
+          "CollectionViewLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": "service.burnance.nodejs.lambdas.dev",
+                "S3Key": "serverless/burnance/dev/1658782896393-2022-07-25T21:01:36.393Z/burnance.zip"
+              },
+              "Handler": "collection/handler.ViewCollection",
+              "Runtime": "nodejs12.x",
+              "FunctionName": "burnance-dev-collectionView",
+              "MemorySize": 128,
+              "Timeout": 30,
+              "Environment": {
+                "Variables": {
+                  "STAGE": "dev",
+                  "REGION": "us-east-1",
+                  "ACCOUNTID": "297677912558",
+                  "USER_AGENT": "dev.nft.burnance.io",
+                  "CDN_BUCKET": "dev.nft.burnance.io",
+                  "NFT_IMAGE_CDN_BUCKET": "dev.image.nft.burnance.io",
+                  "QUICK_NODE_HTTP": "https://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
+                  "QUICK_NODE_WSS": "wss://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
+                  "ETHERSCAN_API_URL": "https://api.etherscan.io/api",
+                  "ALCHEMY_API_KEY": "SExwOepdX3Gy9l-FZQVVITPkIf9sfzNJ",
+                  "API_KEY_TOKEN": "WWY6WGBKZCG5U8JEY2RNTXT1YWMMER6SPN",
+                  "PRO_API_KEY": "TFSZVPV8PUQ2HZWWJAI6TPSASX72HRYNWS",
+                  "ETHERSCAN_ABI_PARAMS": "module=contract&action=getabi",
+                  "OPEN": "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",
+                  "SLACK_API_WAITLIST_WEBHOOK": "https://hooks.slack.com/services/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",
+                  "DRIP": "d19af8d64382261d9cbd9762fdd07356",
+                  "DRIP_ID": "4947055",
+                  "S3_DRIP_CDN_BUCKET": "events.nft.burnance.io",
+                  "DYNAMODB_TABLE_CONTRACT_ABI": "burnance-dev-contract-abi",
+                  "DYNAMODB_TABLE_NFT_METADATA": "burnance-dev-nfts-metadata",
+                  "DYNAMODB_TABLE_NFT_IMAGE": "burnance-dev-nfts-image",
+                  "DYNAMODB_TABLE_WAITLIST": "burnance-dev-waitlist",
+                  "DYNAMODB_TABLE_WALLET": "burnance-dev-wallet",
+                  "DYNAMODB_TABLE_WALLET_NFT": "burnance-dev-wallet-nft",
+                  "DYNAMODB_TABLE_WALLET_NFT_CACHE": "burnance-dev-wallet-nft-cache",
+                  "DYNAMODB_TABLE_WALLET_COLLECTION_CACHE": "burnance-dev-wallet-collection-cache",
+                  "DYNAMODB_TABLE_WALLET_NFT_TX": "burnance-dev-wallet-nft-tx",
+                  "DYNAMODB_TABLE_NFT_COLLECTION": "burnance-dev-nft-collection",
+                  "NODE": "wss://mainnet.infura.io/ws/v3/5d683ea6270a44d4996ad65529057982",
+                  "KEY": "adfb72ce9754e3cbc1e79e44a8e20804cebd3c4a347605c6a3462a8de05b8783",
+                  "STATE_MACHINE_WALLET_ARN": "arn:aws:states:us-east-1:297677912558:stateMachine:walletDetailsStateMachineArn"
+                }
+              },
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              }
+            },
+            "DependsOn": [
+              "CollectionViewLogGroup"
+            ]
+          },
           "CollectionGetDetailsLambdaFunction": {
             "Type": "AWS::Lambda::Function",
             "Properties": {
               "Code": {
                 "S3Bucket": "service.burnance.nodejs.lambdas.dev",
-                "S3Key": "serverless/burnance/dev/1658735543074-2022-07-25T07:52:23.074Z/burnance.zip"
+                "S3Key": "serverless/burnance/dev/1658782896393-2022-07-25T21:01:36.393Z/burnance.zip"
               },
               "Handler": "collection/handler.GetCollectionDetails",
               "Runtime": "nodejs12.x",
@@ -1416,7 +1480,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "service.burnance.nodejs.lambdas.dev",
-                "S3Key": "serverless/burnance/dev/1658735543074-2022-07-25T07:52:23.074Z/burnance.zip"
+                "S3Key": "serverless/burnance/dev/1658782896393-2022-07-25T21:01:36.393Z/burnance.zip"
               },
               "Handler": "collection/handler.GetCollectionFloorPrice",
               "Runtime": "nodejs12.x",
@@ -1474,7 +1538,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "service.burnance.nodejs.lambdas.dev",
-                "S3Key": "serverless/burnance/dev/1658735543074-2022-07-25T07:52:23.074Z/burnance.zip"
+                "S3Key": "serverless/burnance/dev/1658782896393-2022-07-25T21:01:36.393Z/burnance.zip"
               },
               "Handler": "collection/handler.GetCollectionFloorPrice",
               "Runtime": "nodejs12.x",
@@ -1532,7 +1596,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "service.burnance.nodejs.lambdas.dev",
-                "S3Key": "serverless/burnance/dev/1658735543074-2022-07-25T07:52:23.074Z/burnance.zip"
+                "S3Key": "serverless/burnance/dev/1658782896393-2022-07-25T21:01:36.393Z/burnance.zip"
               },
               "Handler": "collection/handler.DeleteCollection",
               "Runtime": "nodejs12.x",
@@ -1585,224 +1649,234 @@
               "CollectionDeleteLogGroup"
             ]
           },
-          "NftImageLambdaVersioncExfqWZD0E3AQoRmIoHiA6OhLToeKdknWjza0Jgo": {
+          "NftImageLambdaVersionuanTpX3GMd2KjX2cvdQWP6E9ve7vsaPs4rVW2pmpU": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "NftImageLambdaFunction"
               },
-              "CodeSha256": "FR3Z6Ej/E7YtPLWhGbnpCgPravrV3zkxXJZNdEPPqdQ="
+              "CodeSha256": "ai1eCLwt/piNkFp+mu+a3EA9lhEOx/Qtcuj8VO/yhOo="
             }
           },
-          "ViewNFTtxLambdaVersion4uJ8schPS37lrTpRmqxOfTPSlrh2prpbMCVmX5JoKEk": {
-            "Type": "AWS::Lambda::Version",
-            "DeletionPolicy": "Retain",
-            "Properties": {
-              "FunctionName": {
-                "Ref": "ViewNFTtxLambdaFunction"
-              },
-              "CodeSha256": "FR3Z6Ej/E7YtPLWhGbnpCgPravrV3zkxXJZNdEPPqdQ="
-            }
-          },
-          "GetTxFeeLambdaVersionJJQX74zjU7SE8YmcIZTfENWeBaindN6Y41jy4hOS08Y": {
-            "Type": "AWS::Lambda::Version",
-            "DeletionPolicy": "Retain",
-            "Properties": {
-              "FunctionName": {
-                "Ref": "GetTxFeeLambdaFunction"
-              },
-              "CodeSha256": "FR3Z6Ej/E7YtPLWhGbnpCgPravrV3zkxXJZNdEPPqdQ="
-            }
-          },
-          "AddToWaitlistLambdaVersionsHJJSaSksfiuVLG69uNt9KuF3aAjkkVUkZk00qZRppo": {
+          "AddToWaitlistLambdaVersionDrtdpDI4Mj2UpqvZH0zI9oXpq5k6Sej78EEHEpRw": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "AddToWaitlistLambdaFunction"
               },
-              "CodeSha256": "FR3Z6Ej/E7YtPLWhGbnpCgPravrV3zkxXJZNdEPPqdQ="
+              "CodeSha256": "ai1eCLwt/piNkFp+mu+a3EA9lhEOx/Qtcuj8VO/yhOo="
             }
           },
-          "ViewNFTLambdaVersionNilGJ1xyqUf89Kd9MMPADesGlpQfowdrqVSQTqQCTg": {
+          "GetTxFeeLambdaVersionvy2HzI5Ddo8FQa4FTy1U9KSqSvzpnpIXU4ZbxJyJ5aw": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
-                "Ref": "ViewNFTLambdaFunction"
+                "Ref": "GetTxFeeLambdaFunction"
               },
-              "CodeSha256": "FR3Z6Ej/E7YtPLWhGbnpCgPravrV3zkxXJZNdEPPqdQ="
+              "CodeSha256": "ai1eCLwt/piNkFp+mu+a3EA9lhEOx/Qtcuj8VO/yhOo="
             }
           },
-          "WalletStartLambdaVersionximY64Kq0o7ldc7fixCxgGa1qbs8274k245xq4hIA": {
-            "Type": "AWS::Lambda::Version",
-            "DeletionPolicy": "Retain",
-            "Properties": {
-              "FunctionName": {
-                "Ref": "WalletStartLambdaFunction"
-              },
-              "CodeSha256": "FR3Z6Ej/E7YtPLWhGbnpCgPravrV3zkxXJZNdEPPqdQ="
-            }
-          },
-          "QnUnderscorefetchNFTsLambdaVersionDBHVY1rPXS5DHqgtCVzAmKK4tTKxXHFipJ7pKMmTU0": {
-            "Type": "AWS::Lambda::Version",
-            "DeletionPolicy": "Retain",
-            "Properties": {
-              "FunctionName": {
-                "Ref": "QnUnderscorefetchNFTsLambdaFunction"
-              },
-              "CodeSha256": "FR3Z6Ej/E7YtPLWhGbnpCgPravrV3zkxXJZNdEPPqdQ="
-            }
-          },
-          "GetEthPriceLambdaVersion1xq1JDQSp2RYbWtIv2UaZNT5llg4tvII6mSnxc9J5E0": {
+          "GetEthPriceLambdaVersion5BAICm3vm7zh23seWwSgmrPBneMBnaXSdZkETDWMyY": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "GetEthPriceLambdaFunction"
               },
-              "CodeSha256": "FR3Z6Ej/E7YtPLWhGbnpCgPravrV3zkxXJZNdEPPqdQ="
+              "CodeSha256": "ai1eCLwt/piNkFp+mu+a3EA9lhEOx/Qtcuj8VO/yhOo="
             }
           },
-          "WalletLoadLambdaVersion1mbGsX20p36gymWFLqiF6JVjMcQHGAuqsf8KTzDfU": {
+          "ViewNFTtxLambdaVersionpGtyPJkkG7hz79lLEzuOE9ZMOOJFUs80pKloIFWcVU": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
-                "Ref": "WalletLoadLambdaFunction"
+                "Ref": "ViewNFTtxLambdaFunction"
               },
-              "CodeSha256": "FR3Z6Ej/E7YtPLWhGbnpCgPravrV3zkxXJZNdEPPqdQ="
+              "CodeSha256": "ai1eCLwt/piNkFp+mu+a3EA9lhEOx/Qtcuj8VO/yhOo="
             }
           },
-          "WalletExecuteLambdaVersioneJ9CEwicibmMJsW4ChPJtByLVEzHM4BmzbOWcjkkdE": {
+          "QnUnderscorefetchNFTsLambdaVersioneV2dpUqUP3hd2y9CShIbvS1lgaPe3ugFnL66YdhDY": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "QnUnderscorefetchNFTsLambdaFunction"
+              },
+              "CodeSha256": "ai1eCLwt/piNkFp+mu+a3EA9lhEOx/Qtcuj8VO/yhOo="
+            }
+          },
+          "WalletExecuteLambdaVersion7LwUe9GhQVE8I22qo2PZDRzCBikY54ZTQ94Q7cY": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "WalletExecuteLambdaFunction"
               },
-              "CodeSha256": "FR3Z6Ej/E7YtPLWhGbnpCgPravrV3zkxXJZNdEPPqdQ="
+              "CodeSha256": "ai1eCLwt/piNkFp+mu+a3EA9lhEOx/Qtcuj8VO/yhOo="
             }
           },
-          "WalletAddLambdaVersionUMooqIfFDkhncQpDbqpISALx7X7IVmOEMX5D3N3lNw": {
-            "Type": "AWS::Lambda::Version",
-            "DeletionPolicy": "Retain",
-            "Properties": {
-              "FunctionName": {
-                "Ref": "WalletAddLambdaFunction"
-              },
-              "CodeSha256": "FR3Z6Ej/E7YtPLWhGbnpCgPravrV3zkxXJZNdEPPqdQ="
-            }
-          },
-          "WalletNotificationLambdaVersion0tbM2KQ7mzSbLF2ZEHSYtjwMZfE1nirwdDlif4GJ4": {
-            "Type": "AWS::Lambda::Version",
-            "DeletionPolicy": "Retain",
-            "Properties": {
-              "FunctionName": {
-                "Ref": "WalletNotificationLambdaFunction"
-              },
-              "CodeSha256": "FR3Z6Ej/E7YtPLWhGbnpCgPravrV3zkxXJZNdEPPqdQ="
-            }
-          },
-          "WalletStopLambdaVersionQTQsFJ7NXg52xgbe7RWnjPM8HfzFNA2MFZjBwsPJSA": {
+          "WalletStopLambdaVersionetPI0BiPQBUW1npND1chYPoUKOS6pYIcEw0oXU8I0g": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "WalletStopLambdaFunction"
               },
-              "CodeSha256": "FR3Z6Ej/E7YtPLWhGbnpCgPravrV3zkxXJZNdEPPqdQ="
+              "CodeSha256": "ai1eCLwt/piNkFp+mu+a3EA9lhEOx/Qtcuj8VO/yhOo="
             }
           },
-          "WalletGetNFTsLambdaVersionYaLIxLnJsgKJUnHxQdcfE0KdcsqvZpuNkVhtEPSJeYw": {
+          "WalletStartLambdaVersionxzv5hkGY3NiS0UpP8T2PJGKwzG7auTYmeAhFKzu4lc": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
-                "Ref": "WalletGetNFTsLambdaFunction"
+                "Ref": "WalletStartLambdaFunction"
               },
-              "CodeSha256": "FR3Z6Ej/E7YtPLWhGbnpCgPravrV3zkxXJZNdEPPqdQ="
+              "CodeSha256": "ai1eCLwt/piNkFp+mu+a3EA9lhEOx/Qtcuj8VO/yhOo="
             }
           },
-          "WalletGetLambdaVersionBvhu7yJKfRYdYYPVUEx4ccSLE0j59Ad2gBHrqjFTI": {
+          "WalletLoadLambdaVersionFFDY8nDO5jaPjZso0Y4vVeVrx95Jgm7acFqAeAvTE": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
-                "Ref": "WalletGetLambdaFunction"
+                "Ref": "WalletLoadLambdaFunction"
               },
-              "CodeSha256": "FR3Z6Ej/E7YtPLWhGbnpCgPravrV3zkxXJZNdEPPqdQ="
+              "CodeSha256": "ai1eCLwt/piNkFp+mu+a3EA9lhEOx/Qtcuj8VO/yhOo="
             }
           },
-          "CollectionAddLambdaVersion5v5HUV5t7871Jn2C6LcXyF5ha1vsStCRUWJ53wEW57A": {
-            "Type": "AWS::Lambda::Version",
-            "DeletionPolicy": "Retain",
-            "Properties": {
-              "FunctionName": {
-                "Ref": "CollectionAddLambdaFunction"
-              },
-              "CodeSha256": "FR3Z6Ej/E7YtPLWhGbnpCgPravrV3zkxXJZNdEPPqdQ="
-            }
-          },
-          "CollectionGetVolumeLambdaVersion8xeL10XBuUfr6lNMCC1qGCdiNPhkdLX9X0IJ5jWCmc": {
-            "Type": "AWS::Lambda::Version",
-            "DeletionPolicy": "Retain",
-            "Properties": {
-              "FunctionName": {
-                "Ref": "CollectionGetVolumeLambdaFunction"
-              },
-              "CodeSha256": "FR3Z6Ej/E7YtPLWhGbnpCgPravrV3zkxXJZNdEPPqdQ="
-            }
-          },
-          "CollectionGetFloorPriceLambdaVersionTPGglUgyMV63p4GLFoNt4jnMP0UwWBujvCTIaboetg": {
-            "Type": "AWS::Lambda::Version",
-            "DeletionPolicy": "Retain",
-            "Properties": {
-              "FunctionName": {
-                "Ref": "CollectionGetFloorPriceLambdaFunction"
-              },
-              "CodeSha256": "FR3Z6Ej/E7YtPLWhGbnpCgPravrV3zkxXJZNdEPPqdQ="
-            }
-          },
-          "CollectionGetLambdaVersionmNokhi4EUqAtqLIhNK2Z4jjo83j3FSovu668coUBs": {
-            "Type": "AWS::Lambda::Version",
-            "DeletionPolicy": "Retain",
-            "Properties": {
-              "FunctionName": {
-                "Ref": "CollectionGetLambdaFunction"
-              },
-              "CodeSha256": "FR3Z6Ej/E7YtPLWhGbnpCgPravrV3zkxXJZNdEPPqdQ="
-            }
-          },
-          "WalletDeleteLambdaVersionC1sj29eeXlE78oyKxPCPnpXDzQWdR4Cc4s8AtIj8E": {
+          "WalletDeleteLambdaVersion6besqRVQjG6N3KEvjSxnUsJXN9FqPHkhjpwY4IQrMIc": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "WalletDeleteLambdaFunction"
               },
-              "CodeSha256": "FR3Z6Ej/E7YtPLWhGbnpCgPravrV3zkxXJZNdEPPqdQ="
+              "CodeSha256": "ai1eCLwt/piNkFp+mu+a3EA9lhEOx/Qtcuj8VO/yhOo="
             }
           },
-          "CollectionGetDetailsLambdaVersioncxxfygPbCSRYTKH2Pf3KqzL0ihlSPKWuaCosk2Cf0s": {
+          "WalletNotificationLambdaVersionTQmdEgrsKO5z0STSBhafmKMiZk54xc3GgvdXFYmHN8": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "WalletNotificationLambdaFunction"
+              },
+              "CodeSha256": "ai1eCLwt/piNkFp+mu+a3EA9lhEOx/Qtcuj8VO/yhOo="
+            }
+          },
+          "WalletGetLambdaVersionHJMPseQuNGjBEo7J6cdcA2CkObecaKDuA964briCY": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "WalletGetLambdaFunction"
+              },
+              "CodeSha256": "ai1eCLwt/piNkFp+mu+a3EA9lhEOx/Qtcuj8VO/yhOo="
+            }
+          },
+          "WalletAddLambdaVersions1HcKNuP4nNTpjm5GS8NrNMOqNbADj5tO4Tdml9IiU": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "WalletAddLambdaFunction"
+              },
+              "CodeSha256": "ai1eCLwt/piNkFp+mu+a3EA9lhEOx/Qtcuj8VO/yhOo="
+            }
+          },
+          "CollectionAddLambdaVersionUeJRH4lJUCc9vJBUjtr57uu76SZ7rLMOGnAJndHFOco": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "CollectionAddLambdaFunction"
+              },
+              "CodeSha256": "ai1eCLwt/piNkFp+mu+a3EA9lhEOx/Qtcuj8VO/yhOo="
+            }
+          },
+          "WalletGetNFTsLambdaVersion2J1epNWtfVYaxf04J0ItqZqXi9fXEhC4UfcyIYZzBXA": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "WalletGetNFTsLambdaFunction"
+              },
+              "CodeSha256": "ai1eCLwt/piNkFp+mu+a3EA9lhEOx/Qtcuj8VO/yhOo="
+            }
+          },
+          "ViewNFTLambdaVersionTrB8TV5G0ToZvbWaz0ddJs2ytKiLMssTvsvykgbiE": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "ViewNFTLambdaFunction"
+              },
+              "CodeSha256": "ai1eCLwt/piNkFp+mu+a3EA9lhEOx/Qtcuj8VO/yhOo="
+            }
+          },
+          "CollectionViewLambdaVersiongY9qOe9YIxtS6cmu38XlsTRsj2MQgWAWjx9QU4CET6A": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "CollectionViewLambdaFunction"
+              },
+              "CodeSha256": "ai1eCLwt/piNkFp+mu+a3EA9lhEOx/Qtcuj8VO/yhOo="
+            }
+          },
+          "CollectionGetDetailsLambdaVersionCe7EKnpkfssfuyUFXFL0VlljgXSuLTjXATcyIHdQ": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "CollectionGetDetailsLambdaFunction"
               },
-              "CodeSha256": "FR3Z6Ej/E7YtPLWhGbnpCgPravrV3zkxXJZNdEPPqdQ="
+              "CodeSha256": "ai1eCLwt/piNkFp+mu+a3EA9lhEOx/Qtcuj8VO/yhOo="
             }
           },
-          "CollectionDeleteLambdaVersions7JPJNaNpsQ4jmZwtYJdAURXPx1B73ChrwQwCcBklOk": {
+          "CollectionGetVolumeLambdaVersionHBFsyt3CL5ZFQAjEA0zzCX8K5d4daEu87UASsUGEmc": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "CollectionGetVolumeLambdaFunction"
+              },
+              "CodeSha256": "ai1eCLwt/piNkFp+mu+a3EA9lhEOx/Qtcuj8VO/yhOo="
+            }
+          },
+          "CollectionGetLambdaVersion2jLdRrIlvRhQrovsIANR7rI2IuUL92GH4dkE5Pp74q0": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "CollectionGetLambdaFunction"
+              },
+              "CodeSha256": "ai1eCLwt/piNkFp+mu+a3EA9lhEOx/Qtcuj8VO/yhOo="
+            }
+          },
+          "CollectionGetFloorPriceLambdaVersiondkEGm7T6HMIcrLkVtWFaSDenMAMvgYqTMebqMOeiUc": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "CollectionGetFloorPriceLambdaFunction"
+              },
+              "CodeSha256": "ai1eCLwt/piNkFp+mu+a3EA9lhEOx/Qtcuj8VO/yhOo="
+            }
+          },
+          "CollectionDeleteLambdaVersionpGkOjbzJvDo99zPzpE8ThrjUiHGChrrxBJqjDqNu06I": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "CollectionDeleteLambdaFunction"
               },
-              "CodeSha256": "FR3Z6Ej/E7YtPLWhGbnpCgPravrV3zkxXJZNdEPPqdQ="
+              "CodeSha256": "ai1eCLwt/piNkFp+mu+a3EA9lhEOx/Qtcuj8VO/yhOo="
             }
           },
           "ApiGatewayRestApi": {
@@ -1976,57 +2050,6 @@
               }
             }
           },
-          "ApiGatewayResourceShopify": {
-            "Type": "AWS::ApiGateway::Resource",
-            "Properties": {
-              "ParentId": {
-                "Fn::GetAtt": [
-                  "ApiGatewayRestApi",
-                  "RootResourceId"
-                ]
-              },
-              "PathPart": "shopify",
-              "RestApiId": {
-                "Ref": "ApiGatewayRestApi"
-              }
-            }
-          },
-          "ApiGatewayResourceShopifyWorkflow": {
-            "Type": "AWS::ApiGateway::Resource",
-            "Properties": {
-              "ParentId": {
-                "Ref": "ApiGatewayResourceShopify"
-              },
-              "PathPart": "workflow",
-              "RestApiId": {
-                "Ref": "ApiGatewayRestApi"
-              }
-            }
-          },
-          "ApiGatewayResourceShopifyWorkflowLanguage": {
-            "Type": "AWS::ApiGateway::Resource",
-            "Properties": {
-              "ParentId": {
-                "Ref": "ApiGatewayResourceShopifyWorkflow"
-              },
-              "PathPart": "language",
-              "RestApiId": {
-                "Ref": "ApiGatewayRestApi"
-              }
-            }
-          },
-          "ApiGatewayResourceShopifyWorkflowLanguageStart": {
-            "Type": "AWS::ApiGateway::Resource",
-            "Properties": {
-              "ParentId": {
-                "Ref": "ApiGatewayResourceShopifyWorkflowLanguage"
-              },
-              "PathPart": "start",
-              "RestApiId": {
-                "Ref": "ApiGatewayRestApi"
-              }
-            }
-          },
           "ApiGatewayResourceWallet": {
             "Type": "AWS::ApiGateway::Resource",
             "Properties": {
@@ -2037,6 +2060,42 @@
                 ]
               },
               "PathPart": "wallet",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayResourceWalletWorkflow": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Ref": "ApiGatewayResourceWallet"
+              },
+              "PathPart": "workflow",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayResourceWalletWorkflowLoad": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Ref": "ApiGatewayResourceWalletWorkflow"
+              },
+              "PathPart": "load",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayResourceWalletWorkflowLoadStart": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Ref": "ApiGatewayResourceWalletWorkflowLoad"
+              },
+              "PathPart": "start",
               "RestApiId": {
                 "Ref": "ApiGatewayRestApi"
               }
@@ -2184,6 +2243,54 @@
                 "Ref": "ApiGatewayResourceCollectionChainVar"
               },
               "PathPart": "{address}",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayResourceCollectionView": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Ref": "ApiGatewayResourceCollection"
+              },
+              "PathPart": "view",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayResourceCollectionViewChainVar": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Ref": "ApiGatewayResourceCollectionView"
+              },
+              "PathPart": "{chain}",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayResourceCollectionViewChainVarAddressVar": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Ref": "ApiGatewayResourceCollectionViewChainVar"
+              },
+              "PathPart": "{address}",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayResourceCollectionViewChainVarAddressVarContractaddressVar": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Ref": "ApiGatewayResourceCollectionViewChainVarAddressVar"
+              },
+              "PathPart": "{contractAddress}",
               "RestApiId": {
                 "Ref": "ApiGatewayRestApi"
               }
@@ -2612,6 +2719,456 @@
               }
             }
           },
+          "ApiGatewayMethodWalletWorkflowLoadStartOptions": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "AuthorizationType": "NONE",
+              "HttpMethod": "OPTIONS",
+              "MethodResponses": [
+                {
+                  "StatusCode": "200",
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": true,
+                    "method.response.header.Access-Control-Allow-Headers": true,
+                    "method.response.header.Access-Control-Allow-Methods": true
+                  },
+                  "ResponseModels": {}
+                }
+              ],
+              "RequestParameters": {},
+              "Integration": {
+                "Type": "MOCK",
+                "RequestTemplates": {
+                  "application/json": "{statusCode:200}"
+                },
+                "ContentHandling": "CONVERT_TO_TEXT",
+                "IntegrationResponses": [
+                  {
+                    "StatusCode": "200",
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": "'*'",
+                      "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                      "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,POST'"
+                    },
+                    "ResponseTemplates": {
+                      "application/json": ""
+                    }
+                  }
+                ]
+              },
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceWalletWorkflowLoadStart"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayMethodWalletOptions": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "AuthorizationType": "NONE",
+              "HttpMethod": "OPTIONS",
+              "MethodResponses": [
+                {
+                  "StatusCode": "200",
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": true,
+                    "method.response.header.Access-Control-Allow-Headers": true,
+                    "method.response.header.Access-Control-Allow-Methods": true
+                  },
+                  "ResponseModels": {}
+                }
+              ],
+              "RequestParameters": {},
+              "Integration": {
+                "Type": "MOCK",
+                "RequestTemplates": {
+                  "application/json": "{statusCode:200}"
+                },
+                "ContentHandling": "CONVERT_TO_TEXT",
+                "IntegrationResponses": [
+                  {
+                    "StatusCode": "200",
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": "'*'",
+                      "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                      "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,POST'"
+                    },
+                    "ResponseTemplates": {
+                      "application/json": ""
+                    }
+                  }
+                ]
+              },
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceWallet"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayMethodWalletChainVarAddressVarOptions": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "AuthorizationType": "NONE",
+              "HttpMethod": "OPTIONS",
+              "MethodResponses": [
+                {
+                  "StatusCode": "200",
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": true,
+                    "method.response.header.Access-Control-Allow-Headers": true,
+                    "method.response.header.Access-Control-Allow-Methods": true
+                  },
+                  "ResponseModels": {}
+                }
+              ],
+              "RequestParameters": {},
+              "Integration": {
+                "Type": "MOCK",
+                "RequestTemplates": {
+                  "application/json": "{statusCode:200}"
+                },
+                "ContentHandling": "CONVERT_TO_TEXT",
+                "IntegrationResponses": [
+                  {
+                    "StatusCode": "200",
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": "'*'",
+                      "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                      "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,DELETE,GET'"
+                    },
+                    "ResponseTemplates": {
+                      "application/json": ""
+                    }
+                  }
+                ]
+              },
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceWalletChainVarAddressVar"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayMethodWalletNftsChainVarAddressVarOptions": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "AuthorizationType": "NONE",
+              "HttpMethod": "OPTIONS",
+              "MethodResponses": [
+                {
+                  "StatusCode": "200",
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": true,
+                    "method.response.header.Access-Control-Allow-Headers": true,
+                    "method.response.header.Access-Control-Allow-Methods": true
+                  },
+                  "ResponseModels": {}
+                }
+              ],
+              "RequestParameters": {},
+              "Integration": {
+                "Type": "MOCK",
+                "RequestTemplates": {
+                  "application/json": "{statusCode:200}"
+                },
+                "ContentHandling": "CONVERT_TO_TEXT",
+                "IntegrationResponses": [
+                  {
+                    "StatusCode": "200",
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": "'*'",
+                      "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                      "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET'"
+                    },
+                    "ResponseTemplates": {
+                      "application/json": ""
+                    }
+                  }
+                ]
+              },
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceWalletNftsChainVarAddressVar"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayMethodCollectionOptions": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "AuthorizationType": "NONE",
+              "HttpMethod": "OPTIONS",
+              "MethodResponses": [
+                {
+                  "StatusCode": "200",
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": true,
+                    "method.response.header.Access-Control-Allow-Headers": true,
+                    "method.response.header.Access-Control-Allow-Methods": true
+                  },
+                  "ResponseModels": {}
+                }
+              ],
+              "RequestParameters": {},
+              "Integration": {
+                "Type": "MOCK",
+                "RequestTemplates": {
+                  "application/json": "{statusCode:200}"
+                },
+                "ContentHandling": "CONVERT_TO_TEXT",
+                "IntegrationResponses": [
+                  {
+                    "StatusCode": "200",
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": "'*'",
+                      "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                      "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,POST'"
+                    },
+                    "ResponseTemplates": {
+                      "application/json": ""
+                    }
+                  }
+                ]
+              },
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceCollection"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayMethodCollectionChainVarAddressVarOptions": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "AuthorizationType": "NONE",
+              "HttpMethod": "OPTIONS",
+              "MethodResponses": [
+                {
+                  "StatusCode": "200",
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": true,
+                    "method.response.header.Access-Control-Allow-Headers": true,
+                    "method.response.header.Access-Control-Allow-Methods": true
+                  },
+                  "ResponseModels": {}
+                }
+              ],
+              "RequestParameters": {},
+              "Integration": {
+                "Type": "MOCK",
+                "RequestTemplates": {
+                  "application/json": "{statusCode:200}"
+                },
+                "ContentHandling": "CONVERT_TO_TEXT",
+                "IntegrationResponses": [
+                  {
+                    "StatusCode": "200",
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": "'*'",
+                      "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                      "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,DELETE,GET'"
+                    },
+                    "ResponseTemplates": {
+                      "application/json": ""
+                    }
+                  }
+                ]
+              },
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceCollectionChainVarAddressVar"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayMethodCollectionViewChainVarAddressVarContractaddressVarOptions": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "AuthorizationType": "NONE",
+              "HttpMethod": "OPTIONS",
+              "MethodResponses": [
+                {
+                  "StatusCode": "200",
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": true,
+                    "method.response.header.Access-Control-Allow-Headers": true,
+                    "method.response.header.Access-Control-Allow-Methods": true
+                  },
+                  "ResponseModels": {}
+                }
+              ],
+              "RequestParameters": {},
+              "Integration": {
+                "Type": "MOCK",
+                "RequestTemplates": {
+                  "application/json": "{statusCode:200}"
+                },
+                "ContentHandling": "CONVERT_TO_TEXT",
+                "IntegrationResponses": [
+                  {
+                    "StatusCode": "200",
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": "'*'",
+                      "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                      "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET'"
+                    },
+                    "ResponseTemplates": {
+                      "application/json": ""
+                    }
+                  }
+                ]
+              },
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceCollectionViewChainVarAddressVarContractaddressVar"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayMethodCollectionDetailsChainVarAddressVarOptions": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "AuthorizationType": "NONE",
+              "HttpMethod": "OPTIONS",
+              "MethodResponses": [
+                {
+                  "StatusCode": "200",
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": true,
+                    "method.response.header.Access-Control-Allow-Headers": true,
+                    "method.response.header.Access-Control-Allow-Methods": true
+                  },
+                  "ResponseModels": {}
+                }
+              ],
+              "RequestParameters": {},
+              "Integration": {
+                "Type": "MOCK",
+                "RequestTemplates": {
+                  "application/json": "{statusCode:200}"
+                },
+                "ContentHandling": "CONVERT_TO_TEXT",
+                "IntegrationResponses": [
+                  {
+                    "StatusCode": "200",
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": "'*'",
+                      "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                      "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET'"
+                    },
+                    "ResponseTemplates": {
+                      "application/json": ""
+                    }
+                  }
+                ]
+              },
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceCollectionDetailsChainVarAddressVar"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayMethodCollectionFloorChainVarAddressVarOptions": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "AuthorizationType": "NONE",
+              "HttpMethod": "OPTIONS",
+              "MethodResponses": [
+                {
+                  "StatusCode": "200",
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": true,
+                    "method.response.header.Access-Control-Allow-Headers": true,
+                    "method.response.header.Access-Control-Allow-Methods": true
+                  },
+                  "ResponseModels": {}
+                }
+              ],
+              "RequestParameters": {},
+              "Integration": {
+                "Type": "MOCK",
+                "RequestTemplates": {
+                  "application/json": "{statusCode:200}"
+                },
+                "ContentHandling": "CONVERT_TO_TEXT",
+                "IntegrationResponses": [
+                  {
+                    "StatusCode": "200",
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": "'*'",
+                      "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                      "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET'"
+                    },
+                    "ResponseTemplates": {
+                      "application/json": ""
+                    }
+                  }
+                ]
+              },
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceCollectionFloorChainVarAddressVar"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayMethodCollectionVolumeChainVarAddressVarOptions": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "AuthorizationType": "NONE",
+              "HttpMethod": "OPTIONS",
+              "MethodResponses": [
+                {
+                  "StatusCode": "200",
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": true,
+                    "method.response.header.Access-Control-Allow-Headers": true,
+                    "method.response.header.Access-Control-Allow-Methods": true
+                  },
+                  "ResponseModels": {}
+                }
+              ],
+              "RequestParameters": {},
+              "Integration": {
+                "Type": "MOCK",
+                "RequestTemplates": {
+                  "application/json": "{statusCode:200}"
+                },
+                "ContentHandling": "CONVERT_TO_TEXT",
+                "IntegrationResponses": [
+                  {
+                    "StatusCode": "200",
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": "'*'",
+                      "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                      "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET'"
+                    },
+                    "ResponseTemplates": {
+                      "application/json": ""
+                    }
+                  }
+                ]
+              },
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceCollectionVolumeChainVarAddressVar"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
           "ApiGatewayMethodNftImagePost": {
             "Type": "AWS::ApiGateway::Method",
             "Properties": {
@@ -2934,13 +3491,13 @@
               "QnUnderscorefetchNFTsLambdaPermissionApiGateway"
             ]
           },
-          "ApiGatewayMethodShopifyWorkflowLanguageStartPost": {
+          "ApiGatewayMethodWalletWorkflowLoadStartPost": {
             "Type": "AWS::ApiGateway::Method",
             "Properties": {
               "HttpMethod": "POST",
               "RequestParameters": {},
               "ResourceId": {
-                "Ref": "ApiGatewayResourceShopifyWorkflowLanguageStart"
+                "Ref": "ApiGatewayResourceWalletWorkflowLoadStart"
               },
               "RestApiId": {
                 "Ref": "ApiGatewayRestApi"
@@ -3348,6 +3905,52 @@
               "CollectionGetLambdaPermissionApiGateway"
             ]
           },
+          "ApiGatewayMethodCollectionViewChainVarAddressVarContractaddressVarGet": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "HttpMethod": "GET",
+              "RequestParameters": {},
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceCollectionViewChainVarAddressVarContractaddressVar"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "ApiKeyRequired": false,
+              "AuthorizationType": "AWS_IAM",
+              "Integration": {
+                "IntegrationHttpMethod": "POST",
+                "Type": "AWS_PROXY",
+                "Uri": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":lambda:path/2015-03-31/functions/",
+                      {
+                        "Fn::GetAtt": [
+                          "CollectionViewLambdaFunction",
+                          "Arn"
+                        ]
+                      },
+                      "/invocations"
+                    ]
+                  ]
+                }
+              },
+              "MethodResponses": []
+            },
+            "DependsOn": [
+              "CollectionViewLambdaPermissionApiGateway"
+            ]
+          },
           "ApiGatewayMethodCollectionDetailsChainVarAddressVarGet": {
             "Type": "AWS::ApiGateway::Method",
             "Properties": {
@@ -3532,7 +4135,7 @@
               "CollectionDeleteLambdaPermissionApiGateway"
             ]
           },
-          "ApiGatewayDeployment1658735498282": {
+          "ApiGatewayDeployment1658782769492": {
             "Type": "AWS::ApiGateway::Deployment",
             "Properties": {
               "RestApiId": {
@@ -3548,6 +4151,16 @@
               "ApiGatewayMethodEtherscanTxOptions",
               "ApiGatewayMethodWaitlistAddOptions",
               "ApiGatewayMethodQuicknodeQnfetchnftsOptions",
+              "ApiGatewayMethodWalletWorkflowLoadStartOptions",
+              "ApiGatewayMethodWalletOptions",
+              "ApiGatewayMethodWalletChainVarAddressVarOptions",
+              "ApiGatewayMethodWalletNftsChainVarAddressVarOptions",
+              "ApiGatewayMethodCollectionOptions",
+              "ApiGatewayMethodCollectionChainVarAddressVarOptions",
+              "ApiGatewayMethodCollectionViewChainVarAddressVarContractaddressVarOptions",
+              "ApiGatewayMethodCollectionDetailsChainVarAddressVarOptions",
+              "ApiGatewayMethodCollectionFloorChainVarAddressVarOptions",
+              "ApiGatewayMethodCollectionVolumeChainVarAddressVarOptions",
               "ApiGatewayMethodNftImagePost",
               "ApiGatewayMethodViewNftPost",
               "ApiGatewayMethodEtherscanTokennfttxPost",
@@ -3555,7 +4168,7 @@
               "ApiGatewayMethodEtherscanTxGet",
               "ApiGatewayMethodWaitlistAddPost",
               "ApiGatewayMethodQuicknodeQnfetchnftsPost",
-              "ApiGatewayMethodShopifyWorkflowLanguageStartPost",
+              "ApiGatewayMethodWalletWorkflowLoadStartPost",
               "ApiGatewayMethodWalletStepStartPost",
               "ApiGatewayMethodWalletStepDetailsLoadPost",
               "ApiGatewayMethodWalletPost",
@@ -3564,6 +4177,7 @@
               "ApiGatewayMethodWalletChainVarAddressVarDelete",
               "ApiGatewayMethodCollectionPost",
               "ApiGatewayMethodCollectionChainVarAddressVarGet",
+              "ApiGatewayMethodCollectionViewChainVarAddressVarContractaddressVarGet",
               "ApiGatewayMethodCollectionDetailsChainVarAddressVarGet",
               "ApiGatewayMethodCollectionFloorChainVarAddressVarGet",
               "ApiGatewayMethodCollectionVolumeChainVarAddressVarGet",
@@ -4162,6 +4776,43 @@
               }
             }
           },
+          "CollectionViewLambdaPermissionApiGateway": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "CollectionViewLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "ApiGatewayRestApi"
+                    },
+                    "/*/*"
+                  ]
+                ]
+              }
+            }
+          },
           "CollectionGetDetailsLambdaPermissionApiGateway": {
             "Type": "AWS::Lambda::Permission",
             "Properties": {
@@ -4423,196 +5074,205 @@
           "NftImageLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "NftImageLambdaVersioncExfqWZD0E3AQoRmIoHiA6OhLToeKdknWjza0Jgo"
+              "Ref": "NftImageLambdaVersionuanTpX3GMd2KjX2cvdQWP6E9ve7vsaPs4rVW2pmpU"
             },
             "Export": {
               "Name": "sls-burnance-dev-NftImageLambdaFunctionQualifiedArn"
             }
           },
-          "ViewNFTtxLambdaFunctionQualifiedArn": {
-            "Description": "Current Lambda function version",
-            "Value": {
-              "Ref": "ViewNFTtxLambdaVersion4uJ8schPS37lrTpRmqxOfTPSlrh2prpbMCVmX5JoKEk"
-            },
-            "Export": {
-              "Name": "sls-burnance-dev-ViewNFTtxLambdaFunctionQualifiedArn"
-            }
-          },
-          "GetTxFeeLambdaFunctionQualifiedArn": {
-            "Description": "Current Lambda function version",
-            "Value": {
-              "Ref": "GetTxFeeLambdaVersionJJQX74zjU7SE8YmcIZTfENWeBaindN6Y41jy4hOS08Y"
-            },
-            "Export": {
-              "Name": "sls-burnance-dev-GetTxFeeLambdaFunctionQualifiedArn"
-            }
-          },
           "AddToWaitlistLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "AddToWaitlistLambdaVersionsHJJSaSksfiuVLG69uNt9KuF3aAjkkVUkZk00qZRppo"
+              "Ref": "AddToWaitlistLambdaVersionDrtdpDI4Mj2UpqvZH0zI9oXpq5k6Sej78EEHEpRw"
             },
             "Export": {
               "Name": "sls-burnance-dev-AddToWaitlistLambdaFunctionQualifiedArn"
             }
           },
-          "ViewNFTLambdaFunctionQualifiedArn": {
+          "GetTxFeeLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "ViewNFTLambdaVersionNilGJ1xyqUf89Kd9MMPADesGlpQfowdrqVSQTqQCTg"
+              "Ref": "GetTxFeeLambdaVersionvy2HzI5Ddo8FQa4FTy1U9KSqSvzpnpIXU4ZbxJyJ5aw"
             },
             "Export": {
-              "Name": "sls-burnance-dev-ViewNFTLambdaFunctionQualifiedArn"
-            }
-          },
-          "WalletStartLambdaFunctionQualifiedArn": {
-            "Description": "Current Lambda function version",
-            "Value": {
-              "Ref": "WalletStartLambdaVersionximY64Kq0o7ldc7fixCxgGa1qbs8274k245xq4hIA"
-            },
-            "Export": {
-              "Name": "sls-burnance-dev-WalletStartLambdaFunctionQualifiedArn"
-            }
-          },
-          "QnUnderscorefetchNFTsLambdaFunctionQualifiedArn": {
-            "Description": "Current Lambda function version",
-            "Value": {
-              "Ref": "QnUnderscorefetchNFTsLambdaVersionDBHVY1rPXS5DHqgtCVzAmKK4tTKxXHFipJ7pKMmTU0"
-            },
-            "Export": {
-              "Name": "sls-burnance-dev-QnUnderscorefetchNFTsLambdaFunctionQualifiedArn"
+              "Name": "sls-burnance-dev-GetTxFeeLambdaFunctionQualifiedArn"
             }
           },
           "GetEthPriceLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "GetEthPriceLambdaVersion1xq1JDQSp2RYbWtIv2UaZNT5llg4tvII6mSnxc9J5E0"
+              "Ref": "GetEthPriceLambdaVersion5BAICm3vm7zh23seWwSgmrPBneMBnaXSdZkETDWMyY"
             },
             "Export": {
               "Name": "sls-burnance-dev-GetEthPriceLambdaFunctionQualifiedArn"
             }
           },
-          "WalletLoadLambdaFunctionQualifiedArn": {
+          "ViewNFTtxLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "WalletLoadLambdaVersion1mbGsX20p36gymWFLqiF6JVjMcQHGAuqsf8KTzDfU"
+              "Ref": "ViewNFTtxLambdaVersionpGtyPJkkG7hz79lLEzuOE9ZMOOJFUs80pKloIFWcVU"
             },
             "Export": {
-              "Name": "sls-burnance-dev-WalletLoadLambdaFunctionQualifiedArn"
+              "Name": "sls-burnance-dev-ViewNFTtxLambdaFunctionQualifiedArn"
+            }
+          },
+          "QnUnderscorefetchNFTsLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "QnUnderscorefetchNFTsLambdaVersioneV2dpUqUP3hd2y9CShIbvS1lgaPe3ugFnL66YdhDY"
+            },
+            "Export": {
+              "Name": "sls-burnance-dev-QnUnderscorefetchNFTsLambdaFunctionQualifiedArn"
             }
           },
           "WalletExecuteLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "WalletExecuteLambdaVersioneJ9CEwicibmMJsW4ChPJtByLVEzHM4BmzbOWcjkkdE"
+              "Ref": "WalletExecuteLambdaVersion7LwUe9GhQVE8I22qo2PZDRzCBikY54ZTQ94Q7cY"
             },
             "Export": {
               "Name": "sls-burnance-dev-WalletExecuteLambdaFunctionQualifiedArn"
             }
           },
-          "WalletAddLambdaFunctionQualifiedArn": {
-            "Description": "Current Lambda function version",
-            "Value": {
-              "Ref": "WalletAddLambdaVersionUMooqIfFDkhncQpDbqpISALx7X7IVmOEMX5D3N3lNw"
-            },
-            "Export": {
-              "Name": "sls-burnance-dev-WalletAddLambdaFunctionQualifiedArn"
-            }
-          },
-          "WalletNotificationLambdaFunctionQualifiedArn": {
-            "Description": "Current Lambda function version",
-            "Value": {
-              "Ref": "WalletNotificationLambdaVersion0tbM2KQ7mzSbLF2ZEHSYtjwMZfE1nirwdDlif4GJ4"
-            },
-            "Export": {
-              "Name": "sls-burnance-dev-WalletNotificationLambdaFunctionQualifiedArn"
-            }
-          },
           "WalletStopLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "WalletStopLambdaVersionQTQsFJ7NXg52xgbe7RWnjPM8HfzFNA2MFZjBwsPJSA"
+              "Ref": "WalletStopLambdaVersionetPI0BiPQBUW1npND1chYPoUKOS6pYIcEw0oXU8I0g"
             },
             "Export": {
               "Name": "sls-burnance-dev-WalletStopLambdaFunctionQualifiedArn"
             }
           },
-          "WalletGetNFTsLambdaFunctionQualifiedArn": {
+          "WalletStartLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "WalletGetNFTsLambdaVersionYaLIxLnJsgKJUnHxQdcfE0KdcsqvZpuNkVhtEPSJeYw"
+              "Ref": "WalletStartLambdaVersionxzv5hkGY3NiS0UpP8T2PJGKwzG7auTYmeAhFKzu4lc"
             },
             "Export": {
-              "Name": "sls-burnance-dev-WalletGetNFTsLambdaFunctionQualifiedArn"
+              "Name": "sls-burnance-dev-WalletStartLambdaFunctionQualifiedArn"
             }
           },
-          "WalletGetLambdaFunctionQualifiedArn": {
+          "WalletLoadLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "WalletGetLambdaVersionBvhu7yJKfRYdYYPVUEx4ccSLE0j59Ad2gBHrqjFTI"
+              "Ref": "WalletLoadLambdaVersionFFDY8nDO5jaPjZso0Y4vVeVrx95Jgm7acFqAeAvTE"
             },
             "Export": {
-              "Name": "sls-burnance-dev-WalletGetLambdaFunctionQualifiedArn"
-            }
-          },
-          "CollectionAddLambdaFunctionQualifiedArn": {
-            "Description": "Current Lambda function version",
-            "Value": {
-              "Ref": "CollectionAddLambdaVersion5v5HUV5t7871Jn2C6LcXyF5ha1vsStCRUWJ53wEW57A"
-            },
-            "Export": {
-              "Name": "sls-burnance-dev-CollectionAddLambdaFunctionQualifiedArn"
-            }
-          },
-          "CollectionGetVolumeLambdaFunctionQualifiedArn": {
-            "Description": "Current Lambda function version",
-            "Value": {
-              "Ref": "CollectionGetVolumeLambdaVersion8xeL10XBuUfr6lNMCC1qGCdiNPhkdLX9X0IJ5jWCmc"
-            },
-            "Export": {
-              "Name": "sls-burnance-dev-CollectionGetVolumeLambdaFunctionQualifiedArn"
-            }
-          },
-          "CollectionGetFloorPriceLambdaFunctionQualifiedArn": {
-            "Description": "Current Lambda function version",
-            "Value": {
-              "Ref": "CollectionGetFloorPriceLambdaVersionTPGglUgyMV63p4GLFoNt4jnMP0UwWBujvCTIaboetg"
-            },
-            "Export": {
-              "Name": "sls-burnance-dev-CollectionGetFloorPriceLambdaFunctionQualifiedArn"
-            }
-          },
-          "CollectionGetLambdaFunctionQualifiedArn": {
-            "Description": "Current Lambda function version",
-            "Value": {
-              "Ref": "CollectionGetLambdaVersionmNokhi4EUqAtqLIhNK2Z4jjo83j3FSovu668coUBs"
-            },
-            "Export": {
-              "Name": "sls-burnance-dev-CollectionGetLambdaFunctionQualifiedArn"
+              "Name": "sls-burnance-dev-WalletLoadLambdaFunctionQualifiedArn"
             }
           },
           "WalletDeleteLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "WalletDeleteLambdaVersionC1sj29eeXlE78oyKxPCPnpXDzQWdR4Cc4s8AtIj8E"
+              "Ref": "WalletDeleteLambdaVersion6besqRVQjG6N3KEvjSxnUsJXN9FqPHkhjpwY4IQrMIc"
             },
             "Export": {
               "Name": "sls-burnance-dev-WalletDeleteLambdaFunctionQualifiedArn"
             }
           },
+          "WalletNotificationLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "WalletNotificationLambdaVersionTQmdEgrsKO5z0STSBhafmKMiZk54xc3GgvdXFYmHN8"
+            },
+            "Export": {
+              "Name": "sls-burnance-dev-WalletNotificationLambdaFunctionQualifiedArn"
+            }
+          },
+          "WalletGetLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "WalletGetLambdaVersionHJMPseQuNGjBEo7J6cdcA2CkObecaKDuA964briCY"
+            },
+            "Export": {
+              "Name": "sls-burnance-dev-WalletGetLambdaFunctionQualifiedArn"
+            }
+          },
+          "WalletAddLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "WalletAddLambdaVersions1HcKNuP4nNTpjm5GS8NrNMOqNbADj5tO4Tdml9IiU"
+            },
+            "Export": {
+              "Name": "sls-burnance-dev-WalletAddLambdaFunctionQualifiedArn"
+            }
+          },
+          "CollectionAddLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "CollectionAddLambdaVersionUeJRH4lJUCc9vJBUjtr57uu76SZ7rLMOGnAJndHFOco"
+            },
+            "Export": {
+              "Name": "sls-burnance-dev-CollectionAddLambdaFunctionQualifiedArn"
+            }
+          },
+          "WalletGetNFTsLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "WalletGetNFTsLambdaVersion2J1epNWtfVYaxf04J0ItqZqXi9fXEhC4UfcyIYZzBXA"
+            },
+            "Export": {
+              "Name": "sls-burnance-dev-WalletGetNFTsLambdaFunctionQualifiedArn"
+            }
+          },
+          "ViewNFTLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "ViewNFTLambdaVersionTrB8TV5G0ToZvbWaz0ddJs2ytKiLMssTvsvykgbiE"
+            },
+            "Export": {
+              "Name": "sls-burnance-dev-ViewNFTLambdaFunctionQualifiedArn"
+            }
+          },
+          "CollectionViewLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "CollectionViewLambdaVersiongY9qOe9YIxtS6cmu38XlsTRsj2MQgWAWjx9QU4CET6A"
+            },
+            "Export": {
+              "Name": "sls-burnance-dev-CollectionViewLambdaFunctionQualifiedArn"
+            }
+          },
           "CollectionGetDetailsLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "CollectionGetDetailsLambdaVersioncxxfygPbCSRYTKH2Pf3KqzL0ihlSPKWuaCosk2Cf0s"
+              "Ref": "CollectionGetDetailsLambdaVersionCe7EKnpkfssfuyUFXFL0VlljgXSuLTjXATcyIHdQ"
             },
             "Export": {
               "Name": "sls-burnance-dev-CollectionGetDetailsLambdaFunctionQualifiedArn"
             }
           },
+          "CollectionGetVolumeLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "CollectionGetVolumeLambdaVersionHBFsyt3CL5ZFQAjEA0zzCX8K5d4daEu87UASsUGEmc"
+            },
+            "Export": {
+              "Name": "sls-burnance-dev-CollectionGetVolumeLambdaFunctionQualifiedArn"
+            }
+          },
+          "CollectionGetLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "CollectionGetLambdaVersion2jLdRrIlvRhQrovsIANR7rI2IuUL92GH4dkE5Pp74q0"
+            },
+            "Export": {
+              "Name": "sls-burnance-dev-CollectionGetLambdaFunctionQualifiedArn"
+            }
+          },
+          "CollectionGetFloorPriceLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "CollectionGetFloorPriceLambdaVersiondkEGm7T6HMIcrLkVtWFaSDenMAMvgYqTMebqMOeiUc"
+            },
+            "Export": {
+              "Name": "sls-burnance-dev-CollectionGetFloorPriceLambdaFunctionQualifiedArn"
+            }
+          },
           "CollectionDeleteLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "CollectionDeleteLambdaVersions7JPJNaNpsQ4jmZwtYJdAURXPx1B73ChrwQwCcBklOk"
+              "Ref": "CollectionDeleteLambdaVersionpGkOjbzJvDo99zPzpE8ThrjUiHGChrrxBJqjDqNu06I"
             },
             "Export": {
               "Name": "sls-burnance-dev-CollectionDeleteLambdaFunctionQualifiedArn"
@@ -4700,7 +5360,7 @@
         "memory": 128,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "NftImageLambdaVersioncExfqWZD0E3AQoRmIoHiA6OhLToeKdknWjza0Jgo"
+        "versionLogicalId": "NftImageLambdaVersionuanTpX3GMd2KjX2cvdQWP6E9ve7vsaPs4rVW2pmpU"
       },
       "viewNFT": {
         "handler": "actions.view",
@@ -4741,7 +5401,7 @@
         "memory": 128,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "ViewNFTLambdaVersionNilGJ1xyqUf89Kd9MMPADesGlpQfowdrqVSQTqQCTg"
+        "versionLogicalId": "ViewNFTLambdaVersionTrB8TV5G0ToZvbWaz0ddJs2ytKiLMssTvsvykgbiE"
       },
       "viewNFTtx": {
         "handler": "etherscan/handler.tokenNftTx",
@@ -4782,7 +5442,7 @@
         "memory": 128,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "ViewNFTtxLambdaVersion4uJ8schPS37lrTpRmqxOfTPSlrh2prpbMCVmX5JoKEk"
+        "versionLogicalId": "ViewNFTtxLambdaVersionpGtyPJkkG7hz79lLEzuOE9ZMOOJFUs80pKloIFWcVU"
       },
       "getEthPrice": {
         "handler": "etherscan/handler.getEthPrice",
@@ -4823,7 +5483,7 @@
         "memory": 128,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "GetEthPriceLambdaVersion1xq1JDQSp2RYbWtIv2UaZNT5llg4tvII6mSnxc9J5E0"
+        "versionLogicalId": "GetEthPriceLambdaVersion5BAICm3vm7zh23seWwSgmrPBneMBnaXSdZkETDWMyY"
       },
       "getTxFee": {
         "handler": "etherscan/handler.getTxTransactionFee",
@@ -4864,7 +5524,7 @@
         "memory": 128,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "GetTxFeeLambdaVersionJJQX74zjU7SE8YmcIZTfENWeBaindN6Y41jy4hOS08Y"
+        "versionLogicalId": "GetTxFeeLambdaVersionvy2HzI5Ddo8FQa4FTy1U9KSqSvzpnpIXU4ZbxJyJ5aw"
       },
       "addToWaitlist": {
         "handler": "waitlist/handler.add",
@@ -4905,7 +5565,7 @@
         "memory": 128,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "AddToWaitlistLambdaVersionsHJJSaSksfiuVLG69uNt9KuF3aAjkkVUkZk00qZRppo"
+        "versionLogicalId": "AddToWaitlistLambdaVersionDrtdpDI4Mj2UpqvZH0zI9oXpq5k6Sej78EEHEpRw"
       },
       "qn_fetchNFTs": {
         "handler": "quicknode/handler.qn_fetchNFTs",
@@ -4946,19 +5606,35 @@
         "memory": 128,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "QnUnderscorefetchNFTsLambdaVersionDBHVY1rPXS5DHqgtCVzAmKK4tTKxXHFipJ7pKMmTU0"
+        "versionLogicalId": "QnUnderscorefetchNFTsLambdaVersioneV2dpUqUP3hd2y9CShIbvS1lgaPe3ugFnL66YdhDY"
       },
       "walletExecute": {
-        "handler": "shopify/language/themelanguage.start",
+        "handler": "wallet/wallet.start",
         "events": [
           {
             "http": {
-              "path": "shopify/workflow/language/start",
+              "path": "wallet/workflow/load/start",
               "method": "post",
               "authorizer": {
                 "type": "AWS_IAM",
                 "managedExternally": false,
                 "identitySource": "method.request.header.Authorization"
+              },
+              "cors": {
+                "origin": "*",
+                "methods": [
+                  "OPTIONS",
+                  "POST"
+                ],
+                "headers": [
+                  "Content-Type",
+                  "X-Amz-Date",
+                  "Authorization",
+                  "X-Api-Key",
+                  "X-Amz-Security-Token",
+                  "X-Amz-User-Agent"
+                ],
+                "allowCredentials": false
               },
               "integration": "AWS_PROXY"
             }
@@ -4970,7 +5646,7 @@
         "timeout": 30,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "WalletExecuteLambdaVersioneJ9CEwicibmMJsW4ChPJtByLVEzHM4BmzbOWcjkkdE"
+        "versionLogicalId": "WalletExecuteLambdaVersion7LwUe9GhQVE8I22qo2PZDRzCBikY54ZTQ94Q7cY"
       },
       "walletStart": {
         "handler": "wallet/steps.start",
@@ -4989,7 +5665,7 @@
         "timeout": 30,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "WalletStartLambdaVersionximY64Kq0o7ldc7fixCxgGa1qbs8274k245xq4hIA"
+        "versionLogicalId": "WalletStartLambdaVersionxzv5hkGY3NiS0UpP8T2PJGKwzG7auTYmeAhFKzu4lc"
       },
       "walletLoad": {
         "handler": "wallet/steps.loadWalletData",
@@ -5008,7 +5684,7 @@
         "timeout": 30,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "WalletLoadLambdaVersion1mbGsX20p36gymWFLqiF6JVjMcQHGAuqsf8KTzDfU"
+        "versionLogicalId": "WalletLoadLambdaVersionFFDY8nDO5jaPjZso0Y4vVeVrx95Jgm7acFqAeAvTE"
       },
       "walletStop": {
         "handler": "wallet/steps.stop",
@@ -5019,7 +5695,7 @@
         "timeout": 30,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "WalletStopLambdaVersionQTQsFJ7NXg52xgbe7RWnjPM8HfzFNA2MFZjBwsPJSA"
+        "versionLogicalId": "WalletStopLambdaVersionetPI0BiPQBUW1npND1chYPoUKOS6pYIcEw0oXU8I0g"
       },
       "walletNotification": {
         "handler": "wallet/steps.notification",
@@ -5030,7 +5706,7 @@
         "timeout": 30,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "WalletNotificationLambdaVersion0tbM2KQ7mzSbLF2ZEHSYtjwMZfE1nirwdDlif4GJ4"
+        "versionLogicalId": "WalletNotificationLambdaVersionTQmdEgrsKO5z0STSBhafmKMiZk54xc3GgvdXFYmHN8"
       },
       "walletAdd": {
         "handler": "wallet/wallet.AddWallet",
@@ -5044,6 +5720,22 @@
                 "managedExternally": false,
                 "identitySource": "method.request.header.Authorization"
               },
+              "cors": {
+                "origin": "*",
+                "methods": [
+                  "OPTIONS",
+                  "POST"
+                ],
+                "headers": [
+                  "Content-Type",
+                  "X-Amz-Date",
+                  "Authorization",
+                  "X-Api-Key",
+                  "X-Amz-Security-Token",
+                  "X-Amz-User-Agent"
+                ],
+                "allowCredentials": false
+              },
               "integration": "AWS_PROXY"
             }
           }
@@ -5054,7 +5746,7 @@
         "timeout": 30,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "WalletAddLambdaVersionUMooqIfFDkhncQpDbqpISALx7X7IVmOEMX5D3N3lNw"
+        "versionLogicalId": "WalletAddLambdaVersions1HcKNuP4nNTpjm5GS8NrNMOqNbADj5tO4Tdml9IiU"
       },
       "walletGet": {
         "handler": "wallet/wallet.GetWallet",
@@ -5068,6 +5760,22 @@
                 "managedExternally": false,
                 "identitySource": "method.request.header.Authorization"
               },
+              "cors": {
+                "origin": "*",
+                "methods": [
+                  "OPTIONS",
+                  "GET"
+                ],
+                "headers": [
+                  "Content-Type",
+                  "X-Amz-Date",
+                  "Authorization",
+                  "X-Api-Key",
+                  "X-Amz-Security-Token",
+                  "X-Amz-User-Agent"
+                ],
+                "allowCredentials": false
+              },
               "integration": "AWS_PROXY"
             }
           }
@@ -5078,7 +5786,7 @@
         "timeout": 30,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "WalletGetLambdaVersionBvhu7yJKfRYdYYPVUEx4ccSLE0j59Ad2gBHrqjFTI"
+        "versionLogicalId": "WalletGetLambdaVersionHJMPseQuNGjBEo7J6cdcA2CkObecaKDuA964briCY"
       },
       "walletGetNFTs": {
         "handler": "wallet/wallet.GetWalletNFTs",
@@ -5092,6 +5800,22 @@
                 "managedExternally": false,
                 "identitySource": "method.request.header.Authorization"
               },
+              "cors": {
+                "origin": "*",
+                "methods": [
+                  "OPTIONS",
+                  "GET"
+                ],
+                "headers": [
+                  "Content-Type",
+                  "X-Amz-Date",
+                  "Authorization",
+                  "X-Api-Key",
+                  "X-Amz-Security-Token",
+                  "X-Amz-User-Agent"
+                ],
+                "allowCredentials": false
+              },
               "integration": "AWS_PROXY"
             }
           }
@@ -5102,7 +5826,7 @@
         "timeout": 30,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "WalletGetNFTsLambdaVersionYaLIxLnJsgKJUnHxQdcfE0KdcsqvZpuNkVhtEPSJeYw"
+        "versionLogicalId": "WalletGetNFTsLambdaVersion2J1epNWtfVYaxf04J0ItqZqXi9fXEhC4UfcyIYZzBXA"
       },
       "walletDelete": {
         "handler": "wallet/wallet.DeleteWallet",
@@ -5116,6 +5840,22 @@
                 "managedExternally": false,
                 "identitySource": "method.request.header.Authorization"
               },
+              "cors": {
+                "origin": "*",
+                "methods": [
+                  "OPTIONS",
+                  "DELETE"
+                ],
+                "headers": [
+                  "Content-Type",
+                  "X-Amz-Date",
+                  "Authorization",
+                  "X-Api-Key",
+                  "X-Amz-Security-Token",
+                  "X-Amz-User-Agent"
+                ],
+                "allowCredentials": false
+              },
               "integration": "AWS_PROXY"
             }
           }
@@ -5126,7 +5866,7 @@
         "timeout": 30,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "WalletDeleteLambdaVersionC1sj29eeXlE78oyKxPCPnpXDzQWdR4Cc4s8AtIj8E"
+        "versionLogicalId": "WalletDeleteLambdaVersion6besqRVQjG6N3KEvjSxnUsJXN9FqPHkhjpwY4IQrMIc"
       },
       "collectionAdd": {
         "handler": "collection/handler.AddCollection",
@@ -5140,6 +5880,22 @@
                 "managedExternally": false,
                 "identitySource": "method.request.header.Authorization"
               },
+              "cors": {
+                "origin": "*",
+                "methods": [
+                  "OPTIONS",
+                  "POST"
+                ],
+                "headers": [
+                  "Content-Type",
+                  "X-Amz-Date",
+                  "Authorization",
+                  "X-Api-Key",
+                  "X-Amz-Security-Token",
+                  "X-Amz-User-Agent"
+                ],
+                "allowCredentials": false
+              },
               "integration": "AWS_PROXY"
             }
           }
@@ -5150,7 +5906,7 @@
         "timeout": 30,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "CollectionAddLambdaVersion5v5HUV5t7871Jn2C6LcXyF5ha1vsStCRUWJ53wEW57A"
+        "versionLogicalId": "CollectionAddLambdaVersionUeJRH4lJUCc9vJBUjtr57uu76SZ7rLMOGnAJndHFOco"
       },
       "collectionGet": {
         "handler": "collection/handler.GetCollection",
@@ -5164,6 +5920,22 @@
                 "managedExternally": false,
                 "identitySource": "method.request.header.Authorization"
               },
+              "cors": {
+                "origin": "*",
+                "methods": [
+                  "OPTIONS",
+                  "GET"
+                ],
+                "headers": [
+                  "Content-Type",
+                  "X-Amz-Date",
+                  "Authorization",
+                  "X-Api-Key",
+                  "X-Amz-Security-Token",
+                  "X-Amz-User-Agent"
+                ],
+                "allowCredentials": false
+              },
               "integration": "AWS_PROXY"
             }
           }
@@ -5174,7 +5946,47 @@
         "timeout": 30,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "CollectionGetLambdaVersionmNokhi4EUqAtqLIhNK2Z4jjo83j3FSovu668coUBs"
+        "versionLogicalId": "CollectionGetLambdaVersion2jLdRrIlvRhQrovsIANR7rI2IuUL92GH4dkE5Pp74q0"
+      },
+      "collectionView": {
+        "handler": "collection/handler.ViewCollection",
+        "events": [
+          {
+            "http": {
+              "path": "collection/view/{chain}/{address}/{contractAddress}",
+              "method": "get",
+              "authorizer": {
+                "type": "AWS_IAM",
+                "managedExternally": false,
+                "identitySource": "method.request.header.Authorization"
+              },
+              "cors": {
+                "origin": "*",
+                "methods": [
+                  "OPTIONS",
+                  "GET"
+                ],
+                "headers": [
+                  "Content-Type",
+                  "X-Amz-Date",
+                  "Authorization",
+                  "X-Api-Key",
+                  "X-Amz-Security-Token",
+                  "X-Amz-User-Agent"
+                ],
+                "allowCredentials": false
+              },
+              "integration": "AWS_PROXY"
+            }
+          }
+        ],
+        "name": "burnance-dev-collectionView",
+        "package": {},
+        "memory": 128,
+        "timeout": 30,
+        "runtime": "nodejs12.x",
+        "vpc": {},
+        "versionLogicalId": "CollectionViewLambdaVersiongY9qOe9YIxtS6cmu38XlsTRsj2MQgWAWjx9QU4CET6A"
       },
       "collectionGetDetails": {
         "handler": "collection/handler.GetCollectionDetails",
@@ -5188,6 +6000,22 @@
                 "managedExternally": false,
                 "identitySource": "method.request.header.Authorization"
               },
+              "cors": {
+                "origin": "*",
+                "methods": [
+                  "OPTIONS",
+                  "GET"
+                ],
+                "headers": [
+                  "Content-Type",
+                  "X-Amz-Date",
+                  "Authorization",
+                  "X-Api-Key",
+                  "X-Amz-Security-Token",
+                  "X-Amz-User-Agent"
+                ],
+                "allowCredentials": false
+              },
               "integration": "AWS_PROXY"
             }
           }
@@ -5198,7 +6026,7 @@
         "timeout": 30,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "CollectionGetDetailsLambdaVersioncxxfygPbCSRYTKH2Pf3KqzL0ihlSPKWuaCosk2Cf0s"
+        "versionLogicalId": "CollectionGetDetailsLambdaVersionCe7EKnpkfssfuyUFXFL0VlljgXSuLTjXATcyIHdQ"
       },
       "collectionGetFloorPrice": {
         "handler": "collection/handler.GetCollectionFloorPrice",
@@ -5212,6 +6040,22 @@
                 "managedExternally": false,
                 "identitySource": "method.request.header.Authorization"
               },
+              "cors": {
+                "origin": "*",
+                "methods": [
+                  "OPTIONS",
+                  "GET"
+                ],
+                "headers": [
+                  "Content-Type",
+                  "X-Amz-Date",
+                  "Authorization",
+                  "X-Api-Key",
+                  "X-Amz-Security-Token",
+                  "X-Amz-User-Agent"
+                ],
+                "allowCredentials": false
+              },
               "integration": "AWS_PROXY"
             }
           }
@@ -5222,7 +6066,7 @@
         "timeout": 30,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "CollectionGetFloorPriceLambdaVersionTPGglUgyMV63p4GLFoNt4jnMP0UwWBujvCTIaboetg"
+        "versionLogicalId": "CollectionGetFloorPriceLambdaVersiondkEGm7T6HMIcrLkVtWFaSDenMAMvgYqTMebqMOeiUc"
       },
       "collectionGetVolume": {
         "handler": "collection/handler.GetCollectionFloorPrice",
@@ -5236,6 +6080,22 @@
                 "managedExternally": false,
                 "identitySource": "method.request.header.Authorization"
               },
+              "cors": {
+                "origin": "*",
+                "methods": [
+                  "OPTIONS",
+                  "GET"
+                ],
+                "headers": [
+                  "Content-Type",
+                  "X-Amz-Date",
+                  "Authorization",
+                  "X-Api-Key",
+                  "X-Amz-Security-Token",
+                  "X-Amz-User-Agent"
+                ],
+                "allowCredentials": false
+              },
               "integration": "AWS_PROXY"
             }
           }
@@ -5246,7 +6106,7 @@
         "timeout": 30,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "CollectionGetVolumeLambdaVersion8xeL10XBuUfr6lNMCC1qGCdiNPhkdLX9X0IJ5jWCmc"
+        "versionLogicalId": "CollectionGetVolumeLambdaVersionHBFsyt3CL5ZFQAjEA0zzCX8K5d4daEu87UASsUGEmc"
       },
       "collectionDelete": {
         "handler": "collection/handler.DeleteCollection",
@@ -5260,6 +6120,22 @@
                 "managedExternally": false,
                 "identitySource": "method.request.header.Authorization"
               },
+              "cors": {
+                "origin": "*",
+                "methods": [
+                  "OPTIONS",
+                  "DELETE"
+                ],
+                "headers": [
+                  "Content-Type",
+                  "X-Amz-Date",
+                  "Authorization",
+                  "X-Api-Key",
+                  "X-Amz-Security-Token",
+                  "X-Amz-User-Agent"
+                ],
+                "allowCredentials": false
+              },
               "integration": "AWS_PROXY"
             }
           }
@@ -5270,7 +6146,7 @@
         "timeout": 30,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "CollectionDeleteLambdaVersions7JPJNaNpsQ4jmZwtYJdAURXPx1B73ChrwQwCcBklOk"
+        "versionLogicalId": "CollectionDeleteLambdaVersionpGkOjbzJvDo99zPzpE8ThrjUiHGChrrxBJqjDqNu06I"
       }
     },
     "resources": {
@@ -5393,7 +6269,7 @@
         "individually": false,
         "deploymentBucket": "service.burnance.nodejs.lambdas.dev",
         "artifact": "C:\\Users\\Allyn Alford\\Documents\\Burnance.com\\api\\.serverless\\burnance.zip",
-        "artifactDirectoryName": "serverless/burnance/dev/1658735543074-2022-07-25T07:52:23.074Z"
+        "artifactDirectoryName": "serverless/burnance/dev/1658782896393-2022-07-25T21:01:36.393Z"
       },
       "functions": {
         "$ref": "$[\"service\"][\"functions\"]"
@@ -5529,7 +6405,7 @@
   },
   "package": {
     "individually": false,
-    "artifactDirectoryName": "serverless/burnance/dev/1658735543074-2022-07-25T07:52:23.074Z",
+    "artifactDirectoryName": "serverless/burnance/dev/1658782896393-2022-07-25T21:01:36.393Z",
     "artifact": "burnance.zip"
   }
 }

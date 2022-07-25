@@ -18,6 +18,7 @@ const PageInvoice = React.lazy(() =>
 );
 
 const Dashboard = React.lazy(() => import('./pages/Dashboard/index'));
+const Collection = React.lazy(() => import("./pages/Pages/CaseStudy/Collection"));
 
 const routes = [
   
@@ -35,6 +36,8 @@ const routes = [
   { path: "/profile", component: Shop, isTopbarDark: true },
   { path: "/account", component: PageInvoice, isTopbarDark: true },
   { path: "/dashboard", component: Dashboard },
+
+  { path: "/collection/:address", component: Collection },
 
   //Index Main
   { path: "/index", component: OnlineLearning, isTopbarDark: true },

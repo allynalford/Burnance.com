@@ -5,6 +5,7 @@ collectionAdd:
         path: collection
         method: post 
         authorizer: aws_iam
+        cors: true
 collectionGet:
   handler: collection/handler.GetCollection
   events:
@@ -12,6 +13,15 @@ collectionGet:
         path: collection/{chain}/{address}
         method: get
         authorizer: aws_iam
+        cors: true
+collectionView:
+  handler: collection/handler.ViewCollection
+  events:
+    - http:
+        path: collection/view/{chain}/{address}/{contractAddress}
+        method: get
+        authorizer: aws_iam
+        cors: true
 collectionGetDetails:
   handler: collection/handler.GetCollectionDetails
   events:
@@ -19,6 +29,7 @@ collectionGetDetails:
         path: collection/details/{chain}/{address}
         method: get
         authorizer: aws_iam
+        cors: true
 collectionGetFloorPrice:
   handler: collection/handler.GetCollectionFloorPrice
   events:
@@ -26,6 +37,7 @@ collectionGetFloorPrice:
         path: collection/floor/{chain}/{address}
         method: get
         authorizer: aws_iam
+        cors: true
 collectionGetVolume:
   handler: collection/handler.GetCollectionFloorPrice
   events:
@@ -33,6 +45,7 @@ collectionGetVolume:
         path: collection/volume/{chain}/{address}
         method: get
         authorizer: aws_iam
+        cors: true
 collectionDelete:
   handler: collection/handler.DeleteCollection
   events:
@@ -40,3 +53,4 @@ collectionDelete:
         path: collection/{chain}/{address}
         method: delete 
         authorizer: aws_iam
+        cors: true

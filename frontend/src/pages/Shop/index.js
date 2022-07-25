@@ -111,60 +111,9 @@ class Index extends Component {
                             md="7"
                             className="text-md-start text-center mt-4 mt-sm-0"
                           >
-                            <h3 className="title mb-0">
-                              {this.state.ethereumAddress}
-                            </h3>
-                            {/* <small className="text-muted h6 me-2">
-                              Web Developer
-                            </small>
-                            <ul className="list-inline mb-0 mt-3">
-                              <li className="list-inline-item me-2">
-                                <Link
-                                  to="#"
-                                  className="text-muted"
-                                  title="Linkedin"
-                                >
-                                  <i>
-                                    <FeatherIcon
-                                      icon="instagram"
-                                      className="fea icon-sm me-2"
-                                    />
-                                  </i>
-                                  krista_joseph
-                                </Link>
-                              </li>
-                              <li className="list-inline-item ms-1">
-                                <Link
-                                  to="#"
-                                  className="text-muted"
-                                  title="Skype"
-                                >
-                                  <i>
-                                    <FeatherIcon
-                                      icon="linkedin"
-                                      className="fea icon-sm me-2"
-                                    />
-                                  </i>
-                                  krista_joseph
-                                </Link>
-                              </li>
-                            </ul> */}
-                          </Col>
-                          <Col md="5" className="text-md-end text-center">
-                          {/* <Link
-                      to="#"
-                      target="_blank"
-                      className="btn btn-pills"
-                      style={{ backgroundColor: '#ff914d'}}
-                      onClick={e => {
-                        e.preventDefault();
-                        if(this.state.walletConnected === false){
-                          this.connectWallet();
-                        }else{
-                          console.log('Wallet Connected')
-                        }
-                      }}>{(this.state.walletConnected === true ? "Connected" : "Connect Wallet")}
-                    </Link> */}
+                            <p className="title mb-0">
+                              <b>Address:</b> {this.state.ethereumAddress}
+                            </p>
                           </Col>
                         </Row>
                       </Col>

@@ -246,6 +246,58 @@ module.exports.GetCollection = async (event) => {
   }
 };
 
+module.exports.ViewCollection = async (event) => {
+  let dt, chain, address, contractAddress;
+  try {
+    dt = dateFormat(new Date(), "isoUtcDateTime");
+
+    chain = event.pathParameters.chain;
+    address = event.pathParameters.address;
+    contractAddress = event.pathParameters.contractAddress;
+
+    if (typeof chain === "undefined") throw new Error("chain is undefined");
+    if (typeof address === "undefined") throw new Error("address is undefined");
+    if (typeof contractAddress === "undefined") throw new Error("contractAddress is undefined");
+
+  } catch (e) {
+    console.error(e);
+    return respond(
+      {
+        success: false,
+        error: true,
+        message: e.message,
+        e,
+      },
+      416
+    );
+  }
+
+  try {
+    const collectionUtils = require('./collectionUtils');
+    const alchemyUtils = require('../alchemy/utils');
+
+    //Grab the collection
+    const collection = await collectionUtils._getCollection(chain, contractAddress);
+
+    //Grab the NFTs for the colection
+    const nfts = await alchemyUtils.getNFTsByContract(chain, address, [contractAddress]);
+
+
+    return responses.respond({ error: false, success: true, collection, nfts: nfts.ownedNfts }, 200);
+  } catch (err) {
+    console.error(err);
+    const res = {
+      error: true,
+      success: false,
+      message: err.message,
+      e: err,
+      code: 201,
+    };
+    console.error("module.exports.ViewCollection", res);
+    return responses.respond(res, 201);
+  }
+};
+
 module.exports.GetCollectionDetails = async (event) => {
   let dt, chain, address;
   try {
