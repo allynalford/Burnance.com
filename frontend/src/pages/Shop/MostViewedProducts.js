@@ -174,8 +174,12 @@ class MostViewedProducts extends Component {
     }
   };
 
-  openModal = (currentCollection) => {
-    this.setState({ currentCollection });
+  openModal = (row) => {
+
+    if(typeof row === 'number'){
+      console.log('currentCollection', _collections[row+1]);
+      this.setState({ currentCollection: _collections[row+1] });
+    };
 
     this.setState((prevState) => ({
       isOpen: !prevState.isOpen,
@@ -190,8 +194,8 @@ class MostViewedProducts extends Component {
           //console.log("Selected ", chartWrapper.getChart().getSelection());
           const item = chartWrapper.getChart().getSelection()[0];
 
-          //console.log(_nfts);
-          _openModal(_collections[item.row]);
+          console.log(item.row);
+          _openModal(item.row);
         },
       },
       {
@@ -328,7 +332,7 @@ class MostViewedProducts extends Component {
           <Row>
             <Col xs={12}>
               <h2 className="mb-0">
-                Your Collections {this.state.collections.length}
+                You have Collections {this.state.collections.length} in your Portfolio
               </h2>
             </Col>
           </Row>

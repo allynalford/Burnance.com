@@ -4,7 +4,7 @@ logs
 
 *_credentials.csv
 
-
+api\.serverless*
 # dependencies
 /api/cache*
 /api/pup/cache*
@@ -29,3 +29,8 @@ logs
 new_user_credentials (1).csv
 frontend_prod_credentials (1).csv
 frontend_credentials (1).csv
+api/.serverless/cloudformation-template-update-stack.json
+api/.serverless/cloudformation-template-update-stack.json
+api/.serverless/serverless-state.json
+api/.serverless/cloudformation-template-update-stack.json
+api/.serverless/serverless-state.json
