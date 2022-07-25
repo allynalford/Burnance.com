@@ -85,13 +85,54 @@ module.exports._getCollectionFloorPrice = async (chain, contractAddress) => {
   }
 };
 
+
+
+/**
+* get collection avg prices from rariable
+*
+* @author Allyn j. Alford <Allyn@tenablylabs.com>
+* @async
+* @function _getFloorPriceAvgs
+* @param {String} chain - ETHEREUM|FLOW|TEZOS|POLYGON|SOLANA
+* @param {String} contractAddress -  NFT Collection contract address
+* @return {Promise<Array>} Response Array for next step to process.
+*/
+module.exports._getFloorPriceAvgs = async (chain, contractAddress) => {
+  try {
+
+    function add(accumulator, a) {
+      return accumulator + a;
+    };
+
+    const rariableUtils = require('../rarible/utils');
+
+    //Grab the rariable avgs
+    const results = await rariableUtils._getPrices(chain, contractAddress);
+
+    const prices = {};
+   // with initial value to avoid when the array is empty
+   //Process each array into avgs
+    prices.priceAvg = (results.avgPrices.reduce(add, 0) / results.avgPrices.length);
+    prices.medianPricesAvg = (results.medianPrices.reduce(add, 0) / results.medianPrices.length);
+    prices.minPricesAvg = (results.minPrices.reduce(add, 0) / results.minPrices.length);
+    prices.sumPricesAvg = (results.sumPrices.reduce(add, 0) / results.sumPrices.length);
+
+
+    return prices;
+ 
+  } catch (e) {
+    console.error(e);
+    throw e;
+  }
+};
+
 /**
 * load floor price from rariable, opensea and looksrare
 *
 * @author Allyn j. Alford <Allyn@tenablylabs.com>
 * @async
 * @function _loadCollectionFloorPrice
-* @param {String} owner - nft owner ethereum wallet address
+* @param {String} chain - ETHEREUM|FLOW|TEZOS|POLYGON|SOLANA
 * @param {String} contractAddress -  NFT Collection contract address
 * @return {Promise<Array>} Response Array for next step to process.
 */
@@ -128,9 +169,9 @@ module.exports._loadCollectionFloorPrice = async (chain, contractAddress) => {
       };
 
       if(typeof results.openSea.floorPrice !== "undefined"){
-        results.avgFloorPrice = (results.rariable.floorPriceUSD + results.looksRare.floorPriceUSD + results.openSea.floorPriceUSD) / 3;
+        results.avgFloorPriceUSD = (results.rariable.floorPriceUSD + results.looksRare.floorPriceUSD + results.openSea.floorPriceUSD) / 3;
       }else{
-        results.avgFloorPrice = (results.rariable.floorPriceUSD + results.looksRare.floorPriceUSD) / 2;
+        results.avgFloorPriceUSD = (results.rariable.floorPriceUSD + results.looksRare.floorPriceUSD) / 2;
       }
 
 
@@ -147,7 +188,7 @@ module.exports._loadCollectionFloorPrice = async (chain, contractAddress) => {
 * @author Allyn j. Alford <Allyn@tenablylabs.com>
 * @async
 * @function _getCollectionVolume
-* @param {String} owner - nft owner ethereum wallet address
+* @param {String} chain - ETHEREUM|FLOW|TEZOS|POLYGON|SOLANA
 * @param {String} contractAddress -  NFT Collection contract address
 * @return {Promise<Array>} Response Array for next step to process.
 */
@@ -175,7 +216,7 @@ module.exports._getCollectionVolume = async (chain, contractAddress) => {
 * @author Allyn j. Alford <Allyn@tenablylabs.com>
 * @async
 * @function _getCollectionDetails
-* @param {String} owner - nft owner ethereum wallet address
+* @param {String} chain - ETHEREUM|FLOW|TEZOS|POLYGON|SOLANA
 * @param {String} contractAddress -  NFT Collection contract address
 * @return {Promise<Array>} Response Array for next step to process.
 */

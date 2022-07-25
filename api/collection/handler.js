@@ -277,6 +277,7 @@ module.exports.GetCollectionFloorPrice = async (event) => {
 
     //Add the wallet
     const results = await collectionUtils._loadCollectionFloorPrice(chain, address);
+    results.rariable = await collectionUtils._getFloorPriceAvgs(chain, address);
 
     //console.log('results', results);
 

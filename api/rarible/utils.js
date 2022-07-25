@@ -81,7 +81,7 @@ module.exports._getPrices = async (chain, contractAddress) => {
         //     ]
         //     }
 
-        return prices;
+        return prices.data;
 
     } catch (e) {
         console.error(e);
