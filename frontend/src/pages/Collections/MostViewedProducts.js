@@ -55,7 +55,9 @@ class MostViewedProducts extends Component {
       itemsPerPage: 15,
       EstHoldingValue: 0,
       Liquidity7D: 0, 
-      ethPrice: 0
+      ethPrice: 0,
+      realizedPNL: 0,
+      PNL: 0
     };
     this.getNFTs.bind(this);
     this.accountsChanged.bind(this);
@@ -479,7 +481,7 @@ class MostViewedProducts extends Component {
                   </div>
                 </div>
               </Col>
-              <Col md="4">
+              <Col md="6">
                 <div
                   key={1}
                   className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
@@ -490,12 +492,12 @@ class MostViewedProducts extends Component {
                   alt=""
                 /> */}
                   <div className="flex-1 content ms-3">
-                    <BasicPopperToolTip title={"PnL"} text={"Test Tool tip text: PnL"} />
-                    <p className="text h3 mb-0">--</p>
+                    <BasicPopperToolTip title={"PnL"} text={"PnL calculated based on NFTs held"} />
+                    <p className="text h3 mb-0">{formatter.format(this.state.PNL)}</p>
                   </div>
                 </div>
               </Col>
-              <Col md="4">
+              <Col md="6">
                 <div
                   key={1}
                   className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
@@ -506,24 +508,8 @@ class MostViewedProducts extends Component {
                   alt=""
                 /> */}
                   <div className="flex-1 content ms-3">
-                    <BasicPopperToolTip title={"Un-Realized PnL"} text={"Test Tool tip text: 7 Day Sales"} />
-                    <p className="text h3 mb-0">--</p>
-                  </div>
-                </div>
-              </Col>
-              <Col md="4">
-                <div
-                  key={1}
-                  className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
-                >
-                  {/* <img
-                  src={work1}
-                  className="avatar avatar-ex-sm"
-                  alt=""
-                /> */}
-                  <div className="flex-1 content ms-3">
-                    <BasicPopperToolTip title="Realized PnL" text={"Test Tool tip text: 7 Day Sales"} />
-                    <p className="text h3 mb-0">--</p>
+                    <BasicPopperToolTip title="Realized PnL" text={"PnL calculated based on NFTs sold"} />
+                    <p className="text h3 mb-0">{formatter.format(this.state.realizedPNL)}</p>
                   </div>
                 </div>
               </Col>
