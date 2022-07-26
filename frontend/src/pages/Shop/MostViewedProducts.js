@@ -122,6 +122,7 @@ class MostViewedProducts extends Component {
           'Floor',
           'Avg Price',
           'Holding Value',
+          'Amount Invested',
           'PnL',
           'Vol(24H)',
           'Vol Chg.',
@@ -135,6 +136,7 @@ class MostViewedProducts extends Component {
           collection.count,
           '4.55',
           'Premium',
+          '569.35',
           '169.35',
           '-114.67',
           '4,801,974.68',
@@ -468,7 +470,7 @@ class MostViewedProducts extends Component {
                   alt=""
                 /> */}
                   <div className="flex-1 content ms-3">
-                    <h2 className="title mb-0">Un-Realized Losses</h2>
+                    <h2 className="title mb-0">Un-Realized PnL</h2>
                     <BasicPopperToolTip text={"Test Tool tip text: 7 Day Sales"} />
                     <p className="text-muted mb-0">--</p>
                     <p className="text-muted mb-0" style={{ fontSize: '12px' }}>
@@ -490,7 +492,7 @@ class MostViewedProducts extends Component {
                   alt=""
                 /> */}
                   <div className="flex-1 content ms-3">
-                    <h2 className="title mb-0">Realized Losses</h2>
+                    <h2 className="title mb-0">Realized PnL</h2>
                     <BasicPopperToolTip text={"Test Tool tip text: 7 Day Sales"} />
                     <p className="text-muted mb-0">--</p>
                     <p className="text-muted mb-0" style={{ fontSize: '12px' }}>
