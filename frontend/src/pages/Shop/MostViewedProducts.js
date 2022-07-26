@@ -371,7 +371,7 @@ class MostViewedProducts extends Component {
 
         <Container>
         <Row className="justify-content-center">
-              <Col md="3">
+              <Col md="4">
                 <div
                   key={1}
                   className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
@@ -393,7 +393,7 @@ class MostViewedProducts extends Component {
                   </div>
                 </div>
               </Col>
-              <Col md="3">
+              <Col md="4">
                 <div
                   key={1}
                   className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
@@ -415,29 +415,7 @@ class MostViewedProducts extends Component {
                   </div>
                 </div>
               </Col>
-              <Col md="3">
-                <div
-                  key={1}
-                  className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
-                >
-                  {/* <img
-                  src={work1}
-                  className="avatar avatar-ex-sm"
-                  alt=""
-                /> */}
-                  <div className="flex-1 content ms-3">
-                    <h2 className="title mb-0">PnL</h2>
-                    <BasicPopperToolTip text={"Test Tool tip text: PnL"} />
-                    <p className="text-muted mb-0">--</p>
-                    <p className="text-muted mb-0" style={{ fontSize: '12px' }}>
-                      <Link to="#" className="text-primary">
-                        how this is calculated
-                      </Link>
-                    </p>
-                  </div>
-                </div>
-              </Col>
-              <Col md="3">
+              <Col md="4">
                 <div
                   key={1}
                   className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
@@ -459,7 +437,29 @@ class MostViewedProducts extends Component {
                   </div>
                 </div>
               </Col>
-              <Col md="3">
+              <Col md="4">
+                <div
+                  key={1}
+                  className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
+                >
+                  {/* <img
+                  src={work1}
+                  className="avatar avatar-ex-sm"
+                  alt=""
+                /> */}
+                  <div className="flex-1 content ms-3">
+                    <h2 className="title mb-0">PnL</h2>
+                    <BasicPopperToolTip text={"Test Tool tip text: PnL"} />
+                    <p className="text-muted mb-0">--</p>
+                    <p className="text-muted mb-0" style={{ fontSize: '12px' }}>
+                      <Link to="#" className="text-primary">
+                        how this is calculated
+                      </Link>
+                    </p>
+                  </div>
+                </div>
+              </Col>
+              <Col md="4">
                 <div
                   key={1}
                   className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
@@ -481,7 +481,7 @@ class MostViewedProducts extends Component {
                   </div>
                 </div>
               </Col>
-              <Col md="3">
+              <Col md="4">
                 <div
                   key={1}
                   className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
