@@ -12,7 +12,8 @@ const serverVars = {
          getEthPriceApiUrl: process.env.REACT_APP_BASE_API_URL + '/etherscan/ethprice',
          getWalletNFTsApiUrl: process.env.REACT_APP_BASE_API_URL + '/wallet/nfts',
          getWalletCollectionsApiUrl: process.env.REACT_APP_BASE_API_URL + '/collection',
-         viewWalletCollectionApiUrl: process.env.REACT_APP_BASE_API_URL + '/collection/view'
+         viewWalletCollectionApiUrl: process.env.REACT_APP_BASE_API_URL + '/collection/view',
+         addWalletApiUrl: process.env.REACT_APP_BASE_API_URL + '/wallet',
         }
   },
 };
@@ -31,7 +32,8 @@ const localVars = {
          getEthPriceApiUrl: process.env.REACT_APP_BASE_API_URL + '/etherscan/ethprice',
          getWalletNFTsApiUrl: process.env.REACT_APP_BASE_API_URL + '/wallet/nfts',
          getWalletCollectionsApiUrl: process.env.REACT_APP_BASE_API_URL + '/collection',
-         viewWalletCollectionApiUrl: process.env.REACT_APP_BASE_API_URL + '/collection/view'
+         viewWalletCollectionApiUrl: process.env.REACT_APP_BASE_API_URL + '/collection/view',
+         addWalletApiUrl: process.env.REACT_APP_BASE_API_URL + '/wallet',
         }
   },
 };

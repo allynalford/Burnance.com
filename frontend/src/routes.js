@@ -11,7 +11,7 @@ import React from "react";
 //const Blog = React.lazy(() => import("./pages/Blog/index"));
 const HomePage = React.lazy(() => import("./pages/HomePage/index"));
 const PageError = React.lazy(() => import("./pages/Pages/Special/PageError"));
-const Shop = React.lazy(() => import("./pages/Shop/index"));
+const Collections = React.lazy(() => import("./pages/Collections/index"));
 
 const PageInvoice = React.lazy(() =>
   import("./pages/Pages/Account/AccountView")
@@ -33,7 +33,7 @@ const routes = [
   //{ path: "/documentation", component: Documentation, isTopbarDark: true },
   //{ path: "/widget", component: Widget, isTopbarDark: true },
 
-  { path: "/collections", component: Shop, isTopbarDark: true },
+  { path: "/collections", component: Collections, isTopbarDark: true },
   { path: "/account", component: PageInvoice, isTopbarDark: true },
   { path: "/dashboard", component: Dashboard },
 

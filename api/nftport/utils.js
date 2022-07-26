@@ -19,7 +19,16 @@ const baseURL = "https://api.nftport.xyz/v0";
 module.exports._getCollectionStats = async (chain, contractAddress) => {
     try {
         const Chain = chain.toLowerCase();
-        const stats = await endpoint._get(`${baseURL}/transactions/stats/${contractAddress}?chain=${Chain}`);
+        const options = {
+            method: 'GET',
+            url: `${baseURL}/transactions/stats/${contractAddress}`,
+            params: {chain: Chain},
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: process.env.NFT_PORT_API_KEY
+            }
+          };
+        const stats = await endpoint._getWithOptions(options);
 
         // {
         //     "response": "OK",
@@ -54,7 +63,7 @@ module.exports._getCollectionStats = async (chain, contractAddress) => {
         return stats.data;
 
     } catch (e) {
-        console.error(e);
+        console.error(e.message);
         throw e;
     }
 };

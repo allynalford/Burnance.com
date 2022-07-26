@@ -13,6 +13,15 @@ module.exports._get = (path) => {
     }
 };
 
+module.exports._getWithOptions = (options) => {
+    try {
+        return axios.request(options);
+    } catch (e) {
+        console.error(e.message);
+        return { error: true, message: e.message, e: e };
+    }
+};
+
 module.exports._getBasicAuth = (path, username, password) => {
     try {
         return axios.get(path, {

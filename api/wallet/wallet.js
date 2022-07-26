@@ -76,7 +76,7 @@ module.exports.start = async event => {
 
 
 module.exports.AddWallet = async (event) => {
-  let req, chain, address, dt;
+  let req, chain, address, dt, add;
   try {
     req = JSON.parse(event.body);
     dt = dateFormat(new Date(), "isoUtcDateTime");
@@ -100,8 +100,18 @@ module.exports.AddWallet = async (event) => {
   try {
     const walletUtils = require('./utils');
 
-    //Add the wallet
-    const add = await walletUtils._addWallet(chain, address);
+    //Check if wallet exists, if it does update last connection date/time
+    const exists = await walletUtils._getWallet(chain, address);
+
+    if(typeof exists === "undefined"){
+      //Add the wallet
+      add = await walletUtils._addWallet(chain, address);
+      console.log('Added', dt);
+    }else{
+      //Update the last connectionDate
+      add = await walletUtils._updateWalletFields(chain, address, [{name: 'lastConnectionDateTime', value: dt}]);
+      console.log('lastConnectionDateTime', dt);
+    }
 
     return responses.respond({ error: false, success: true, add, dt }, 200);
   } catch (err) {

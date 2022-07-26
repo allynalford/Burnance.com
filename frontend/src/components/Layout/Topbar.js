@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { withRouter } from "react-router";
 import {Container} from "reactstrap";
 import {Event, initGA} from "../../common/gaUtils";
+import { getChain } from "../../common/config";
+var endpoint = require('../../common/endpoint');
 
 class Topbar extends Component {
   constructor(props) {
@@ -30,6 +32,7 @@ class Topbar extends Component {
     this.connectWallet.bind(this);
     this.getEthBalance.bind(this);
     this.accountsChanged.bind(this);
+    this.addWallet.bind(this);
   }
 
   toggleWishlistModal = () => {
@@ -69,6 +72,7 @@ class Topbar extends Component {
 
     if (window.ethereum) {
       window.ethereum.on('accountsChanged', this.accountsChanged);
+
       if (
         window.ethereum &&
         window.ethereum._state.isConnected &&
@@ -80,6 +84,7 @@ class Topbar extends Component {
           walletConnected: true,
         });
         this.getEthBalance(window.ethereum._state.accounts[0]);
+        this.addWallet('ethereum', window.ethereum._state.accounts[0]);
       }
     }
 
@@ -106,6 +111,12 @@ class Topbar extends Component {
   accountsChanged = () => {
     if (typeof window.ethereum._state.accounts[0] === 'undefined') {
       this.setState({ walletConnected: false, ethereumAddress: '' });
+    }
+  };
+
+  addWallet =  async (chain, address) => {
+    if (typeof address !== 'undefined' && typeof chain !== 'undefined') {
+      endpoint._post(getChain()['eth'].addWalletApiUrl, {chain, address})
     }
   };
 

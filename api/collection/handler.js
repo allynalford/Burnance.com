@@ -176,14 +176,22 @@ module.exports.GetCollection = async (event) => {
   try {
     const collectionUtils = require('./collectionUtils');
     const walletUtils = require('../wallet/utils');
+    const nftPortUtils = require('../nftport/utils');
 
-    //Add the wallet
+    //We need to return
+    // - Floor Price
+    // - Holding Value: HELD * Floor Price or HELD * avg price
+    // - Amount Invested: Calculate the amount invested based on basisCost of each NFT added together
+    // - Pnl: Holding Value - Amount Invested
+    // - Liquidity(7D): The liquidity rate measures the relative liquidity of each collection. Liquidity = Sales / The number of NFTs * 100%
+
+    //Check if the collection already exists in cache
     var collections = await walletUtils._getWalletCollectionFromCache(chain, address);
 
     if(typeof collections === "undefined"){
 
       const alchemyUtils = require('../alchemy/utils');
-
+      //Then grab the collections for this wallet
       const addresses = await alchemyUtils.getCollections(chain, address);
 
       console.info('Addresses to process:', addresses.length);
@@ -196,23 +204,87 @@ module.exports.GetCollection = async (event) => {
         //Check if the collection exists
         let collection = await collectionUtils._getCollection(chain, addr.address);
 
+        //If the collection doesn't already exists in the wallet
         if(typeof collection === "undefined"){
+
+          //Grab the wallets information
           const metaData = await alchemyUtils.getContractMetadata(chain, addr.address);
 
           collection = metaData.contractMetadata;
           collection.chain = chain;
           collection.address = metaData.address;
 
-          //Add the collection
-          await collectionUtils._addCollection(
-            chain,
-            metaData.address,
-            metaData.contractMetadata.name,
-            metaData.contractMetadata.symbol,
-            metaData.contractMetadata.totalSupply,
-            metaData.contractMetadata.tokenType
-          );
+
+          try {
+            statistics = await nftPortUtils._getCollectionStats(chain, addr.address);
+          } catch (s) {
+            console.log(s.statusText);
+            statistics = {};
+
+            //We need to look up the data elsewhere
+          }
+
+
+          if (typeof statistics.statistics !== "undefined") {
+
+            console.log('Loaded Stats for new Collection', statistics.statistics);
+
+            collection.statistics = statistics.statistics;
+
+            //Add the collection
+            await collectionUtils._addCollectionWithStats(
+              chain,
+              metaData.address,
+              metaData.contractMetadata.name,
+              metaData.contractMetadata.symbol,
+              metaData.contractMetadata.totalSupply,
+              metaData.contractMetadata.tokenType,
+              collection.statistics
+            );
+
+
+          } else {
+            //Add the collection
+            await collectionUtils._addCollection(
+              chain,
+              metaData.address,
+              metaData.contractMetadata.name,
+              metaData.contractMetadata.symbol,
+              metaData.contractMetadata.totalSupply,
+              metaData.contractMetadata.tokenType
+            );
+
+          }
+
+ 
+        } else {
+
+          //Does the collection have the needed data
+          if (typeof collection.statistics === "undefined") {
+            let statistics;
+
+            try {
+              statistics = await nftPortUtils._getCollectionStats(chain, addr.address);
+            } catch (s) {
+              console.log(s.message);
+              statistics = {};
+
+              //We need to look up the data elsewhere
+            }
+
+            if (typeof statistics.statistics !== "undefined") {
+
+              console.log('Adding Stats for Existing Collection',statistics.statistics);
+
+              await collectionUtils._updateCollectionFields(chain, addr.address, [{ name: 'statistics', value: statistics.statistics }]);
+
+              collection.statistics = statistics.statistics
+            }
+          }
         }
+
+
+      
 
         collection.count = addr.count;
 
@@ -222,6 +294,33 @@ module.exports.GetCollection = async (event) => {
 
       //Push the collection to the cache
       await walletUtils._addWalletCollectionToCache(chain, address, collections);
+
+    }
+
+    for (const collection of collections) {
+
+      //We need to return
+      // - Floor Price
+      // - Holding Value: HELD * Floor Price or HELD * avg price
+      // - Amount Invested: Calculate the amount invested based on basisCost of each NFT added together
+      // - Pnl: Holding Value - Amount Invested
+      // - Liquidity(7D): The liquidity rate measures the relative liquidity of each collection. 
+      //   Liquidity = Sales / The number of NFTs * 100%
+
+      if (typeof collection.statistics !== "undefined") {
+
+        collection.HoldingValue = (collection.count * collection.statistics.average_price);
+        collection.FloorPrice = collection.statistics.floor_price;
+        collection.AmountInvested = '...';
+        collection.pnl = '...';
+        collection.Liquidity7D = (collection.statistics.seven_day_sales / collection.statistics.num_owners) * 100;
+      } else {
+        collection.HoldingValue = 'N/F';
+        collection.FloorPrice = 'N/F';
+        collection.AmountInvested = '...';
+        collection.pnl = '...';
+        collection.Liquidity7D = 0;
+      }
 
     }
 

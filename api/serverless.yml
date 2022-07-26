@@ -19,6 +19,7 @@ provider:
     QUICK_NODE_HTTP: ${file(config.${self:provider.stage}.json):QUICK_NODE_HTTP}
     QUICK_NODE_WSS: ${file(config.${self:provider.stage}.json):QUICK_NODE_WSS}
     ETHERSCAN_API_URL: ${file(config.${self:provider.stage}.json):ETHERSCAN_API_URL}
+    NFT_PORT_API_KEY: ${file(config.${self:provider.stage}.json):NFT_PORT_API_KEY}
     ALCHEMY_API_KEY: ${file(config.${self:provider.stage}.json):ALCHEMY_API_KEY}
     API_KEY_TOKEN: ${file(config.${self:provider.stage}.json):API_KEY_TOKEN}
     PRO_API_KEY: ${file(config.${self:provider.stage}.json):PRO_API_KEY}
@@ -129,28 +130,28 @@ resources:
     #       ReadCapacityUnits: 1
     #       WriteCapacityUnits: 1
     #     TableName: ${self:provider.environment.DYNAMODB_TABLE_WALLET_COLLECTION_CACHE}
-    NFTImageDynamoDBTable:
-      Type: 'AWS::DynamoDB::Table'
-      DeletionPolicy: Retain
-      Properties:
-        AttributeDefinitions:
-          -
-            AttributeName: chainContractAddress
-            AttributeType: S
-          -  
-            AttributeName: tokenId
-            AttributeType: N
-        KeySchema:
-          -
-            AttributeName: chainContractAddress
-            KeyType: HASH
-          -
-            AttributeName: tokenId
-            KeyType: RANGE      
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-        TableName: ${self:provider.environment.DYNAMODB_TABLE_NFT_IMAGE}
+    # NFTImageDynamoDBTable:
+    #   Type: 'AWS::DynamoDB::Table'
+    #   DeletionPolicy: Retain
+    #   Properties:
+    #     AttributeDefinitions:
+    #       -
+    #         AttributeName: chainContractAddress
+    #         AttributeType: S
+    #       -  
+    #         AttributeName: tokenId
+    #         AttributeType: N
+    #     KeySchema:
+    #       -
+    #         AttributeName: chainContractAddress
+    #         KeyType: HASH
+    #       -
+    #         AttributeName: tokenId
+    #         KeyType: RANGE      
+    #     ProvisionedThroughput:
+    #       ReadCapacityUnits: 1
+    #       WriteCapacityUnits: 1
+    #     TableName: ${self:provider.environment.DYNAMODB_TABLE_NFT_IMAGE}
     # WalletNFTtxDynamoDBTable:
     #   Type: 'AWS::DynamoDB::Table'
     #   DeletionPolicy: Retain

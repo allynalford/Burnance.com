@@ -22,6 +22,16 @@ var _ = require('lodash');
 var endpoint = require('../../common/endpoint');
 const Swal = require('sweetalert2');
 
+// Create our number formatter.
+var formatter = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+
+  // These options are needed to round to whole numbers if that's what you want.
+  //minimumFractionDigits: 0, // (this suffices for whole numbers, but will print 2500.10 as $2,500.1)
+  //maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
+});
+
 var _collections = [],
   _openModal;
 
@@ -43,12 +53,16 @@ class MostViewedProducts extends Component {
       pageCount: 0,
       itemOffset: 0,
       itemsPerPage: 15,
+      EstHoldingValue: 0,
+      Liquidity7D: 0, 
+      ethPrice: 0
     };
     this.getNFTs.bind(this);
     this.accountsChanged.bind(this);
     this.AddToBatch.bind(this);
     this.fireMsg.bind(this);
     this.openModal.bind(this);
+    this.getEthPrice.bind(this);
 
     _openModal = this.openModal;
   }
@@ -74,8 +88,10 @@ class MostViewedProducts extends Component {
         walletConnected: true,
       });
 
+
       //Get the NFTs
       this.getNFTs(window.ethereum._state.accounts[0], 1);
+
     } else if (typeof window.ethereum._state.accounts[0] === 'undefined') {
       this.setState({ nfts: [], walletConnected: false, ethereumAddress: '' });
     }
@@ -95,14 +111,18 @@ class MostViewedProducts extends Component {
           ethereumAddress: window.ethereum._state.accounts[0],
           walletConnected: true,
         });
+
+        //Get the price
+        this.getEthPrice(window.ethereum._state.accounts[0]);
+
         //console.log('account', window.ethereum._state.accounts[0])
-        this.getNFTs(window.ethereum._state.accounts[0], 1);
+        //this.getNFTs(window.ethereum._state.accounts[0], 1);
       }
     }
   }
 
   //Add try/catch to this function
-  getNFTs = async (ethereumAddress, pageNumber) => {
+  getNFTs = async (ethereumAddress, ethusd) => {
     //console.log('Loading Page:',pageNumber);
     try {
       let Collections = JSON.parse(sessionstorage.getItem(ethereumAddress));
@@ -114,6 +134,8 @@ class MostViewedProducts extends Component {
         Collections = Collections.data;
         sessionstorage.setItem(ethereumAddress, JSON.stringify(Collections));
       }
+
+      //console.log(Collections);
 
       let collections = [
         [
@@ -129,32 +151,69 @@ class MostViewedProducts extends Component {
         ],
       ];
 
+      let EstHoldingValue = 0, SevenDaySales = 0, NumOwners = 0;
       for (const collection of Collections.collections) {
+
+        const floorPrice = (collection.FloorPrice !== "N/F" ? formatter.format(parseFloat(Number(collection.FloorPrice) * Number(ethusd))) : formatter.format(0.00));
+        const avgPrice = (typeof collection.statistics !== "undefined" ? formatter.format(parseFloat(Number(collection.statistics.average_price) * Number(ethusd))) : formatter.format(0.00))
         collections.push([
           collection.name,
           collection.count,
-          '4.55',
-          'Premium',
-          '569.35',
-          '169.35',
-          '-114.67',
-          '4801974.68',
-          { v: 12, f: "-4.71%" },
+          floorPrice,
+          avgPrice,
+          (collection.HoldingValue !== "N/F" ? collection.HoldingValue.toFixed(6) : collection.FloorPrice.HoldingValue),
+          collection.AmountInvested,
+          collection.pnl,
+          (typeof collection.statistics !== "undefined" ? collection.statistics.one_day_volume.toFixed(4) : "--"),
+          { v: 12, f: (typeof collection.statistics !== "undefined" ? collection.statistics.one_day_change.toFixed(2) : "--") + "%" },
         ]);
+
+
         _collections.push({
           name: collection.name,
           contractAddress: (typeof collection.address !== "undefined" ? collection.address : collection.contractAddress),
         });
+
+        if(typeof collection.HoldingValue === "number"){
+          EstHoldingValue = (Number(EstHoldingValue) + Number(collection.HoldingValue));
+          //parseFloat(costETH * price.result[0].value)
+        };
+
+        if(typeof collection.statistics !== "undefined"){
+          SevenDaySales = (Number(SevenDaySales) + Number(collection.statistics.seven_day_sales));
+          NumOwners = (Number(NumOwners) + Number(collection.statistics.num_owners));
+        };
+
+
+
+
       }
 
-      this.setState({ collections, loading: false });
+      EstHoldingValue = parseFloat(Number(EstHoldingValue) * Number(ethusd));
+
+      //Liquidity = Sales / The number of NFTs * 100%
+      const Liquidity7D = (SevenDaySales / NumOwners) * 100;
+      this.setState({ collections, loading: false, EstHoldingValue: EstHoldingValue.toFixed(4), Liquidity7D: Liquidity7D.toFixed(2) });
     } catch (e) {
       console.error(e);
       this.setState({ loading: false });
     }
   };
 
+  getEthPrice = async () => {
 
+    let ethPrice = JSON.parse(sessionstorage.getItem("ethPrice"));
+
+    if ((typeof ethPrice === 'undefined') | (ethPrice === null)) {
+      ethPrice = await endpoint._get(getChain()['eth'].getEthPriceApiUrl);
+      ethPrice = ethPrice.data.result;
+      sessionstorage.setItem("ethPrice", JSON.stringify(ethPrice));
+    };
+
+    this.getNFTs(window.ethereum._state.accounts[0], ethPrice.ethusd);
+
+    this.setState({ethPrice});
+  };
 
   AddToBatch = (contractAddress, tokenId, name) => {
     var nft = _.find(this.state.batch, { contractAddress, tokenId });
@@ -380,14 +439,8 @@ class MostViewedProducts extends Component {
                   alt=""
                 /> */}
                   <div className="flex-1 content ms-3">
-                    <h2 className="title mb-0">Est Holding Value</h2>
-                    <BasicPopperToolTip text={"Test Tool tip text: Est Holding Value"} />
-                    <p className="text-muted mb-0">$0.00</p>
-                    <p className="text-muted mb-0" style={{ fontSize: '12px' }}>
-                      <Link to="#" className="text-primary">
-                        how this is calculated
-                      </Link>
-                    </p>
+                    <BasicPopperToolTip title={"Est Holding Value"} text={"Test Tool tip text: Est Holding Value"} />
+                    <p className="text h3 mb-0">{formatter.format(this.state.EstHoldingValue)}</p>
                   </div>
                 </div>
               </Col>
@@ -402,14 +455,8 @@ class MostViewedProducts extends Component {
                   alt=""
                 /> */}
                   <div className="flex-1 content ms-3">
-                    <h2 className="title mb-0">Est Holding Cost </h2>
-                    <BasicPopperToolTip text={"Test Tool tip text: Est Holding Cost"} />
-                    <p className="text mb-0">--</p>
-                    <p className="text-muted mb-0" style={{ fontSize: '12px' }}>
-                      <Link to="#" className="text-primary">
-                        how this is calculated
-                      </Link>
-                    </p>
+                    <BasicPopperToolTip title={"Est Holding Cost"} text={"Test Tool tip text: Est Holding Cost"} />
+                    <p className="text h3 mb-0">--</p>
                   </div>
                 </div>
               </Col>
@@ -424,14 +471,8 @@ class MostViewedProducts extends Component {
                   alt=""
                 /> */}
                   <div className="flex-1 content ms-3">
-                    <h2 className="title mb-0">7 Day Sales</h2>
-                    <BasicPopperToolTip text={"Test Tool tip text: 7 Day Sales"} />
-                    <p className="text-muted mb-0">--</p>
-                    <p className="text-muted mb-0" style={{ fontSize: '12px' }}>
-                      <Link to="#" className="text-primary">
-                        how this is calculated
-                      </Link>
-                    </p>
+                    <BasicPopperToolTip title={"7 Day Sales"} text={"Test Tool tip text: 7 Day Sales"} />
+                    <p className="text h3 mb-0" >{this.state.Liquidity7D}%</p>
                   </div>
                 </div>
               </Col>
@@ -446,14 +487,8 @@ class MostViewedProducts extends Component {
                   alt=""
                 /> */}
                   <div className="flex-1 content ms-3">
-                    <h2 className="title mb-0">PnL</h2>
-                    <BasicPopperToolTip text={"Test Tool tip text: PnL"} />
-                    <p className="text-muted mb-0">--</p>
-                    <p className="text-muted mb-0" style={{ fontSize: '12px' }}>
-                      <Link to="#" className="text-primary">
-                        how this is calculated
-                      </Link>
-                    </p>
+                    <BasicPopperToolTip title={"PnL"} text={"Test Tool tip text: PnL"} />
+                    <p className="text h3 mb-0">--</p>
                   </div>
                 </div>
               </Col>
@@ -468,14 +503,8 @@ class MostViewedProducts extends Component {
                   alt=""
                 /> */}
                   <div className="flex-1 content ms-3">
-                    <h2 className="title mb-0">Un-Realized PnL</h2>
-                    <BasicPopperToolTip text={"Test Tool tip text: 7 Day Sales"} />
-                    <p className="text-muted mb-0">--</p>
-                    <p className="text-muted mb-0" style={{ fontSize: '12px' }}>
-                      <Link to="#" className="text-primary">
-                        how this is calculated
-                      </Link>
-                    </p>
+                    <BasicPopperToolTip title={"Un-Realized PnL"} text={"Test Tool tip text: 7 Day Sales"} />
+                    <p className="text h3 mb-0">--</p>
                   </div>
                 </div>
               </Col>
@@ -490,14 +519,8 @@ class MostViewedProducts extends Component {
                   alt=""
                 /> */}
                   <div className="flex-1 content ms-3">
-                    <h2 className="title mb-0">Realized PnL</h2>
-                    <BasicPopperToolTip text={"Test Tool tip text: 7 Day Sales"} />
-                    <p className="text-muted mb-0">--</p>
-                    <p className="text-muted mb-0" style={{ fontSize: '12px' }}>
-                      <Link to="#" className="text-primary">
-                        how this is calculated
-                      </Link>
-                    </p>
+                    <BasicPopperToolTip title="Realized PnL" text={"Test Tool tip text: 7 Day Sales"} />
+                    <p className="text h3 mb-0">--</p>
                   </div>
                 </div>
               </Col>
@@ -550,9 +573,16 @@ class MostViewedProducts extends Component {
                       },
                       {
                         type: 'NumberFormat',
+                        column: 4,
+                        options: {
+                          fractionDigits: 6,
+                        },
+                      },
+                      {
+                        type: 'NumberFormat',
                         column: 3,
                         options: {
-                          fractionDigits: 8,
+                          fractionDigits: 6,
                         },
                       },
                     ]}

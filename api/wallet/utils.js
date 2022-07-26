@@ -301,6 +301,48 @@ module.exports._getWallet = async (chain, address) => {
 };
 
 /**
+* update wallet fields
+*
+* @author Allyn j. Alford <Allyn@tenablylabs.com>
+* @async
+* @function _updateWalletFields
+* @param {string} chain 
+* @param {string} address
+* @param {list} fields 
+*/
+module.exports._updateWalletFields = async (chain, address, fields) => {
+    try {
+        const dateFormat = require('dateformat');
+        const dynamo = require('../common/dynamo');
+
+        var ExpressionAttributeValues = {}, ExpressionAttributeNames = {}
+        var UpdateExpression = "set #dt = :dt";
+
+        for (const f of fields) {
+            ExpressionAttributeValues[`:${f.name}`] = f.value;
+            ExpressionAttributeNames[`#${f.name}`] = f.name;
+            UpdateExpression = UpdateExpression + `, #${f.name} = :${f.name}`
+        };
+
+        ExpressionAttributeNames["#dt"] = "updatedAt";
+        ExpressionAttributeValues[":dt"] = dateFormat(new Date(), "isoUtcDateTime");
+
+        //Save the profile to dynamoDB
+        return await dynamo.updateDB({
+            TableName: process.env.DYNAMODB_TABLE_WALLET,
+            Key: { chain, address },
+            UpdateExpression,
+            ExpressionAttributeValues,
+            ExpressionAttributeNames,
+            ReturnValues: "UPDATED_NEW"
+        });
+    } catch (err) {
+        console.error(JSON.stringify(err));
+        throw err;
+    };
+};
+
+/**
 * Add NFT transaction
 *
 * @author Allyn j. Alford <Allyn@tenablylabs.com>
