@@ -457,6 +457,50 @@ class MostViewedProducts extends Component {
                   </div>
                 </div>
               </Col>
+              <Col md="3">
+                <div
+                  key={1}
+                  className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
+                >
+                  {/* <img
+                  src={work1}
+                  className="avatar avatar-ex-sm"
+                  alt=""
+                /> */}
+                  <div className="flex-1 content ms-3">
+                    <h2 className="title mb-0">Un-Realized Losses</h2>
+                    <BasicPopperToolTip text={"Test Tool tip text: 7 Day Sales"} />
+                    <p className="text-muted mb-0">--</p>
+                    <p className="text-muted mb-0" style={{ fontSize: '12px' }}>
+                      <Link to="#" className="text-primary">
+                        how this is calculated
+                      </Link>
+                    </p>
+                  </div>
+                </div>
+              </Col>
+              <Col md="3">
+                <div
+                  key={1}
+                  className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
+                >
+                  {/* <img
+                  src={work1}
+                  className="avatar avatar-ex-sm"
+                  alt=""
+                /> */}
+                  <div className="flex-1 content ms-3">
+                    <h2 className="title mb-0">Realized Losses</h2>
+                    <BasicPopperToolTip text={"Test Tool tip text: 7 Day Sales"} />
+                    <p className="text-muted mb-0">--</p>
+                    <p className="text-muted mb-0" style={{ fontSize: '12px' }}>
+                      <Link to="#" className="text-primary">
+                        how this is calculated
+                      </Link>
+                    </p>
+                  </div>
+                </div>
+              </Col>
             </Row>
             {(this.state.walletConnected === false ? "" : <Row>
             <Col xs={12} style={{marginTop: "25px"}}>

@@ -536,9 +536,11 @@ class Collection extends Component {
                                   <ButtonGroup size="sm" role="group">
                                     <Button className="btn btn-mini btn-warning rounded">Approve</Button>
                                     <DropdownButton as={ButtonGroup} title="Options" id="bg-nested-dropdown">
-                                      <Dropdown.Item className="btn-success" eventKey="1">Sell (Burn)</Dropdown.Item>
+                                      <Dropdown.Item className="btn-success" eventKey="1" onClick={ e =>{
+                                        console.log('Burn',cases.contract.address);
+                                      }}>Sell (Burn)</Dropdown.Item>
                                       <Dropdown.Item defaultValue={"Add"} className="btn-info" eventKey="2" onClick={ e =>{
-                                        console.log(cases.contract.address);
+                                        console.log('Add',cases.contract.address);
                                       }}>Add to Batch</Dropdown.Item>
                                     </DropdownButton>
                                   </ButtonGroup>
