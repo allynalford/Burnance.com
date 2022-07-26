@@ -14,6 +14,8 @@ import { Chart } from 'react-google-charts';
 import './tableCss.css';
 import { Link } from 'react-router-dom';
 import DataTable from '../../components/DataTable';
+import bgImg from "../../assets/images/nfts/ac1_unfit_digital_collage_of_locally_owned_nfts_by_annie_bur.jpg";
+
 var sessionstorage = require('sessionstorage');
 var _ = require('lodash');
 var endpoint = require('../../common/endpoint');
@@ -305,7 +307,7 @@ class MostViewedProducts extends Component {
           </ModalBody>
           <ModalFooter>
             <Link
-              color="primary"
+              className="btn mouse-down"
               to={`/collection/${this.state.currentCollection.contractAddress}`}
             >
               View NFTs
@@ -315,11 +317,56 @@ class MostViewedProducts extends Component {
             </Button>
           </ModalFooter>
         </Modal>
+        <section
+          className="bg-half d-table w-100"
+          style={{ background: `url(${bgImg}) center center` }}
+        >
+          <div className="bg-overlay"></div>
+          <div className="container">
+            <div className="row justify-content-center">
+              <div className="col-lg-12 text-center">
+                <div className="page-next-level">
+                  <h1 className="title text-white title-dark">
+                    {' '}
+                    {''}{' '}
+                  </h1>
+                  <div className="page-next">
+                    <nav aria-label="breadcrumb" className="d-inline-block">
+                      <ul className="breadcrumb bg-white rounded shadow mb-0">
+                        <li className="breadcrumb-item">
+                          <Link to="/">Burnance</Link>
+                        </li>
+                        <li className="breadcrumb-item">
+                          <Link to="/collections">Collections</Link>
+                        </li>
+                      </ul>
+                    </nav>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        <div className="position-relative">
+          <div className="shape overflow-hidden text-white">
+            <svg
+              viewBox="0 0 2880 48"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M0 48H1437.5H2880V0H2160C1442.5 52 720 0 720 0H0V48Z"
+                fill="currentColor"
+              ></path>
+            </svg>
+          </div>
+        </div>
+        <section className="section">
         <Container>
           <Row>
             <Col xs={12}>
               <h2 className="mb-0">
-                You have Collections {this.state.collections.length} in your Portfolio
+                You have {this.state.collections.length} Collections in your Portfolio
               </h2>
             </Col>
           </Row>
@@ -404,6 +451,7 @@ class MostViewedProducts extends Component {
               ))}
             </Row> */}
         </Container>
+        </section>
       </React.Fragment>
     );
   }

@@ -84,46 +84,7 @@ class Index extends Component {
 
         {/* import Collection 
         <Collection />*/}
-        <section
-          className="bg-profile d-table w-100 bg-primary"
-          style={{ background: `url(${imgbg}) center center` }}
-        >
-          <Container>
-            <Row>
-              <Col lg="12">
-                <Card
-                  className="public-profile border-0 rounded shadow"
-                  style={{ zIndex: '1' }}
-                >
-                  <CardBody>
-                    <Row className="align-items-center">
-                      {/* <Col lg="2" md="3" className="text-md-start text-center">
-                        <img
-                          src={profile}
-                          className="avatar avatar-large rounded-circle shadow d-block mx-auto"
-                          alt=""
-                        />
-                      </Col> */}
 
-                      <Col lg="10" md="9">
-                        <Row className="align-items-end">
-                          <Col
-                            md="7"
-                            className="text-md-start text-center mt-4 mt-sm-0"
-                          >
-                            <p className="title mb-0">
-                              <b>Address:</b> {this.state.ethereumAddress}
-                            </p>
-                          </Col>
-                        </Row>
-                      </Col>
-                    </Row>
-                  </CardBody>
-                </Card>
-              </Col>
-            </Row>
-          </Container>
-        </section>
         <section className="section">
           <MostViewedProducts walletConnected={this.state.walletConnected} ethereumAddress={this.state.ethereumAddress} />
 

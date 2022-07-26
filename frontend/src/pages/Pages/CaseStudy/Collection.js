@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Container, Row, Col, Card, CardBody } from "reactstrap";
+import { Container, Row, Col, Card, CardBody, Button } from "reactstrap";
 import { Link, withRouter } from "react-router-dom";
 //Fade in effect
 import FadeIn from "react-fade-in";
@@ -9,16 +9,8 @@ import ImageGrid from '../../../components/ImageGrid';
 
 
 //Import Images
-import bgImg from "../../../assets/images/2.jpg";
-import work1 from "../../../assets/images/work/1.jpg";
-import work2 from "../../../assets/images/work/2.jpg";
-import work3 from "../../../assets/images/work/3.jpg";
-import work4 from "../../../assets/images/work/4.jpg";
-import work5 from "../../../assets/images/work/5.jpg";
-import work6 from "../../../assets/images/work/6.jpg";
-import work7 from "../../../assets/images/work/7.jpg";
-import work8 from "../../../assets/images/work/8.jpg";
-import work9 from "../../../assets/images/work/9.jpg";
+import bgImg from "../../../assets/images/nfts/ac1_unfit_digital_collage_of_locally_owned_nfts_by_annie_bur.jpg";
+
 
 var sessionstorage = require('sessionstorage');
 var endpoint = require('../../../common/endpoint');
@@ -26,70 +18,15 @@ var endpoint = require('../../../common/endpoint');
 class Collection extends Component {
   constructor(props, { match }) {
     super(props);
-    const address = this.props.match.params.address;
     this.state = {
       collection: { name: '' },
       ethereumAddress: '',
       walletConnected: false,
+      collectionApproved: false,
       loading: false,
       nfts: [],
-      works: [
-        {
-          image: work1,
-          title: '200% Extended Facebook Reach',
-          isBusiness: true,
-          category: 'Business',
-        },
-        {
-          image: work2,
-          title: 'SEO Success For Insulation',
-          isMarketing: true,
-          category: 'Marketing',
-        },
-        {
-          image: work3,
-          title: 'Mobile-Friendly Campaigns',
-          isFinance: true,
-          category: 'Finanace',
-        },
-        {
-          image: work4,
-          title: 'HVAC SEO Campaign',
-          isHR: true,
-          category: 'Human Research',
-        },
-        {
-          image: work5,
-          title: 'Social Media & Small Business',
-          isBusiness: true,
-          category: 'Business',
-        },
-        {
-          image: work6,
-          title: 'PPC Success For HVAC Company',
-          isMarketing: true,
-          category: 'Marketing',
-        },
-        {
-          image: work7,
-          title: 'Ecommerce PPC Case Studys',
-          isFinance: true,
-          category: 'Finanace',
-        },
-        {
-          image: work8,
-          title: 'Iphone mockup',
-          isHR: true,
-          category: 'Human Research',
-        },
-        {
-          image: work9,
-          title: 'Iphone mockup',
-          isHR: true,
-          category: 'Human Research',
-        },
-      ],
       displayCategory: 'All',
+      description: "",
     };
     this.setCategory.bind(this);
     this.getNFTs.bind(this);
@@ -167,6 +104,7 @@ class Collection extends Component {
           collection: exists.collection,
           nfts: exists.nfts,
           loading: false,
+          description: exists.nfts[0].description
         });
       } else {
         //Call the service to get the NFTs
@@ -178,6 +116,7 @@ class Collection extends Component {
           collection: Collection.data.collection,
           nfts: Collection.data.nfts,
           loading: false,
+          description: Collection.data.nfts[0].description
         });
 
         sessionstorage.setItem(
@@ -213,7 +152,7 @@ class Collection extends Component {
                           <Link to="/">Burnance</Link>
                         </li>
                         <li className="breadcrumb-item">
-                          <Link to="/profile">Collection</Link>
+                          <Link to="/collections">Collection</Link>
                         </li>
                         <li
                           className="breadcrumb-item active"
@@ -330,6 +269,30 @@ class Collection extends Component {
                     </p>
                   </div>
                 </div>
+              </Col>
+              <Col md="12">
+              <p className="text mb-0" style={{marginTop: "25px"}}>{this.state.description}</p>
+              </Col>
+              <Col md="12">
+                <p className="text mb-0" style={{ marginTop: "25px" }}>Approval the collection to burn an NFT from the collection</p>
+                <Link
+                  to="#"
+                  className="btn mouse-down"
+                  style={{
+                    marginRight: '10px',
+                    backgroundColor: (this.state.collectionApproved === true ? "#24A159" : "#E76E3C" ),
+                    color: 'white',
+                  }}
+                  disabled={this.state.loading}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    console.info('Approve Collection')
+                  }}
+                >
+                  {this.state.collectionApproved === true
+                    ? 'Approved'
+                    : 'Approve Collection'}
+                </Link>
               </Col>
             </Row>
 
@@ -467,32 +430,39 @@ class Collection extends Component {
                                 </Link>
                               </h5>
                               <Row>
-                                <Col md="6"><p className="text">{cases.description}</p></Col>
+                                <Col md="6">
+                                <Row>
+                                    <Col md="6" style={{fontSize: '16px'}}>
+                                      $0.00
+                                    </Col>
+                                    <Col md="6" style={{fontSize: '16px'}}>
+                                     $0.00
+                                    </Col>
+                                    <Col md="6" style={{fontSize: '16px'}}>
+                                      Cost
+                                    </Col>
+                                    <Col md="6" style={{fontSize: '16px'}}>
+                                     Gas
+                                    </Col>
+                                  </Row>
+                                </Col>
                                 <Col md="6">
                                   <Row>
                                     <Col md="12" style={{fontSize: '32px'}}>
                                       $0.00
                                     </Col>
                                     <Col md="12">
-                                      Basis Cost
+                                      Cost Basis 
                                     </Col>
                                   </Row>
                                 </Col>
                               </Row>
                               <hr />
-                              <h6>Purchase <span style={{fontSize: '14px'}}>02/23/21</span></h6>
                               <Row>
-                                <Col md="4">ETH: $0.00</Col>
-                                <Col md="4">Cost: $0.00</Col>
-                                <Col md="4">Gas: $0.00</Col>
+                                <Col md="6">ETH on 02/23/21: $0.00</Col>
+                                <Col md="6">ETH Current: $0.00</Col>
                               </Row>
-                              <hr />
-                              <h6>Current</h6>
-                              <Row>
-                                <Col md="4">ETH: $0.00</Col>
-                                <Col md="4">Cost: $0.00</Col>
-                                <Col md="4">Gas: $0.00</Col>
-                              </Row>
+
                               <hr />
                               <a
                                 href={`https://opensea.io/assets/${this.state.collection.chain}/${cases.contract.address}/${cases.tokenId}`}

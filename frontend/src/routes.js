@@ -33,7 +33,7 @@ const routes = [
   //{ path: "/documentation", component: Documentation, isTopbarDark: true },
   //{ path: "/widget", component: Widget, isTopbarDark: true },
 
-  { path: "/profile", component: Shop, isTopbarDark: true },
+  { path: "/collections", component: Shop, isTopbarDark: true },
   { path: "/account", component: PageInvoice, isTopbarDark: true },
   { path: "/dashboard", component: Dashboard },
 
