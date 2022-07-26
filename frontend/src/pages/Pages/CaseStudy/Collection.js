@@ -466,13 +466,32 @@ class Collection extends Component {
                                   {cases.title}
                                 </Link>
                               </h5>
-                              <p className="text">{cases.description}</p>
-                              <p className="text">Purchased On 02/23/21</p>
-                              <hr />
                               <Row>
-                                <Col md="4">ETH Price: $0.00</Col>
-                                <Col md="4">NFT Cost: $0.00</Col>
-                                <Col md="4">Gas Fee: $0.00</Col>
+                                <Col md="6"><p className="text">{cases.description}</p></Col>
+                                <Col md="6">
+                                  <Row>
+                                    <Col md="12" style={{fontSize: '32px'}}>
+                                      $0.00
+                                    </Col>
+                                    <Col md="12">
+                                      Basis Cost
+                                    </Col>
+                                  </Row>
+                                </Col>
+                              </Row>
+                              <hr />
+                              <h6>Purchase <span style={{fontSize: '14px'}}>02/23/21</span></h6>
+                              <Row>
+                                <Col md="4">ETH: $0.00</Col>
+                                <Col md="4">Cost: $0.00</Col>
+                                <Col md="4">Gas: $0.00</Col>
+                              </Row>
+                              <hr />
+                              <h6>Current</h6>
+                              <Row>
+                                <Col md="4">ETH: $0.00</Col>
+                                <Col md="4">Cost: $0.00</Col>
+                                <Col md="4">Gas: $0.00</Col>
                               </Row>
                               <hr />
                               <a

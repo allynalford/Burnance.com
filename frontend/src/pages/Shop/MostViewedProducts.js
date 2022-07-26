@@ -138,7 +138,7 @@ class MostViewedProducts extends Component {
         ]);
         _collections.push({
           name: collection.name,
-          contractAddress: collection.address,
+          contractAddress: (typeof collection.address !== "undefined" ? collection.address : collection.contractAddress),
         });
       }
 
@@ -149,19 +149,7 @@ class MostViewedProducts extends Component {
     }
   };
 
-  ChangePage = (event) => {
-    const newOffset =
-      (event.selected * this.state.itemsPerPage) % this.state.nfts.length;
 
-    const endOffset = newOffset + this.state.itemsPerPage;
-
-    console.log(`Loading items from ${this.state.itemOffset} to ${endOffset}`);
-
-    this.setState({
-      currentItems: this.state.nfts.slice(newOffset, endOffset),
-      pageCount: Math.ceil(this.state.nfts.length / this.state.itemsPerPage),
-    });
-  };
 
   AddToBatch = (contractAddress, tokenId, name) => {
     var nft = _.find(this.state.batch, { contractAddress, tokenId });
@@ -174,11 +162,11 @@ class MostViewedProducts extends Component {
     }
   };
 
-  openModal = (row) => {
+  openModal = (name) => {
 
-    if(typeof row === 'number'){
-      console.log('currentCollection', _collections[row+1]);
-      this.setState({ currentCollection: _collections[row+1] });
+    if(typeof name !== 'undefined'){
+      
+      this.setState({ currentCollection: _.find(_collections, ['name', name]) });
     };
 
     this.setState((prevState) => ({
@@ -193,9 +181,8 @@ class MostViewedProducts extends Component {
         callback({ chartWrapper }) {
           //console.log("Selected ", chartWrapper.getChart().getSelection());
           const item = chartWrapper.getChart().getSelection()[0];
-
-          console.log(item.row);
-          _openModal(item.row);
+          const name = chartWrapper.getDataTable().cache[item.row][0].Me;
+          _openModal(name);
         },
       },
       {
