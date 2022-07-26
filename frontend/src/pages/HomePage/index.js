@@ -3,6 +3,8 @@ import React, { Component } from "react";
 import Section from "./Section";
 import About from "./About";
 import FAQ from "./Faqs";
+import TaskManager from "./TaskManager";
+import HowBurningWorks from "./HowBurningWorks";
 import {initGA, PageView} from "../../common/gaUtils";
 class Index extends Component {
   componentDidMount() {
@@ -32,8 +34,8 @@ class Index extends Component {
     return (
       <React.Fragment>
         <Section />
-
-
+        <HowBurningWorks />
+        <TaskManager />
         <section className="section">
           <About />
 

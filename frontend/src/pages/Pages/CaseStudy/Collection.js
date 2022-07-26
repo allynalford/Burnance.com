@@ -7,6 +7,7 @@ import BasicPopperToolTip from "../../../components/BasicPopperToolTip";
 import FadeIn from "react-fade-in";
 import { getChain } from '../../../common/config';
 import ImageGrid from '../../../components/ImageGrid';
+import {initGA, PageView, Event} from '../../../common/gaUtils';
 
 
 //Import Images
@@ -44,6 +45,9 @@ class Collection extends Component {
     document.body.classList = '';
     document.getElementById('top-menu').classList.add('nav-light');
     window.addEventListener('scroll', this.scrollNavigation, true);
+
+    initGA();
+    PageView();
 
     if (window.ethereum) {
       window.ethereum.on('accountsChanged', this.accountsChanged);
@@ -323,7 +327,10 @@ class Collection extends Component {
                     id="filter"
                   >
                     <li
-                      onClick={() => this.setCategory('All')}
+                      onClick={() => {
+                        this.setCategory('All');
+                        Event('Collection', 'FilterBy', 'All');
+                      }}
                       className={
                         this.state.displayCategory === 'All'
                           ? 'list-inline-item categories-name border text-dark rounded active'
@@ -333,7 +340,10 @@ class Collection extends Component {
                       All
                     </li>{' '}
                     <li
-                      onClick={() => this.setCategory('Minted')}
+                      onClick={() => {
+                        this.setCategory('Minted');
+                        Event('Collection', 'FilterBy', 'Minted');
+                    }}
                       className={
                         this.state.displayCategory === 'Minted'
                           ? 'list-inline-item categories-name border text-dark rounded active'
@@ -343,7 +353,11 @@ class Collection extends Component {
                       Minted
                     </li>{' '}
                     <li
-                      onClick={() => this.setCategory('Purchased')}
+                      onClick={() => {
+                        this.setCategory('Purchased');
+                        Event('Collection', 'FilterBy', 'Purchased');
+                      }
+                      }
                       className={
                         this.state.displayCategory === 'Purchased'
                           ? 'list-inline-item categories-name border text-dark rounded active'
@@ -353,24 +367,44 @@ class Collection extends Component {
                       Purchased
                     </li>{' '}
                     <li
-                      onClick={() => this.setCategory('Transfered')}
+                      onClick={() => {
+                        this.setCategory('Transferred');
+                        Event('Collection', 'FilterBy', 'Transferred');
+                    }
+                    }
                       className={
-                        this.state.displayCategory === 'Transfered'
+                        this.state.displayCategory === 'Transferred'
                           ? 'list-inline-item categories-name border text-dark rounded active'
                           : 'list-inline-item categories-name border text-dark rounded'
                       }
                     >
-                      Transfered
+                      Transferred
                     </li>{' '}
                     <li
-                      onClick={() => this.setCategory('Development')}
+                      onClick={() => {
+                        this.setCategory('Listed');
+                        Event('Collection', 'FilterBy', 'Listed');
+                      }}
                       className={
-                        this.state.displayCategory === 'Development'
+                        this.state.displayCategory === 'Listed'
                           ? 'list-inline-item categories-name border text-dark rounded active'
                           : 'list-inline-item categories-name border text-dark rounded'
                       }
                     >
-                      Nick?
+                      Listed
+                    </li>{' '}
+                    <li
+                      onClick={() => {
+                        this.setCategory('Staked');
+                        Event('Collection', 'FilterBy', 'Staked');
+                      }}
+                      className={
+                        this.state.displayCategory === 'Staked'
+                          ? 'list-inline-item categories-name border text-dark rounded active'
+                          : 'list-inline-item categories-name border text-dark rounded'
+                      }
+                    >
+                      Staked
                     </li>{' '}
                   </ul>
                 </div>
@@ -538,9 +572,15 @@ class Collection extends Component {
                                     <DropdownButton as={ButtonGroup} title="Options" id="bg-nested-dropdown">
                                       <Dropdown.Item className="btn-success" eventKey="1" onClick={ e =>{
                                         console.log('Burn',cases.contract.address);
+                                        Event('Collection NFT', 'Option', 'Sell (Burn)');
                                       }}>Sell (Burn)</Dropdown.Item>
+                                      <Dropdown.Item className="btn-success" eventKey="1" onClick={ e =>{
+                                        console.log('Buy Back',cases.contract.address);
+                                        Event('Collection NFT', 'Option', 'Sell (w/Buy Back)');
+                                      }}>Sell (w/Buy Back)</Dropdown.Item>
                                       <Dropdown.Item defaultValue={"Add"} className="btn-info" eventKey="2" onClick={ e =>{
                                         console.log('Add',cases.contract.address);
+                                        Event('Collection NFT', 'Option', 'Add to Batch');
                                       }}>Add to Batch</Dropdown.Item>
                                     </DropdownButton>
                                   </ButtonGroup>

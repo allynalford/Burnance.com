@@ -9,7 +9,7 @@ import React from "react";
 
 //const Forums = React.lazy(() => import("./pages/Forums/index"));
 //const Blog = React.lazy(() => import("./pages/Blog/index"));
-const OnlineLearning = React.lazy(() => import("./pages/OnlineLearning/index"));
+const HomePage = React.lazy(() => import("./pages/HomePage/index"));
 const PageError = React.lazy(() => import("./pages/Pages/Special/PageError"));
 const Shop = React.lazy(() => import("./pages/Shop/index"));
 
@@ -40,10 +40,10 @@ const routes = [
   { path: "/collection/:address", component: Collection },
 
   //Index Main
-  { path: "/index", component: OnlineLearning, isTopbarDark: true },
+  { path: "/index", component: HomePage, isTopbarDark: true },
 
   //Index root
-  { path: "/", component: OnlineLearning, isTopbarDark: true },
+  { path: "/", component: HomePage, isTopbarDark: true },
   //{ path: "/old", component: Root, isWithoutLayout: true, exact: true },
   { component: PageError, isWithoutLayout: true, exact: false },
 ];

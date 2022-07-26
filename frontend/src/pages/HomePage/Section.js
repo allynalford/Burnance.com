@@ -130,7 +130,7 @@ class Section extends Component {
                         <p className="para-desc text">
                           Burn your Sh!t NFTs and get PAID in (ETH) Ethereum.
                         </p>
-                        <div className="subcribe-form mt-4 pt-2">
+                        {/* <div className="subcribe-form mt-4 pt-2">
                           <Alert
                             isOpen={this.state.isOpen}
                             toggle={() => this.setState({ isOpen: false })}
@@ -203,7 +203,7 @@ class Section extends Component {
                               </Row>
                             </FormGroup>
                           </AvForm>
-                        </div>
+                        </div> */}
                       </div>
                     </Col>
 
@@ -233,57 +233,43 @@ class Section extends Component {
             <Row className="align-items-center">
               <Col md={this.state.attributes.length === 0 ? '12' : '5'}>
                 <div className="section-title">
-                  <h2 className="title">NFT Rewards for Burn</h2>
+                  <h2 className="title">What is Burnance</h2>
                   <p className="text mb-4">
-                    The Worst Thing About Having Useless Crypto Assets: The Tax
-                    Man Cometh We've all been there. You invest in what you
-                    think is the next big thing, only to watch it flounder and
-                    become completely worthless. And if your investment is in a
-                    cryptocurrency, the situation is even worse. Not only are
-                    you out the money you invested, but you may also be on the
-                    hook for taxes on the "gains" you never realized.
+                    Why did burnance start? CAUSE WE GOT TIRED OF CARRYING BAGS
+                    in our hidden wallets! Also, liquidity issues become a
+                    challenge when it comes time to tax season. Burnance
+                    provides all the tools necessary to properly track and
+                    realize losses on your Sh!t NFTs and soon crypto tokens. You
+                    can read more about tax harvesting under our FAQs
                   </p>
                   <p className="text mb-4">
-                    But there is a silver lining. If you can find a liquidity
-                    provider that is willing to purchase your worthless crypto
-                    assets, you can trigger a tax event that will allow you to
-                    deduct your losses. This can be a huge relief, especially if
-                    you've lost a significant amount of money on your
-                    investment.
+                    What burnance provides is a platform to burn your bags and
+                    claim losses for your investing activities. But burnance
+                    provides more than that offering deep data analytics on your
+                    investment portfolios with real life tracking of purchases
+                    and sales.
                   </p>
                   <p className="text mb-4">
-                    Of course, finding a liquidity provider can be difficult.
-                    They are not always easy to find, and even when you do find
-                    one, they may not be willing to purchase your assets. But it
-                    is worth looking into, as it can be a lifesaver come tax
-                    time.
+                  The best offering yet is the Burnance BuyBack Guarantee (BBG) 
                   </p>
-                  <Alert
-                    isOpen={this.state.isOpenCopy}
-                    toggle={() => this.setState({ isOpenCopy: false })}
-                    color="success"
-                  >
-                    {'Alternative Text Copied to Clipboard'}
-                  </Alert>
                 </div>
               </Col>
-              {this.state.attributes.length === 0 ? null : (
-                <Col md="7" className="mt-4 mt-sm-0 pt-2 pt-sm-0">
-                  <div className="ms-md-4">
-                    <Row>
-                      {this.state.attributes.map((trait) => {
-                        return (
-                          <Col md="4">
-                            <p className="title text">
-                              <b>{trait.trait_type}</b> : {trait.value}
-                            </p>
-                          </Col>
-                        );
-                      })}
-                    </Row>
-                  </div>
-                </Col>
-              )}
+              <Col md={this.state.attributes.length === 0 ? '12' : '5'}>
+                <div className="section-title">
+                  <h2 className="title">Membership</h2>
+                  <p className="text mb-4">
+                    Burnance Membership will provide:
+                  </p>
+                  <ul className="text mb-4">
+                   <li>Instant liquidity on dead projects.</li>
+                   <li>Analyze portfolio liquidity</li>
+                   <li>Easily identify which NFT to harvest.</li>
+                   <li>Ability to track tax harvest</li>
+                   <li>Access to Burnance Guaranteed Buyback Program</li>
+                  </ul>
+                 
+                </div>
+              </Col>
             </Row>
           </Container>
         </section>

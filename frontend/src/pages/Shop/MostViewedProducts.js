@@ -138,7 +138,7 @@ class MostViewedProducts extends Component {
           '569.35',
           '169.35',
           '-114.67',
-          '4,801,974.68',
+          '4801974.68',
           { v: 12, f: "-4.71%" },
         ]);
         _collections.push({
@@ -505,7 +505,7 @@ class MostViewedProducts extends Component {
             {(this.state.walletConnected === false ? "" : <Row>
             <Col xs={12} style={{marginTop: "25px"}}>
               <h2 className="mb-0">
-                You have {this.state.collections.length} Collections in your Portfolio
+                You have {(this.state.collections.length === 0 ? "-" : this.state.collections.length)} Collections in your Portfolio
               </h2>
             </Col>
           </Row>)}
@@ -537,7 +537,7 @@ class MostViewedProducts extends Component {
                     formatters={[
                       {
                         type: 'ArrowFormat',
-                        column: 6,
+                        column: 8,
                       },
                       {
                         type: 'NumberFormat',
@@ -550,23 +550,7 @@ class MostViewedProducts extends Component {
                       },
                       {
                         type: 'NumberFormat',
-                        column: 4,
-                        options: {
-                          prefix: '$',
-                          negativeColor: 'red',
-                          negativeParens: true,
-                        },
-                      },
-                      {
-                        type: 'NumberFormat',
                         column: 3,
-                        options: {
-                          fractionDigits: 8,
-                        },
-                      },
-                      {
-                        type: 'NumberFormat',
-                        column: 2,
                         options: {
                           fractionDigits: 8,
                         },

@@ -15,42 +15,10 @@ import {
 import { Link } from "react-router-dom";
 
 
-//import images
-import Asset190 from "../../assets/images/illustrator/Asset190.svg";
-import Asset189 from "../../assets/images/illustrator/Asset189.svg";
-import Asset192 from "../../assets/images/illustrator/Asset192.svg";
-import Asset187 from "../../assets/images/illustrator/Asset187.svg";
-
-
-
 class Faqs extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      counters: [
-        {
-          title: "Happy Client",
-          image: Asset190,
-          start: 0,
-          value: 97,
-          postfix: "%",
-        },
-        { title: "Awards", image: Asset189, start: 0, value: 15, postfix: "+" },
-        {
-          title: "Job Placement",
-          image: Asset192,
-          start: 0,
-          value: 2,
-          postfix: "K",
-        },
-        {
-          title: "Project Complete",
-          image: Asset187,
-          start: 0,
-          value: 98,
-          postfix: "%",
-        },
-      ],
       isOpen: false,
       collapse1: true,
       col1: true,
@@ -312,7 +280,50 @@ class Faqs extends Component {
                       </Link>
                       <Collapse isOpen={this.state.col3}>
                         <CardBody>
-                          <p className="text mb-0 faq-ans">......</p>
+                          <p className="text faq-ans">
+                            While the IRS hasn’t taken a formal stance on the
+                            tax treatment of NFTs yet it does not exclude them
+                            from needing proper tracking for tax purposes. This
+                            does make calculating NFT taxes a bit tricky, but it
+                            also underscores the importance of staying on top of
+                            your NFT taxes.
+                          </p>
+                          <p className="text faq-ans">
+                            It’s better to be over prepared than under prepared
+                            when dealing with the IRS. On one hand, it’s
+                            possible that NFTs could receive the same treatment
+                            as crypto, in which case NFTs would be considered
+                            property. That means they would have long-term
+                            capital gains tax rates based on your personal
+                            income, around 0% to 20%.
+                          </p>
+                          <p className="text faq-ans">
+                            On the other hand, NFTs may receive similar
+                            treatment to stamps, antiques, or trading cards.
+                            This would give them the collectibles tax rate,
+                            which is significantly higher, around 28%.
+                          </p>
+                          <p className="text faq-ans">
+                            These are just the rates for NFTs held longer than
+                            one year though. If you buy and sell an NFT in less
+                            than a year,{' '}
+                            <b>
+                              you’re subject to short-term capital gains tax
+                              based on your personal income. Some estimate this
+                              range could be between 37% and 50% of your
+                              earnings.
+                            </b>
+                          </p>
+                          <p className="text mb-0 faq-ans">
+                            Now, remember that a lot of these numbers are
+                            currently just industry speculation. But you have to
+                            be aware of the conversation happening around NFT
+                            taxes. The best thing you can do is get in touch
+                            with a tax professional to discuss what your
+                            personal situation will look like. And that
+                            situation will look different depending on whether
+                            you’re an NFT artist or an NFT investor.
+                          </p>
                         </CardBody>
                       </Collapse>
                     </Card>
@@ -344,7 +355,19 @@ class Faqs extends Component {
                       </Link>
                       <Collapse isOpen={this.state.col4}>
                         <CardBody>
-                          <p className="text mb-0 faq-ans">.....</p>
+                          <p className="text faq-ans">
+                            Being that crypto taxes is one of the most discussed
+                            topics in economics, tax shelters are still being
+                            figured out and are certain to evolve over time,
+                            especially as regulations enforce harder.
+                          </p>
+                          <p className="text faq-ans">
+                            The best ways currently:
+                          </p>
+                          <ol className="text faq-ans">
+                            <li>Tax Harvesting (Which is what Burnance is)</li>
+                            <li>Donating to charity (something we do!)</li>
+                          </ol>
                         </CardBody>
                       </Collapse>
                     </Card>
@@ -376,7 +399,56 @@ class Faqs extends Component {
                       </Link>
                       <Collapse isOpen={this.state.col5}>
                         <CardBody>
-                          <p className="text mb-0 faq-ans">......</p>
+                          <p className="text faq-ans">
+                            The IRS has not released any tax guidance on NFTs
+                            yet. The best guidance currently is the existing US
+                            tax code (
+                            <a
+                              target={'_new'}
+                              href="https://www.law.cornell.edu/uscode/text/26/408"
+                            >
+                              IRS 408(m)(2)(A)
+                            </a>
+                            ), “any work of art” is considered a “collectible”.
+                            Therefore, it is reasonable to assume that most
+                            art-based NFTs should be classified as collectibles
+                            for tax purposes. This classification subjects NFTs
+                            to{' '}
+                            <a
+                              target={'_new'}
+                              href="https://www.cointracker.io/blog/crypto-tax-guide"
+                            >
+                              capital gain taxes similar to other common
+                              cryptocurrencies
+                            </a>{' '}
+                            (e.g. BTC, ETH, etc.).
+                          </p>
+                          <p className="text faq-ans">
+                            The specific tax implications of a given NFT depends
+                            on:
+                          </p>
+                          <ol className="text faq-ans">
+                            <li>
+                              The taxpayer’s role (NFT creator or investor) and;
+                            </li>
+                            <li>
+                              To what extent (i.e. as a{' '}
+                              <a
+                                target={'_new'}
+                                href="https://www.irs.gov/faqs/small-business-self-employed-other-business/income-expenses/income-expenses"
+                              >
+                                hobby
+                              </a>{' '}
+                              or a{' '}
+                              <a
+                                target={'_new'}
+                                href="https://www.irs.gov/businesses/small-businesses-self-employed/business-activities"
+                              >
+                                trade or business
+                              </a>
+                              ) the taxpayer interacts with NFTs
+                            </li>
+                          </ol>
                         </CardBody>
                       </Collapse>
                     </Card>
@@ -409,44 +481,27 @@ class Faqs extends Component {
                       </Link>
                       <Collapse isOpen={this.state.col6}>
                         <CardBody>
-                          <p className="text mb-0 faq-ans">......</p>
-                        </CardBody>
-                      </Collapse>
-                    </Card>
-                    <Card className="border-0 rounded mb-2">
-                      <Link
-                        to="#"
-                        onClick={this.t_col7}
-                        className={
-                          this.state.col3
-                            ? 'faq position-relative text-primary'
-                            : 'faq position-relative text-dark'
-                        }
-                      >
-                        <CardHeader
-                          className="border-0 bg-light p-3 pe-5"
-                          id="headingTwo"
-                        >
-                          <h4 className="title mb-0">
-                            NFT taxes for creators
-                            <i
-                              className={
-                                this.state.col7
-                                  ? 'mdi mdi-chevron-up float-end'
-                                  : 'mdi mdi-chevron-down float-end'
-                              }
-                            ></i>
-                          </h4>
-                        </CardHeader>
-                      </Link>
-                      <Collapse isOpen={this.state.col7}>
-                        <CardBody>
-                          <p className="text mb-0 faq-ans">
-                            Creators are treated as a “business” when it comes
-                            to taxes. The money generated is considered income
-                            and should be taxed accordingly. This also applies
-                            to the royalties associated with the sales of the
-                            assets.
+                          <p className="text faq-ans">
+                            Taxes apply when one of the following actions takes
+                            place:
+                          </p>
+                          <ul className="text faq-ans">
+                            <li>Acquire an NFT using cryptocurrency</li>
+                            <li>Sell off an NFT for cryptocurrency</li>
+                            <li>Trade an NFT for another NFT</li>
+                          </ul>
+                          <p className="text faq-ans">
+                            Purchasing an NFT with crypto, like ETH, is
+                            considered a disposal event. You’ll incur a capital
+                            gain or loss on that disposal depending on the
+                            valuation of your coins since your original point of
+                            purchase.
+                          </p>
+                          <p className="text faq-ans">
+                            For example, let’s say you bought 1 ETH last year
+                            for $100. Today, you want to use it to purchase an
+                            NFT for 1 ETH, but the overall value of ETH has
+                            appreciated to $1,000.
                           </p>
                         </CardBody>
                       </Collapse>
