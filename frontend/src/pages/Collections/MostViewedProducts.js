@@ -144,10 +144,11 @@ class MostViewedProducts extends Component {
           'Floor',
           'Avg Price',
           'Holding Value',
-          'Amount Invested',
+          'Cost Basis',
           'PnL',
-          'Vol(24H)',
-          'Vol Chg.',
+          'Liquidity (1D)',
+          'Liquidity (7D)',
+          'Liquidity (30D)',
         ],
       ];
 
@@ -156,16 +157,18 @@ class MostViewedProducts extends Component {
 
         const floorPrice = (collection.FloorPrice !== "N/F" ? formatter.format(parseFloat(Number(collection.FloorPrice) * Number(ethusd))) : formatter.format(0.00));
         const avgPrice = (typeof collection.statistics !== "undefined" ? formatter.format(parseFloat(Number(collection.statistics.average_price) * Number(ethusd))) : formatter.format(0.00))
+        const holdingValue = (collection.HoldingValue !== "N/F" ? formatter.format(parseFloat(Number(collection.HoldingValue) * Number(ethusd))) : formatter.format(0.00))
         collections.push([
           collection.name,
           collection.count,
           floorPrice,
           avgPrice,
-          (collection.HoldingValue !== "N/F" ? collection.HoldingValue.toFixed(6) : collection.FloorPrice.HoldingValue),
-          collection.AmountInvested,
-          collection.pnl,
-          (typeof collection.statistics !== "undefined" ? collection.statistics.one_day_volume.toFixed(4) : "--"),
-          { v: 12, f: (typeof collection.statistics !== "undefined" ? collection.statistics.one_day_change.toFixed(2) : "--") + "%" },
+          holdingValue,
+          '--',
+          '--',
+          (typeof collection.statistics !== "undefined" ? (collection.statistics.one_day_sales / collection.statistics.num_owners) * 100 : 0.0),
+          (typeof collection.statistics !== "undefined" ? (collection.statistics.seven_day_sales / collection.statistics.num_owners) * 100 : 0.0),
+          (typeof collection.statistics !== "undefined" ? (collection.statistics.thirty_day_sales / collection.statistics.num_owners) * 100 : 0.0),
         ]);
 
 
@@ -559,8 +562,33 @@ class MostViewedProducts extends Component {
                     }}
                     formatters={[
                       {
-                        type: 'ArrowFormat',
+                        type: 'NumberFormat',
+                        column: 9,
+                        options: {
+                          suffix: '%',
+                          negativeColor: 'red',
+                          negativeParens: true,
+                          fractionDigits: 2,
+                        },
+                      },{
+                        type: 'NumberFormat',
                         column: 8,
+                        options: {
+                          suffix: '%',
+                          negativeColor: 'red',
+                          negativeParens: true,
+                          fractionDigits: 2,
+                        },
+                      },
+                      {
+                        type: 'NumberFormat',
+                        column: 7,
+                        options: {
+                          suffix: '%',
+                          negativeColor: 'red',
+                          negativeParens: true,
+                          fractionDigits: 2,
+                        },
                       },
                       {
                         type: 'NumberFormat',

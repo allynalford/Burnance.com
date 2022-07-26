@@ -311,15 +311,16 @@ module.exports.GetCollection = async (event) => {
 
         collection.HoldingValue = (collection.count * collection.statistics.average_price);
         collection.FloorPrice = collection.statistics.floor_price;
-        collection.AmountInvested = '...';
-        collection.pnl = '...';
+        collection.AmountInvested = 0.00;
+        collection.pnl = 0.00;
         collection.Liquidity7D = (collection.statistics.seven_day_sales / collection.statistics.num_owners) * 100;
       } else {
-        collection.HoldingValue = 'N/F';
-        collection.FloorPrice = 'N/F';
-        collection.AmountInvested = '...';
-        collection.pnl = '...';
+        collection.HoldingValue = 0.00;
+        collection.FloorPrice = 0.00;
+        collection.AmountInvested = 0.00;
+        collection.pnl = 0.00;
         collection.Liquidity7D = 0;
+        collection.notfound = true;
       }
 
     }
