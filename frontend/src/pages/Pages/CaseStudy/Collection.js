@@ -98,6 +98,8 @@ class Collection extends Component {
         sessionstorage.getItem(ethereumAddress + '-' + contractAddress),
       );
 
+      //console.log(exists)
+
       //Check if the records exists in storage
       if (typeof exists !== 'undefined' && exists !== null) {
         this.setState({
@@ -238,8 +240,10 @@ class Collection extends Component {
                   className="avatar avatar-ex-sm"
                   alt=""
                 /> */}
+                  {/* The liquidity rate measures the relative liquidity of each collection. 
+                Liquidity = Sales / The number of NFTs * 100% */}
                   <div className="flex-1 content ms-3">
-                    <h2 className="title mb-0">30 Day Sales</h2>
+                    <h2 className="title mb-0">Liquidity (7D)</h2>
                     <p className="text-muted mb-0">--</p>
                     <p className="text-muted mb-0" style={{ fontSize: '12px' }}>
                       <Link to="#" className="text-primary">
@@ -260,7 +264,7 @@ class Collection extends Component {
                   alt=""
                 /> */}
                   <div className="flex-1 content ms-3">
-                    <h2 className="title mb-0">7 Day Sales</h2>
+                    <h2 className="title mb-0">Sales (7D)</h2>
                     <p className="text-muted mb-0">--</p>
                     <p className="text-muted mb-0" style={{ fontSize: '12px' }}>
                       <Link to="#" className="text-primary">
@@ -271,22 +275,29 @@ class Collection extends Component {
                 </div>
               </Col>
               <Col md="12">
-              <p className="text mb-0" style={{marginTop: "25px"}}>{this.state.description}</p>
+                <p className="text mb-0" style={{ marginTop: '25px' }}>
+                  {this.state.description}
+                </p>
               </Col>
               <Col md="12">
-                <p className="text mb-0" style={{ marginTop: "25px" }}>Approval the collection to burn an NFT from the collection</p>
+                <p className="text mb-0" style={{ marginTop: '25px' }}>
+                  Approval the collection to burn an NFT from the collection
+                </p>
                 <Link
                   to="#"
                   className="btn mouse-down"
                   style={{
                     marginRight: '10px',
-                    backgroundColor: (this.state.collectionApproved === true ? "#24A159" : "#E76E3C" ),
+                    backgroundColor:
+                      this.state.collectionApproved === true
+                        ? '#24A159'
+                        : '#E76E3C',
                     color: 'white',
                   }}
                   disabled={this.state.loading}
                   onClick={(e) => {
                     e.preventDefault();
-                    console.info('Approve Collection')
+                    console.info('Approve Collection');
                   }}
                 >
                   {this.state.collectionApproved === true
@@ -387,6 +398,7 @@ class Collection extends Component {
                             className="img-fluid rounded work-image"
                             alt={cases.description}
                           />
+
                           <CardBody>
                             <div className="content">
                               {cases.isBusiness && (
@@ -408,9 +420,18 @@ class Collection extends Component {
                               {cases.isFinance && (
                                 <Link
                                   to="#"
-                                  className="badge badge-link bg-success"
+                                  onClick={ e =>{
+                                    e.preventDefault();
+                                    window.open(`https://opensea.io/assets/${this.state.collection.chain}/${cases.contract.address}/${cases.tokenId}`);
+                                  }}
                                 >
-                                  Finance
+                                  <img
+                                      alt="OpenSea listing"
+                                      align="right"
+                                      width="25"
+                                      height="25"
+                                      src="https://storage.googleapis.com/opensea-static/Logomark/Logomark-Blue.png"
+                                    />
                                 </Link>
                               )}
                               {cases.isHR && (
@@ -421,6 +442,36 @@ class Collection extends Component {
                                   HR
                                 </Link>
                               )}
+                              {/* <Link
+                                  to="#"
+                                  onClick={ e =>{
+                                    e.preventDefault();
+                                    window.open(`https://opensea.io/assets/${this.state.collection.chain}/${cases.contract.address}/${cases.tokenId}`);
+                                  }}
+                                >
+                                  <img
+                                      alt="OpenSea listing"
+                                      align="right"
+                                      width="25"
+                                      height="25"
+                                      src="https://storage.googleapis.com/opensea-static/Logomark/Logomark-Blue.png"
+                                    />
+                                </Link>
+                                &nbsp;&nbsp;&nbsp;
+                                <Link
+                                  to="#"
+                                  onClick={ e =>{
+                                    e.preventDefault();
+                                    window.open(`https://opensea.io/assets/${this.state.collection.chain}/${cases.contract.address}/${cases.tokenId}`);
+                                  }}
+                                >
+                                  <img
+                                      align="right"
+                                      width="25"
+                                      height="25"
+                                      src="https://etherscan.io/images/brandassets/etherscan-logo-circle.png"
+                                    />
+                                </Link> */}
                               <h5 className="mt-3">
                                 <Link
                                   to="page-case-detail"
@@ -431,48 +482,67 @@ class Collection extends Component {
                               </h5>
                               <Row>
                                 <Col md="6">
-                                <Row>
-                                    <Col md="6" style={{fontSize: '16px'}}>
+                                  <Row>
+                                    <Col md="6" style={{ fontSize: '16px' }}>
                                       $0.00
                                     </Col>
-                                    <Col md="6" style={{fontSize: '16px'}}>
-                                     $0.00
+                                    <Col md="6" style={{ fontSize: '16px' }}>
+                                      $0.00
                                     </Col>
-                                    <Col md="6" style={{fontSize: '16px'}}>
+                                    <Col md="6" style={{ fontSize: '16px' }}>
                                       Cost
                                     </Col>
-                                    <Col md="6" style={{fontSize: '16px'}}>
-                                     Gas
+                                    <Col md="6" style={{ fontSize: '16px' }}>
+                                      <i className="uil uil-angle-right-b align-middle"></i>
+                                      Gas
                                     </Col>
                                   </Row>
                                 </Col>
                                 <Col md="6">
                                   <Row>
-                                    <Col md="12" style={{fontSize: '32px'}}>
-                                      $0.00 <sup style={{fontSize: '16px', color: 'red'}}>-$0.00</sup>
+                                    <Col md="12" style={{ fontSize: '32px' }}>
+                                      $0.00{' '}
+                                      <sup
+                                        style={{
+                                          fontSize: '16px',
+                                          color: 'red',
+                                        }}
+                                      >
+                                        -$0.00
+                                      </sup>
                                     </Col>
-                                    <Col md="12">
-                                      Cost Basis 
-                                    </Col>
+                                    <Col md="12">Cost Basis</Col>
                                   </Row>
                                 </Col>
                               </Row>
                               <hr />
                               <Row>
-                                <Col md="12"><h6>ETH Prices</h6></Col>
+                                <Col md="12">
+                                  <h6>ETH Prices</h6>
+                                </Col>
                                 <Col md="6">2/22/2020: $0.00</Col>
                                 <Col md="6">Current: $0.00</Col>
                               </Row>
 
                               <hr />
-                              <a
-                                href={`https://opensea.io/assets/${this.state.collection.chain}/${cases.contract.address}/${cases.tokenId}`}
-                                target="_new"
-                                className="text-primary h6"
-                              >
-                                View on OpenSea{' '}
-                                <i className="uil uil-angle-right-b align-middle"></i>
-                              </a>
+
+                              <Row>
+                                <Col md="8">
+                                  <Link
+                                    to="#"
+                                    className="text h7 badge badge-link bg-info"
+                                  >
+                                    Add to Batch
+                                  </Link>
+                                  &nbsp;
+                                  <Link
+                                    to="#"
+                                    className="text h7 badge badge-link bg-warning"
+                                  >
+                                    Approve
+                                  </Link>
+                                </Col>
+                              </Row>
                             </div>
                           </CardBody>
                         </Card>

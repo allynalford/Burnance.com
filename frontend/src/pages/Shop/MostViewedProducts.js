@@ -120,9 +120,10 @@ class MostViewedProducts extends Component {
           'Held',
           'Floor',
           'Avg Price',
-          'Market Cap',
-          '30 Day Sales',
-          '30 Day Change',
+          'Holding Value',
+          'PnL',
+          'Vol(24H)',
+          'Vol Chg.',
           'Approved',
         ],
       ];
@@ -131,11 +132,12 @@ class MostViewedProducts extends Component {
         collections.push([
           collection.name,
           collection.count,
+          '4.55',
           'Premium',
-          'Premium',
-          'Premium',
-          'Premium',
-          'Premium',
+          '169.35',
+          '-114.67',
+          '4,801,974.68',
+          { v: 12, f: "-4.71%" },
           'Unapproved',
         ]);
         _collections.push({
@@ -363,9 +365,96 @@ class MostViewedProducts extends Component {
           </div>
         </div>
         <section className="section">
+
         <Container>
+        <Row className="justify-content-center">
+              <Col md="3">
+                <div
+                  key={1}
+                  className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
+                >
+                  {/* <img
+                  src={work1}
+                  className="avatar avatar-ex-sm"
+                  alt=""
+                /> */}
+                  <div className="flex-1 content ms-3">
+                    <h2 className="title mb-0">Est Holding Value</h2>
+                    <p className="text-muted mb-0">$0.00</p>
+                    <p className="text-muted mb-0" style={{ fontSize: '12px' }}>
+                      <Link to="#" className="text-primary">
+                        how this is calculated
+                      </Link>
+                    </p>
+                  </div>
+                </div>
+              </Col>
+              <Col md="3">
+                <div
+                  key={1}
+                  className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
+                >
+                  {/* <img
+                  src={work1}
+                  className="avatar avatar-ex-sm"
+                  alt=""
+                /> */}
+                  <div className="flex-1 content ms-3">
+                    <h2 className="title mb-0">Est Holding Cost</h2>
+                    <p className="text mb-0">--</p>
+                    <p className="text-muted mb-0" style={{ fontSize: '12px' }}>
+                      <Link to="#" className="text-primary">
+                        how this is calculated
+                      </Link>
+                    </p>
+                  </div>
+                </div>
+              </Col>
+              <Col md="3">
+                <div
+                  key={1}
+                  className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
+                >
+                  {/* <img
+                  src={work1}
+                  className="avatar avatar-ex-sm"
+                  alt=""
+                /> */}
+                  <div className="flex-1 content ms-3">
+                    <h2 className="title mb-0">PnL</h2>
+                    <p className="text-muted mb-0">--</p>
+                    <p className="text-muted mb-0" style={{ fontSize: '12px' }}>
+                      <Link to="#" className="text-primary">
+                        how this is calculated
+                      </Link>
+                    </p>
+                  </div>
+                </div>
+              </Col>
+              <Col md="3">
+                <div
+                  key={1}
+                  className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
+                >
+                  {/* <img
+                  src={work1}
+                  className="avatar avatar-ex-sm"
+                  alt=""
+                /> */}
+                  <div className="flex-1 content ms-3">
+                    <h2 className="title mb-0">7 Day Sales</h2>
+                    <p className="text-muted mb-0">--</p>
+                    <p className="text-muted mb-0" style={{ fontSize: '12px' }}>
+                      <Link to="#" className="text-primary">
+                        how this is calculated
+                      </Link>
+                    </p>
+                  </div>
+                </div>
+              </Col>
+            </Row>
           <Row>
-            <Col xs={12}>
+            <Col xs={12} style={{marginTop: "25px"}}>
               <h2 className="mb-0">
                 You have {this.state.collections.length} Collections in your Portfolio
               </h2>
@@ -392,29 +481,11 @@ class MostViewedProducts extends Component {
                     formatters={[
                       {
                         type: 'ArrowFormat',
-                        column: 7,
-                      },
-                      {
-                        type: 'NumberFormat',
                         column: 6,
-                        options: {
-                          prefix: '$',
-                          negativeColor: 'red',
-                          negativeParens: true,
-                        },
                       },
                       {
                         type: 'NumberFormat',
-                        column: 2,
-                        options: {
-                          prefix: '$',
-                          negativeColor: 'red',
-                          negativeParens: true,
-                        },
-                      },
-                      {
-                        type: 'NumberFormat',
-                        column: 3,
+                        column: 5,
                         options: {
                           prefix: '$',
                           negativeColor: 'red',
@@ -432,9 +503,16 @@ class MostViewedProducts extends Component {
                       },
                       {
                         type: 'NumberFormat',
-                        column: 5,
+                        column: 3,
                         options: {
-                          fractionDigits: 6,
+                          fractionDigits: 8,
+                        },
+                      },
+                      {
+                        type: 'NumberFormat',
+                        column: 2,
+                        options: {
+                          fractionDigits: 8,
                         },
                       },
                     ]}
