@@ -123,7 +123,7 @@ class MostViewedProducts extends Component {
           'Market Cap',
           '30 Day Sales',
           '30 Day Change',
-          'View',
+          'Approved',
         ],
       ];
 
@@ -136,7 +136,7 @@ class MostViewedProducts extends Component {
           'Premium',
           'Premium',
           'Premium',
-          '<input id="button" type="submit" name="button" value="NFTs"/>',
+          'Unapproved',
         ]);
         _collections.push({
           name: collection.name,
@@ -167,8 +167,9 @@ class MostViewedProducts extends Component {
   openModal = (name) => {
 
     if(typeof name !== 'undefined'){
-      
-      this.setState({ currentCollection: _.find(_collections, ['name', name]) });
+      const collection = _.find(_collections, ['name', name]);
+      //this.setState({ currentCollection:  });
+      window.location.href = `/collection/${collection.contractAddress}`;
     };
 
     this.setState((prevState) => ({
@@ -219,10 +220,10 @@ class MostViewedProducts extends Component {
           role="dialog"
           autoFocus={true}
           centered={true}
-          style={{ maxWidth: '800px', width: '800px' }}
+          style={{ maxWidth: '500px', width: '500px' }}
         >
           <ModalHeader toggle={this.openModal}>
-            {this.state.currentCollection.name}
+            {(typeof this.state.currentCollection !== "undefined" ? this.state.currentCollection.name : "")}
           </ModalHeader>
           <ModalBody>
             <Row>
@@ -267,7 +268,7 @@ class MostViewedProducts extends Component {
                     viewBox="0 0 32 32"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
-                    class="w-4 h-4"
+                    className="w-4 h-4"
                   >
                     <g
                       clip-path="url(#etherscan_svg__clip0_1129_1376)"
@@ -308,7 +309,7 @@ class MostViewedProducts extends Component {
           <ModalFooter>
             <Link
               className="btn mouse-down"
-              to={`/collection/${this.state.currentCollection.contractAddress}`}
+              to={`/collection/${(typeof this.state.currentCollection !== "undefined" ? this.state.currentCollection.contractAddress : "")}`}
             >
               View NFTs
             </Link>

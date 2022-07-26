@@ -317,37 +317,37 @@ class Collection extends Component {
                       All
                     </li>{' '}
                     <li
-                      onClick={() => this.setCategory('Business')}
+                      onClick={() => this.setCategory('Minted')}
                       className={
-                        this.state.displayCategory === 'Branding'
+                        this.state.displayCategory === 'Minted'
                           ? 'list-inline-item categories-name border text-dark rounded active'
                           : 'list-inline-item categories-name border text-dark rounded'
                       }
                     >
-                      What Should
+                      Minted
                     </li>{' '}
                     <li
-                      onClick={() => this.setCategory('Marketing')}
+                      onClick={() => this.setCategory('Purchased')}
                       className={
-                        this.state.displayCategory === 'Designing'
+                        this.state.displayCategory === 'Purchased'
                           ? 'list-inline-item categories-name border text-dark rounded active'
                           : 'list-inline-item categories-name border text-dark rounded'
                       }
                     >
-                      These Filters
+                      Purchased
                     </li>{' '}
                     <li
-                      onClick={() => this.setCategory('Finanace')}
+                      onClick={() => this.setCategory('Transfered')}
                       className={
-                        this.state.displayCategory === 'Photography'
+                        this.state.displayCategory === 'Transfered'
                           ? 'list-inline-item categories-name border text-dark rounded active'
                           : 'list-inline-item categories-name border text-dark rounded'
                       }
                     >
-                      Be
+                      Transfered
                     </li>{' '}
                     <li
-                      onClick={() => this.setCategory('Human Research')}
+                      onClick={() => this.setCategory('Development')}
                       className={
                         this.state.displayCategory === 'Development'
                           ? 'list-inline-item categories-name border text-dark rounded active'
@@ -449,7 +449,7 @@ class Collection extends Component {
                                 <Col md="6">
                                   <Row>
                                     <Col md="12" style={{fontSize: '32px'}}>
-                                      $0.00
+                                      $0.00 <sup style={{fontSize: '16px', color: 'red'}}>-$0.00</sup>
                                     </Col>
                                     <Col md="12">
                                       Cost Basis 
@@ -459,8 +459,9 @@ class Collection extends Component {
                               </Row>
                               <hr />
                               <Row>
-                                <Col md="6">ETH on 02/23/21: $0.00</Col>
-                                <Col md="6">ETH Current: $0.00</Col>
+                                <Col md="12"><h6>ETH Prices</h6></Col>
+                                <Col md="6">2/22/2020: $0.00</Col>
+                                <Col md="6">Current: $0.00</Col>
                               </Row>
 
                               <hr />
