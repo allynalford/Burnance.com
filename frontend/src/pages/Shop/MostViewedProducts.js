@@ -126,7 +126,6 @@ class MostViewedProducts extends Component {
           'PnL',
           'Vol(24H)',
           'Vol Chg.',
-          'Approved',
         ],
       ];
 
@@ -141,7 +140,6 @@ class MostViewedProducts extends Component {
           '-114.67',
           '4,801,974.68',
           { v: 12, f: "-4.71%" },
-          'Unapproved',
         ]);
         _collections.push({
           name: collection.name,
