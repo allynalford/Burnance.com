@@ -439,7 +439,7 @@ class MostViewedProducts extends Component {
                   alt=""
                 /> */}
                   <div className="flex-1 content ms-3">
-                    <BasicPopperToolTip title={"Est Holding Value"} text={"Test Tool tip text: Est Holding Value"} />
+                    <BasicPopperToolTip title={"Est Holding Value"} text={"Holding value is calculated as: number of NFTs held * avg sale price of NFT's in the collection"} />
                     <p className="text h3 mb-0">{formatter.format(this.state.EstHoldingValue)}</p>
                   </div>
                 </div>
@@ -471,7 +471,7 @@ class MostViewedProducts extends Component {
                   alt=""
                 /> */}
                   <div className="flex-1 content ms-3">
-                    <BasicPopperToolTip title={"7 Day Sales"} text={"Test Tool tip text: 7 Day Sales"} />
+                    <BasicPopperToolTip title={"Liquidity (7D)"} text={"Liquidity is calculated as: 7 day sales / The number of NFT holders * 100%"} />
                     <p className="text h3 mb-0" >{this.state.Liquidity7D}%</p>
                   </div>
                 </div>
