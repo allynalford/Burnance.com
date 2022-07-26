@@ -1,9 +1,10 @@
 import React, { Component } from "react";
-import { Container, Row, Col, Card, CardBody, Button } from "reactstrap";
+import { Container, Row, Col, Card, CardBody, Button, ButtonGroup} from "reactstrap";
+import DropdownButton from 'react-bootstrap/DropdownButton';
+import Dropdown from 'react-bootstrap/Dropdown';
 import { Link, withRouter } from "react-router-dom";
-//Fade in effect
+import BasicPopperToolTip from "../../../components/BasicPopperToolTip";
 import FadeIn from "react-fade-in";
-
 import { getChain } from '../../../common/config';
 import ImageGrid from '../../../components/ImageGrid';
 
@@ -98,7 +99,7 @@ class Collection extends Component {
         sessionstorage.getItem(ethereumAddress + '-' + contractAddress),
       );
 
-      //console.log(exists)
+      console.log(exists)
 
       //Check if the records exists in storage
       if (typeof exists !== 'undefined' && exists !== null) {
@@ -114,6 +115,9 @@ class Collection extends Component {
           getChain()['eth'].viewWalletCollectionApiUrl +
             `/ethereum/${ethereumAddress}/${contractAddress}`,
         );
+
+        console.log(Collection)
+
         this.setState({
           collection: Collection.data.collection,
           nfts: Collection.data.nfts,
@@ -199,7 +203,8 @@ class Collection extends Component {
                   alt=""
                 /> */}
                   <div className="flex-1 content ms-3">
-                    <h2 className="title mb-0">Floor Price</h2>
+                    <BasicPopperToolTip title="Floor Price" text={"Test Tool tip text: Floor Price"} />
+                    
                     <p className="text-muted mb-0">--</p>
                     <p className="text-muted mb-0" style={{ fontSize: '12px' }}>
                       <Link to="#" className="text-primary">
@@ -220,7 +225,7 @@ class Collection extends Component {
                   alt=""
                 /> */}
                   <div className="flex-1 content ms-3">
-                    <h2 className="title mb-0">Market Cap</h2>
+                    <BasicPopperToolTip title="Market Cap" text={"Test Tool tip text: Market Cap"} />
                     <p className="text mb-0">--</p>
                     <p className="text-muted mb-0" style={{ fontSize: '12px' }}>
                       <Link to="#" className="text-primary">
@@ -243,7 +248,7 @@ class Collection extends Component {
                   {/* The liquidity rate measures the relative liquidity of each collection. 
                 Liquidity = Sales / The number of NFTs * 100% */}
                   <div className="flex-1 content ms-3">
-                    <h2 className="title mb-0">Liquidity (7D)</h2>
+                    <BasicPopperToolTip title="Liquidity (7D)" text={"Test Tool tip text: Liquidity (7D)"} />
                     <p className="text-muted mb-0">--</p>
                     <p className="text-muted mb-0" style={{ fontSize: '12px' }}>
                       <Link to="#" className="text-primary">
@@ -264,7 +269,7 @@ class Collection extends Component {
                   alt=""
                 /> */}
                   <div className="flex-1 content ms-3">
-                    <h2 className="title mb-0">Sales (7D)</h2>
+                    <BasicPopperToolTip title="Sales (7D)" text={"Test Tool tip text: Sales (7D)"} />
                     <p className="text-muted mb-0">--</p>
                     <p className="text-muted mb-0" style={{ fontSize: '12px' }}>
                       <Link to="#" className="text-primary">
@@ -394,7 +399,7 @@ class Collection extends Component {
                       <FadeIn delay={100}>
                         <Card className="blog border-0 work-container work-classic shadow rounded-md overflow-hidden">
                           <img
-                            src={cases.media[0].gateway}
+                            src={(typeof cases.media[0] === "undefined" ? `${process.env.REACT_APP_BASE_CDN_URL}/default-image.jpg` : cases.media[0].gateway)}
                             className="img-fluid rounded work-image"
                             alt={cases.description}
                           />
@@ -527,7 +532,24 @@ class Collection extends Component {
                               <hr />
 
                               <Row>
-                                <Col md="8">
+                                <Col md="12">
+                                  <ButtonGroup size="sm" role="group">
+                                    <Button className="btn btn-mini btn-warning rounded">Approve</Button>
+                                    <DropdownButton as={ButtonGroup} title="Options" id="bg-nested-dropdown">
+                                      <Dropdown.Item className="btn-success" eventKey="1">Sell (Burn)</Dropdown.Item>
+                                      <Dropdown.Item defaultValue={"Add"} className="btn-info" eventKey="2" onClick={ e =>{
+                                        console.log(cases.contract.address);
+                                      }}>Add to Batch</Dropdown.Item>
+                                    </DropdownButton>
+                                  </ButtonGroup>
+                               
+                                  {/* <Link
+                                    to="#"
+                                    className="text h7 badge badge-link bg-warning"
+                                  >
+                                    Approve
+                                  </Link>
+                                  &nbsp;
                                   <Link
                                     to="#"
                                     className="text h7 badge badge-link bg-info"
@@ -537,10 +559,10 @@ class Collection extends Component {
                                   &nbsp;
                                   <Link
                                     to="#"
-                                    className="text h7 badge badge-link bg-warning"
+                                    className="text h7 badge badge-link bg-success"
                                   >
-                                    Approve
-                                  </Link>
+                                    Sell (Burn)
+                                  </Link> */}
                                 </Col>
                               </Row>
                             </div>

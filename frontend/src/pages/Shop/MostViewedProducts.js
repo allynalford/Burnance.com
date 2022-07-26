@@ -13,9 +13,10 @@ import { getChain } from '../../common/config';
 import { Chart } from 'react-google-charts';
 import './tableCss.css';
 import { Link } from 'react-router-dom';
+import FeatherIcon from "feather-icons-react";
 import DataTable from '../../components/DataTable';
 import bgImg from "../../assets/images/nfts/ac1_unfit_digital_collage_of_locally_owned_nfts_by_annie_bur.jpg";
-
+import BasicPopperToolTip from "../../components/BasicPopperToolTip";
 var sessionstorage = require('sessionstorage');
 var _ = require('lodash');
 var endpoint = require('../../common/endpoint');
@@ -380,6 +381,7 @@ class MostViewedProducts extends Component {
                 /> */}
                   <div className="flex-1 content ms-3">
                     <h2 className="title mb-0">Est Holding Value</h2>
+                    <BasicPopperToolTip text={"Test Tool tip text: Est Holding Value"} />
                     <p className="text-muted mb-0">$0.00</p>
                     <p className="text-muted mb-0" style={{ fontSize: '12px' }}>
                       <Link to="#" className="text-primary">
@@ -400,7 +402,8 @@ class MostViewedProducts extends Component {
                   alt=""
                 /> */}
                   <div className="flex-1 content ms-3">
-                    <h2 className="title mb-0">Est Holding Cost</h2>
+                    <h2 className="title mb-0">Est Holding Cost </h2>
+                    <BasicPopperToolTip text={"Test Tool tip text: Est Holding Cost"} />
                     <p className="text mb-0">--</p>
                     <p className="text-muted mb-0" style={{ fontSize: '12px' }}>
                       <Link to="#" className="text-primary">
@@ -422,6 +425,7 @@ class MostViewedProducts extends Component {
                 /> */}
                   <div className="flex-1 content ms-3">
                     <h2 className="title mb-0">PnL</h2>
+                    <BasicPopperToolTip text={"Test Tool tip text: PnL"} />
                     <p className="text-muted mb-0">--</p>
                     <p className="text-muted mb-0" style={{ fontSize: '12px' }}>
                       <Link to="#" className="text-primary">
@@ -443,6 +447,7 @@ class MostViewedProducts extends Component {
                 /> */}
                   <div className="flex-1 content ms-3">
                     <h2 className="title mb-0">7 Day Sales</h2>
+                    <BasicPopperToolTip text={"Test Tool tip text: 7 Day Sales"} />
                     <p className="text-muted mb-0">--</p>
                     <p className="text-muted mb-0" style={{ fontSize: '12px' }}>
                       <Link to="#" className="text-primary">
@@ -453,15 +458,22 @@ class MostViewedProducts extends Component {
                 </div>
               </Col>
             </Row>
-          <Row>
+            {(this.state.walletConnected === false ? "" : <Row>
             <Col xs={12} style={{marginTop: "25px"}}>
               <h2 className="mb-0">
                 You have {this.state.collections.length} Collections in your Portfolio
               </h2>
             </Col>
-          </Row>
+          </Row>)}
+          
           <Row>
-            <Col md="12">
+              {(this.state.walletConnected === false ? <Col md="12">
+                <div className="row justify-content-center">
+                  <div className="col-lg-12 text-center">
+                    <h3 className="mb-0" style={{marginTop: '45px'}}>Connect your Wallet</h3>
+                  </div>
+                </div>
+              </Col> :  <Col md="12">
               {this.state.loading === true ? (
                 <DataTable width={'100%'} />
               ) : (
@@ -520,7 +532,7 @@ class MostViewedProducts extends Component {
                   />
                 </div>
               )}
-            </Col>
+            </Col>)}
           </Row>
           {/* <Row>
               {this.state.nfts.map((nft, key) => (
