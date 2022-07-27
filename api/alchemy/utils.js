@@ -93,6 +93,81 @@ module.exports.getCollections = async (chain, address) => {
 *
 * @author Allyn j. Alford <Allyn@tenablylabs.com>
 * @async
+* @function getCollectionsAndTokenIds
+* @param {String} chain - ETHEREUM|FLOW|TEZOS|POLYGON|SOLANA
+* @param {String} address -  address for NFT owner (can be in ENS format!)
+* @return {Promise<Array>} Response Array
+*/
+module.exports.getCollectionsAndTokenIds = async (chain, address) => {
+    try {
+      //const results = await endpoint._get(`${baseURL}/getNFTs/?owner=${address}`);
+
+      // Print total NFT count returned in the response:
+      const nfts = await this.getNFTs(chain, address);
+      //console.log('API First Pull FULL',nfts);
+      //Add the wallet
+      var wallet = [...nfts.ownedNfts];
+      console.log('API First Pull',{length: wallet.length, key: nfts.pageKey});
+
+      //Check if the list has more NFTs
+      if (typeof nfts.pageKey !== "undefined") {
+        const page = await this.getNFTsByPageKey(
+          chain,
+          address,
+          nfts.pageKey
+        );
+        //console.log("Next Page", page);
+        wallet.push(...page.ownedNfts);
+      }
+
+      const _ = require('lodash');
+
+      //Filter out the addresses for collections
+      const addresses = _.uniq(_.map(wallet, 'contract.address'));
+
+      //mintTokenIds = _.uniq(_.map(tokenNftTx.result, 'tokenID'));
+
+      //Loop the list of addresses
+      const addresses and 
+      tokenNftTx = 
+
+
+
+      //Responses object
+      let resp = [];
+
+      //Loop the addresses and produce a NFT count
+      for(const address of addresses){
+        //Count the amount of NFTs with the same contract address
+        const obj = _.countBy(wallet, (rec) => {
+            return rec.contract.address === address;
+        });
+
+        const nfts = _.find(wallet, function (o) { return o.contract.address === address;  });
+        console.log('nfts', nfts);
+
+        //Add the address tot he response with the count
+        resp.push({address, count: obj.true});
+
+      };
+
+      return resp;
+    } catch (e) {
+        console.error(e);
+        throw e;
+    }
+};
+
+
+/**
+* Gets all NFTs currently owned by a given address
+* This endpoint is supported on the following chains and networks:
+* Ethereum: Mainnet, Rinkeby, Kovan, Goerli, Ropsten
+* Polygon: Mainnet and Mumbai
+* Flow: Mainnet and Testnet (see docs here)
+*
+* @author Allyn j. Alford <Allyn@tenablylabs.com>
+* @async
 * @function getNFTs
 * @param {String} chain - ETHEREUM|FLOW|TEZOS|POLYGON|SOLANA
 * @param {String} address -  address for NFT owner (can be in ENS format!)

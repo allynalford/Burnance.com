@@ -140,39 +140,11 @@ export default class TaskManager extends Component {
               </ul>
             </Col>
             <Col md={7} xs={12} className="mt-4 pt-2">
-              <TabContent className="ms-lg-4" activeTab={this.state.activeTab}>
-                <TabPane className="show fade" tabId="1">
-                  <img
+            <img
                     src={apps}
                     className="img-fluid mx-auto rounded-md shadow-lg d-block"
                     alt=""
                   />
-                </TabPane>
-
-                <TabPane className="fade show" tabId="2">
-                  <img
-                    src={widgets2}
-                    className="img-fluid mx-auto rounded-md shadow-lg d-block"
-                    alt=""
-                  />
-                </TabPane>
-
-                <TabPane className="show fade" tabId="3">
-                  <img
-                    src={task}
-                    className="img-fluid mx-auto rounded-md shadow-lg d-block"
-                    alt=""
-                  />
-                </TabPane>
-
-                <TabPane className="tab-pane fade show" tabId="4">
-                  <img
-                    src={file}
-                    className="img-fluid mx-auto rounded-md shadow-lg d-block"
-                    alt=""
-                  />
-                </TabPane>
-              </TabContent>
             </Col>{' '}
           </Row>{' '}
         </Container>

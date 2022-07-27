@@ -61,11 +61,9 @@ module.exports.getNFTtx = async (chain, address, contractaddress, tokenId) => {
             const _ = require('lodash');
 
             mintTokenIds = _.uniq(_.map(tokenNftTx.result, 'tokenID'));
+            tokenNftTx = _.find(tokenNftTx.result, function (o) { return o.tokenID === tokenId.toString();  });
 
-            tokenNftTx = _.find(tokenNftTx.result, function (o) { return o.tokenID === tokenId; });
-
-           
-            console.log('Filtered', tokenNftTx);
+            console.log(`Filtered by (${tokenId})`, tokenNftTx);
 
             //If there is multiple in the transaction, it was a multiple mint
             //this should be flagged

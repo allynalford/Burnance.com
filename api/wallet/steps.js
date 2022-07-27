@@ -112,7 +112,185 @@ module.exports.start = async event => {
   
 };
 
+module.exports.loadWalletNFTList = async (event) => {
+    let req, dt, pupUtils, etherUtils, walletUtils, web3, loaded;
+    let chain, address, contractAddress, tokenIds;
 
+    try{
+        //req = (event.body !== "" ? JSON.parse(event.body) : event);
+        req = event;
+        log.options.tags = ['log', '<<level>>'];
+        dt = dateFormat(new Date(), "isoUtcDateTime");
+
+        address  = req.address;
+        chain  = req.chain;
+        contractAddress  = req.contractAddress;
+        tokenIds = req.tokenIds;
+
+
+        if(typeof address  === 'undefined') throw new Error("address is undefined");
+        if(typeof chain  === 'undefined') throw new Error("chain is undefined");
+        if(typeof contractAddress  === 'undefined') throw new Error("contractAddress is undefined");
+        if(typeof tokenIds  === 'undefined') throw new Error("tokenIds is undefined");
+
+
+        pupUtils = require('../pup/utils');
+        etherUtils = require('../etherscan/ethUtils');
+        walletUtils = require('../wallet/utils');
+        const Web3 = require('web3');
+        //add provider to it
+        web3 = new Web3(process.env.QUICK_NODE_HTTP);
+        
+    }catch(e){
+        console.error(e);
+        const error = new CustomError('HandledError',e.message);
+        return error;
+      }
+
+    try{
+
+
+        var browser = await pupUtils.getBrowser();
+
+        //Create a page
+        //const page = await browser.newPage();
+        const page = (await browser.pages())[0];
+
+        await page.setUserAgent(pupUtils.getRandomAgent());
+
+        await page.setRequestInterception(true);
+
+        //if the page makes a  request to a resource type of image then abort that request
+        page.on('request', request => {
+            if (request.resourceType() === 'image')
+                request.abort();
+            else
+                request.continue();
+        });
+
+
+
+            console.info('Browser Tabs: ', (await browser.pages()).length);
+
+            const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+            console.log(tokenIds)
+
+            for(const token of tokenIds){
+                const tx = await etherUtils.getNFTtx(chain, address, contractAddress, token.tokenId);
+                console.log('txs', tx);
+    
+                const url = `https://etherscan.io/tx/${tx.hash}`;
+    
+                let gasData = {retry: true};
+    
+    
+                if(typeof tx.gasData === "undefined"){
+                    while(typeof gasData.retry !== "undefined"){
+    
+                        gasData = await etherUtils._getNftTxHash(chain, address, tx.hash);
+    
+                        console.log('gasData Exists', gasData);
+    
+                        if(typeof gasData === "undefined"){
+    
+                            gasData = await pupUtils.getTxTransactionFee(url, page);
+    
+                        }else{
+                            gasData = gasData.result;
+    
+                            console.log('Deleting retry property')
+                            delete gasData.retry;
+                        }
+    
+                                 
+                        if(typeof gasData.retry !== "undefined"){
+                            console.log("Delaying 12000");
+    
+                            //delay next call
+                            await delay(12000);
+    
+                            //change the user agent
+                            await page.setUserAgent(pupUtils.getRandomAgent());
+    
+                        }else{
+    
+                            etherUtils._addNftTxHash(chain, address, tx.hash, gasData);
+    
+                            gasData.mintTokenIds = tx.mintTokenIds;
+                            gasData.transactionDate = tx.transactionDate;
+    
+                            let fields = [{name: 'status', value: 'loaded'},{name: 'gasData', value:  gasData}]
+                           
+                            //Update the NFT in the wallet
+                            //gasData.gasETH = web3.utils.fromWei(gasData.txFee.toString(), 'ether');
+                            gasData.gasETH = gasData.txFee;
+                            gasData.gasUSD = parseFloat((gasData.gasETH + 0) * gasData.closingPrice);
+    
+                            fields.push({ name: 'gasUSD', value:  gasData.gasUSD});
+                            fields.push({name: 'gasETH', value:  gasData.gasETH});
+    
+                            
+                            console.log('gasETH: ',gasData.gasETH);
+                            console.log('gasUSD: ',gasData.gasUSD);
+    
+                            
+    
+                            //Calculate the cost
+                            gasData.costETH = (gasData.gasETH + gasData.value);
+                            gasData.costUSD = parseFloat(gasData.costETH * gasData.closingPrice);
+                            gasData.valueUSD = parseFloat(gasData.value * gasData.closingPrice);
+    
+                            fields.push({name: 'valueETH', value:  gasData.value});
+                            fields.push({name: 'valueUSD', value:  gasData.valueUSD});
+    
+                            console.log('costETH: ',gasData.costETH);
+                            console.log('costUSD: ',gasData.costUSD);
+    
+                            fields.push({name: 'costETH', value:  gasData.costETH});
+                            fields.push({name: 'costUSD', value:  gasData.costUSD});
+    
+                            const update = await walletUtils._updateWalletNFTFields(chain, contractAddress + token.tokenId, fields);
+                            console.log('Update',update);
+                        }
+        
+                        
+                    }
+                    token.loaded = true;
+                }else{
+                    console.log("NFT already loaded");
+                    token.loaded = false;
+                    token.message = "NFT already loaded";
+                }
+            }
+
+ 
+
+        //Start cleaning up the browser session
+        page.removeAllListeners();
+
+        //Close the page
+        await page.close();
+
+        //Close the browser
+        await browser.close();
+        
+       
+        const resp = {
+            tokenIds,
+            dt
+        }
+
+        console.info('return', resp);
+
+     
+        return resp
+    }catch(e){
+        const error = new CustomError('HandledError',e.message);
+        return error;
+    }
+
+};
 
 
 module.exports.loadWalletData = async event => {

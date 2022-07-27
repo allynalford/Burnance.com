@@ -374,32 +374,42 @@ module.exports.ViewCollection = async (event) => {
 
   try {
     const collectionUtils = require('./collectionUtils');
-    const alchemyUtils = require('../alchemy/utils');
-    const walletUtils = require('../wallet/utils');
+   // const alchemyUtils = require('../alchemy/utils');
+    //const walletUtils = require('../wallet/utils');
     
 
     //Grab the collection
     const collection = await collectionUtils._getCollection(chain, contractAddress);
 
     //Grab the NFTs for the collection
-    const nfts = await alchemyUtils.getNFTsByContract(chain, address, [contractAddress]);
+    // const nfts = await alchemyUtils.getNFTsByContract(chain, address, [contractAddress]);
 
-    const updatedNfts = [];
-    //Loop the NFT's and get the data for them
-    for(const ownedNft of nfts.ownedNfts){
-      //console.log(ownedNft);
-      const nft = await walletUtils._ViewWalletNFT(chain, address, contractAddress, ownedNft.tokenId);
+    // const updatedNfts = []. nftsToLoad = [];
+    // //Loop the NFT's and get the data for them
+    // for(const ownedNft of nfts.ownedNfts){
+    //   //console.log(ownedNft);
+    //   const nft = await walletUtils._ViewWalletNFT(chain, address, contractAddress, ownedNft.tokenId);
 
-      //console.log(ownedNft);
+    //   //console.log(ownedNft);
 
-      nft.title = ownedNft.title;
-      nft.media = ownedNft.media;
-      nft.contract = ownedNft.contract;
-      nft.tokenId = ownedNft.tokenId;
-      nft.description = ownedNft.description;
+    //   if(typeof nft === "undefined"){
+    //     //Add to list to be loaded
+    //     nft.loading = true;
+    //     nftsToLoad.push({chain, address, contractAddress, tokenId: ownedNft.tokenId})
+    //   };
 
-      updatedNfts.push(nft);
-    }
+    //   nft.title = ownedNft.title;
+    //   nft.media = ownedNft.media;
+    //   nft.contract = ownedNft.contract;
+    //   nft.tokenId = ownedNft.tokenId;
+    //   nft.description = ownedNft.description;
+
+    //   updatedNfts.push(nft);
+    // };
+
+    // if(nftsToLoad.length !== 0){
+    //   //Send list to State Machine
+    // }
 
 
     return responses.respond({ error: false, success: true, collection, nfts: updatedNfts }, 200);

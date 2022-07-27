@@ -18,6 +18,8 @@
       - http:
           path: wallet/step/details/load
           method: post
+  walletNFTListLoad:
+    handler: wallet/steps.loadWalletNFTList  
   walletStop:
     handler: wallet/steps.stop   
   walletNotification:
@@ -52,5 +54,15 @@
       - http:
           path: wallet/{chain}/{address}
           method: delete
+          authorizer: aws_iam
+          cors: true
+  walletCollectionView:
+    handler: wallet/wallet.ViewWalletCollectionNFTs
+    memorySize: 1024 # optional, in MB, default is 1024
+    timeout: 30 # optional, in seconds, default is 6
+    events:
+      - http:
+          path: wallet/collection/{chain}/{address}/{contractAddress}
+          method: get
           authorizer: aws_iam
           cors: true

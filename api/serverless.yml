@@ -43,6 +43,7 @@ provider:
     NODE: ${file(config.${self:provider.stage}.json):NODE}
     KEY: ${file(config.${self:provider.stage}.json):KEY}
     STATE_MACHINE_WALLET_ARN : arn:aws:states:${opt:region, self:provider.region}:${self:provider.environment.ACCOUNTID}:stateMachine:walletDetailsStateMachineArn
+    STATE_MACHINE_WALLET_NFT_LIST_ARN : arn:aws:states:${opt:region, self:provider.region}:${self:provider.environment.ACCOUNTID}:stateMachine:walletNftListStateMachine
   iamRoleStatements:  
     - Effect: "Allow"
       Action:

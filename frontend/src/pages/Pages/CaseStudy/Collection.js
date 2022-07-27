@@ -44,6 +44,7 @@ class Collection extends Component {
       walletConnected: false,
       collectionApproved: false,
       loading: false,
+      loadingCollection: false,
       nfts: [],
       displayCategory: 'All',
       description: "",
@@ -129,9 +130,13 @@ class Collection extends Component {
   getNFTs = async (ethereumAddress, contractAddress, ethusd) => {
     //console.log('Loading Page:',pageNumber);
     try {
-      this.setState({ loading: true });
+      this.setState({ loading: true, loadingCollection: true });
       const exists = JSON.parse(
         sessionstorage.getItem(ethereumAddress + '-' + contractAddress),
+      );
+
+      const existsNFTS = JSON.parse(
+        sessionstorage.getItem(ethereumAddress + '-' + contractAddress + '-nfts'),
       );
 
       console.log('Exists in Cache', exists);
@@ -144,15 +149,16 @@ class Collection extends Component {
         const floorPrice = (typeof collection.statistics !== "undefined" ? formatter.format(parseFloat(Number(collection.statistics.floor_price) * Number(ethusd))) : formatter.format(0.00));
         const marketCap = (typeof collection.statistics !== "undefined" ? formatter.format(parseFloat(Number(collection.statistics.market_cap) * Number(ethusd))) : formatter.format(0.00));
         const avgPrice = (typeof collection.statistics !== "undefined" ? formatter.format(parseFloat(Number(collection.statistics.average_price) * Number(ethusd))) : formatter.format(0.00))
-        const holdingValue = (typeof collection.statistics !== "undefined" ? formatter.format(parseFloat(Number((exists.nfts.length * collection.statistics.average_price)) * Number(ethusd))) : formatter.format(0.00))
+        const holdingValue = (typeof collection.statistics !== "undefined" ? formatter.format(parseFloat(Number((existsNFTS.nfts.length * collection.statistics.average_price)) * Number(ethusd))) : formatter.format(0.00))
         const thirtyDayVolume = (typeof collection.statistics !== "undefined" ? formatter.format(parseFloat(Number(collection.statistics.thirty_day_volume) * Number(ethusd))) : formatter.format(0.00));
         
         console.log('Setting State');
         this.setState({
           collection: exists.collection,
-          nfts: exists.nfts,
+          nfts: existsNFTS.nfts,
+          loadingCollection: false,
           loading: false,
-          description: exists.nfts[0].description,
+          description: existsNFTS.nfts[0].description,
           floorPrice,
           marketCap,
           avgPrice,
@@ -160,7 +166,7 @@ class Collection extends Component {
           thirtyDayVolume,
           totalSupply: (typeof collection.statistics !== "undefined" ? collection.statistics.total_supply : '-'),
           owners: (typeof collection.statistics !== "undefined" ? collection.statistics.num_owners : '-'),
-          held: exists.nfts.length,
+          held: existsNFTS.nfts.length,
           liquidity1d: (typeof collection.statistics !== "undefined" ? ((collection.statistics.one_day_sales / (collection.statistics.total_supply - collection.statistics.num_owners)) * 100).toFixed(2) : 0.0),
           liquidity7d:(typeof collection.statistics !== "undefined" ? ((collection.statistics.seven_day_sales / (collection.statistics.total_supply - collection.statistics.num_owners)) * 100).toFixed(2) : 0.0),
           liquidity30d:(typeof collection.statistics !== "undefined" ? ((collection.statistics.thirty_day_sales / (collection.statistics.total_supply - collection.statistics.num_owners)) * 100).toFixed(2) : 0.0),
@@ -184,29 +190,23 @@ class Collection extends Component {
         }
 
         console.log('Called Service', Collection);
-        console.log('Called Service', Collection.data.nfts[0].details);
        
         const collection = Collection.data.collection;
         const floorPrice = (typeof collection.statistics !== "undefined" ? formatter.format(parseFloat(Number(collection.statistics.floor_price) * Number(ethusd))) : formatter.format(0.00));
         const marketCap = (typeof collection.statistics !== "undefined" ? formatter.format(parseFloat(Number(collection.statistics.market_cap) * Number(ethusd))) : formatter.format(0.00));
         const avgPrice = (typeof collection.statistics !== "undefined" ? formatter.format(parseFloat(Number(collection.statistics.average_price) * Number(ethusd))) : formatter.format(0.00))
-        const holdingValue = (typeof collection.statistics !== "undefined" ? formatter.format(parseFloat(Number((Collection.data.nfts.length * collection.statistics.average_price)) * Number(ethusd))) : formatter.format(0.00))
         const thirtyDayVolume = (typeof collection.statistics !== "undefined" ? formatter.format(parseFloat(Number(collection.statistics.thirty_day_volume) * Number(ethusd))) : formatter.format(0.00));
           
 
         this.setState({
           collection: Collection.data.collection,
-          nfts: Collection.data.nfts,
-          loading: false,
-          description: Collection.data.nfts[0].description,
+          loadingCollection: false,
           floorPrice,
           avgPrice,
-          holdingValue,
           marketCap,
           thirtyDayVolume,
           totalSupply: (typeof collection.statistics !== "undefined" ? collection.statistics.total_supply : '-'),
           owners: (typeof collection.statistics !== "undefined" ? collection.statistics.num_owners : '-'),
-          held: Collection.data.nfts.length,
           liquidity1d: (typeof collection.statistics !== "undefined" ? ((collection.statistics.one_day_sales / (collection.statistics.total_supply - collection.statistics.num_owners)) * 100).toFixed(2) : 0.0),
           liquidity7d:(typeof collection.statistics !== "undefined" ? ((collection.statistics.seven_day_sales / (collection.statistics.total_supply - collection.statistics.num_owners)) * 100).toFixed(2) : 0.0),
           liquidity30d:(typeof collection.statistics !== "undefined" ? ((collection.statistics.thirty_day_sales / (collection.statistics.total_supply - collection.statistics.num_owners)) * 100).toFixed(2) : 0.0),
@@ -216,6 +216,41 @@ class Collection extends Component {
           ethereumAddress + '-' + contractAddress,
           JSON.stringify(Collection.data),
         );
+
+
+        let NFTS;
+        try{
+          NFTS = await endpoint._get(
+            getChain()['eth'].viewWalletCollectionNftsApiUrl +
+              `/ethereum/${ethereumAddress}/${contractAddress}`,
+          );
+        }catch(e){
+          console.warn(e);
+          NFTS = await endpoint._get(
+            getChain()['eth'].viewWalletCollectionNftsApiUrl +
+              `/ethereum/${ethereumAddress}/${contractAddress}`,
+          );
+        }
+
+
+        console.log('Called NFT Service', NFTS);
+
+        const holdingValue = (typeof collection.statistics !== "undefined" ? formatter.format(parseFloat(Number((NFTS.data.nfts.length * collection.statistics.average_price)) * Number(ethusd))) : formatter.format(0.00))
+
+
+        this.setState({
+          nfts: NFTS.data.nfts,
+          loading: false,
+          holdingValue,
+          description: NFTS.data.nfts[0].description,
+          held: NFTS.data.nfts.length,
+           });
+
+           sessionstorage.setItem(
+            ethereumAddress + '-' + contractAddress + '-nfts',
+            JSON.stringify(NFTS.data),
+          );
+
       }
     } catch (e) {
       console.error(e);
