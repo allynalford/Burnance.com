@@ -109,7 +109,7 @@ module.exports.getTxTransactionFee = async (url, page) => {
         if(typeof txFee !== "undefined"){
          //Clean Up the fee
          txFee = txFee.replace(' Ether', '');
-         txFee = txFee.replace('0.', '');
+         //txFee = txFee.replace('0.', '');
         }
 
         if(typeof closingPrice !== "undefined"){
@@ -136,10 +136,10 @@ module.exports.getTxTransactionFee = async (url, page) => {
 
         //Return the data
         return {
-            value,
-            txFee,
-            gasPrice,
-            closingPrice,
+            value: Number(value),
+            txFee: Number(txFee),
+            gasPrice: Number(gasPrice),
+            closingPrice: Number(closingPrice),
             dt: dateFormat(dt, "isoDateTime")
         }
     } catch (err) {

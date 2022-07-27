@@ -150,7 +150,7 @@ module.exports.AddCollection = async (event) => {
 };
 
 module.exports.GetCollection = async (event) => {
-  let dt, chain, address;
+  let dt, chain, address, statistics;
   try {
     dt = dateFormat(new Date(), "isoUtcDateTime");
 
@@ -218,7 +218,7 @@ module.exports.GetCollection = async (event) => {
           try {
             statistics = await nftPortUtils._getCollectionStats(chain, addr.address);
           } catch (s) {
-            console.log(s.statusText);
+            console.log(s.message);
             statistics = {};
 
             //We need to look up the data elsewhere
@@ -375,15 +375,34 @@ module.exports.ViewCollection = async (event) => {
   try {
     const collectionUtils = require('./collectionUtils');
     const alchemyUtils = require('../alchemy/utils');
+    const walletUtils = require('../wallet/utils');
+    
 
     //Grab the collection
     const collection = await collectionUtils._getCollection(chain, contractAddress);
 
-    //Grab the NFTs for the colection
+    //Grab the NFTs for the collection
     const nfts = await alchemyUtils.getNFTsByContract(chain, address, [contractAddress]);
 
+    const updatedNfts = [];
+    //Loop the NFT's and get the data for them
+    for(const ownedNft of nfts.ownedNfts){
+      //console.log(ownedNft);
+      const nft = await walletUtils._ViewWalletNFT(chain, address, contractAddress, ownedNft.tokenId);
 
-    return responses.respond({ error: false, success: true, collection, nfts: nfts.ownedNfts }, 200);
+      //console.log(ownedNft);
+
+      nft.title = ownedNft.title;
+      nft.media = ownedNft.media;
+      nft.contract = ownedNft.contract;
+      nft.tokenId = ownedNft.tokenId;
+      nft.description = ownedNft.description;
+
+      updatedNfts.push(nft);
+    }
+
+
+    return responses.respond({ error: false, success: true, collection, nfts: updatedNfts }, 200);
   } catch (err) {
     console.error(err);
     const res = {

@@ -415,7 +415,7 @@ module.exports._deleteWallet = async (chain, address) => {
 module.exports._getWalletNFT = async (owner, contractAddressTokenId) => {
     try {
         const dynamo = require('../common/dynamo');
-        return await dynamo.queryDB({
+        const nft = await dynamo.queryDB({
             TableName: process.env.DYNAMODB_TABLE_WALLET_NFT,
             IndexName: 'InstanceIdIndex',
             KeyConditionExpression: "#owner = :owner and #contractAddressTokenId = :contractAddressTokenId",
@@ -428,6 +428,8 @@ module.exports._getWalletNFT = async (owner, contractAddressTokenId) => {
                 ":contractAddressTokenId": contractAddressTokenId
             },
         });
+
+        return nft[0];
 
     } catch (e) {
         console.error(e.message);
@@ -597,4 +599,215 @@ module.exports._addWalletCollectionToCache = async (chain, address, collections)
         console.error(e);
         throw e;
     }
+};
+
+
+/**
+* Returns wallet collections
+*
+* @author Allyn j. Alford <Allyn@tenablylabs.com>
+* @async
+* @function _getWalletNFT
+* @param {String} chain - ethereum
+* @param {String} address -  wallet owner address
+* @return {Promise<Array>} Response Array for next step to process.
+*/
+module.exports._ViewWalletNFT = async (chain, address, contractAddress, tokenId) => {
+    try {
+        //First check if it's in the database
+        let nft = await this._getWalletNFT(address, contractAddress+tokenId);
+
+        console.log(`module.exports._ViewWalletNFT: Exists in DB(${contractAddress+tokenId})`, typeof nft !== "undefined");
+
+        //Check if it exists, if it does return the results
+        if(typeof nft === "undefined" || typeof nft.gasData === "undefined"){
+           //We need to build, save and return it
+            await this.loadWalletNFT(chain, address, contractAddress, tokenId);
+          
+            nft = await this._getWalletNFT(address, contractAddress+tokenId);
+        }
+
+        return nft;
+    } catch (e) {
+        console.error(e);
+        throw e;
+    }
+  };
+
+  module.exports.loadWalletNFT = async (chain, address, contractAddress, tokenId) => {
+    let dt, pupUtils, etherUtils, walletUtils, web3, loaded;
+
+    try{
+        const dateformat = require("dateformat");
+        dt = dateformat(new Date(), "isoUtcDateTime");
+
+
+        if(typeof address  === 'undefined') throw new Error("address is undefined");
+        if(typeof chain  === 'undefined') throw new Error("chain is undefined");
+
+
+        pupUtils = require('../pup/utils');
+        etherUtils = require('../etherscan/ethUtils');
+        walletUtils = require('../wallet/utils');
+        const Web3 = require('web3');
+        //add provider to it
+        web3 = new Web3(process.env.QUICK_NODE_HTTP);
+        
+    }catch(e){
+      console.error(e);
+      return e;
+    }
+
+    try{
+
+        const MAX_TRYS = 10, TRY_TIMEOUT = 800;
+        function toTry() {
+            return new Promise((ok, fail) => {
+                setTimeout(() => Math.random() < 0.05 ? ok("OK!") : fail("Error"), TRY_TIMEOUT);
+            });
+        }
+        async function tryNTimes(toTry, count = MAX_TRYS) {
+            if (count > 0) {
+                const result = await toTry().catch(e => e);
+                if (result === "Error") { return await tryNTimes(toTry, count - 1) }
+                return result
+            }
+            return `Tried ${MAX_TRYS} times and failed`;
+        }
+
+        var browser = await pupUtils.getBrowser();
+
+        //Create a page
+        //const page = await browser.newPage();
+        const page = (await browser.pages())[0];
+
+        await page.setUserAgent(pupUtils.getRandomAgent());
+
+        await page.setRequestInterception(true);
+
+        //if the page makes a  request to a resource type of image then abort that request
+        page.on('request', request => {
+            if (request.resourceType() === 'image')
+                request.abort();
+            else
+                request.continue();
+        });
+
+
+
+        console.info('Browser Tabs: ', (await browser.pages()).length);
+
+            const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+            const tx = await etherUtils.getNFTtx(chain, address, contractAddress, tokenId);
+            console.log('txs', tx);
+
+            const url = `https://etherscan.io/tx/${tx.hash}`;
+
+            let gasData = {retry: true};
+
+
+            if(typeof tx.gasData === "undefined"){
+                while(typeof gasData.retry !== "undefined"){
+
+                    gasData = await etherUtils._getNftTxHash(chain, address, tx.hash);
+
+                    //console.log('gasData Exists',gasData);
+
+                    if(typeof gasData === "undefined"){
+
+                        gasData = await pupUtils.getTxTransactionFee(url, page);
+
+                    }else{
+                        gasData = gasData.result;
+
+                        delete gasData.retry;
+                    }
+
+                             
+                    if(typeof gasData.retry !== "undefined"){
+                        console.log("Delaying 12000");
+
+                        //delay next call
+                        await delay(12000);
+
+                        //change the user agent
+                        await page.setUserAgent(pupUtils.getRandomAgent());
+
+                    }else{
+
+                        etherUtils._addNftTxHash(chain, address, tx.hash, gasData);
+
+                        gasData.mintTokenIds = tx.mintTokenIds;
+                        gasData.transactionDate = tx.transactionDate;
+
+                        let fields = [{name: 'status', value: 'loaded'},{name: 'gasData', value:  gasData}]
+                       
+                        //Update the NFT in the wallet
+                        //gasData.gasETH = web3.utils.fromWei(gasData.txFee.toString(), 'ether');
+                        gasData.gasETH = gasData.txFee;
+                        gasData.gasUSD = parseFloat((gasData.gasETH + 0) * gasData.closingPrice);
+
+                        fields.push({ name: 'gasUSD', value:  gasData.gasUSD});
+                        fields.push({name: 'gasETH', value:  gasData.gasETH});
+
+                        
+                        console.log('gasETH: ',gasData.gasETH);
+                        console.log('gasUSD: ',gasData.gasUSD);
+
+                        
+
+                        //Calculate the cost
+                        gasData.costETH = (gasData.gasETH + gasData.value);
+                        gasData.costUSD = parseFloat(gasData.costETH * gasData.closingPrice);
+                        gasData.valueUSD = parseFloat(gasData.value * gasData.closingPrice);
+
+                        fields.push({name: 'valueETH', value:  gasData.value});
+                        fields.push({name: 'valueUSD', value:  gasData.valueUSD});
+
+                        console.log('costETH: ',gasData.costETH);
+                        console.log('costUSD: ',gasData.costUSD);
+
+                        fields.push({name: 'costETH', value:  gasData.costETH});
+                        fields.push({name: 'costUSD', value:  gasData.costUSD});
+
+                        const update = await walletUtils._updateWalletNFTFields(chain, contractAddress + tokenId, fields);
+                        console.log('Update',update);
+                    }
+    
+                    
+                }
+                loaded = true;
+            }else{
+                console.log("NFT already loaded");
+                loaded = false;
+            }
+
+
+ 
+
+        //Start cleaning up the browser session
+        page.removeAllListeners();
+
+        //Close the page
+        await page.close();
+
+        //Close the browser
+        await browser.close();
+        
+       
+        const resp = {
+            loaded,
+            dt
+        }
+
+        console.info('return', resp);
+     
+
+        return resp
+    }catch(e){
+        console.error(e);
+        return e;
+    }
+
 };

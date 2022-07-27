@@ -168,13 +168,24 @@ class Collection extends Component {
       } else {
         
         //Call the service to get the NFTs
-        const Collection = await endpoint._get(
-          getChain()['eth'].viewWalletCollectionApiUrl +
-            `/ethereum/${ethereumAddress}/${contractAddress}`,
-        );
+        let Collection;
+
+        try{
+          Collection = await endpoint._get(
+            getChain()['eth'].viewWalletCollectionApiUrl +
+              `/ethereum/${ethereumAddress}/${contractAddress}`,
+          );
+        }catch(e){
+          console.warn(e);
+          Collection = await endpoint._get(
+            getChain()['eth'].viewWalletCollectionApiUrl +
+              `/ethereum/${ethereumAddress}/${contractAddress}`,
+          );
+        }
 
         console.log('Called Service', Collection);
-
+        console.log('Called Service', Collection.data.nfts[0].details);
+       
         const collection = Collection.data.collection;
         const floorPrice = (typeof collection.statistics !== "undefined" ? formatter.format(parseFloat(Number(collection.statistics.floor_price) * Number(ethusd))) : formatter.format(0.00));
         const marketCap = (typeof collection.statistics !== "undefined" ? formatter.format(parseFloat(Number(collection.statistics.market_cap) * Number(ethusd))) : formatter.format(0.00));
@@ -221,7 +232,7 @@ class Collection extends Component {
       sessionstorage.setItem("ethPrice", JSON.stringify(ethPrice));
     };
 
-    console.log('EthPrice: Running getNFTs')
+    console.log('EthPrice: Running getNFTs', ethPrice)
     this.getNFTs(ethereumAddress, contractAddress, ethPrice.ethusd);
 
     this.setState({ethPrice});
@@ -754,7 +765,11 @@ class Collection extends Component {
                       this.state.displayCategory === category ||
                       this.state.displayCategory === 'All',
                   )
-                  .map((cases, key) => (
+                  .map((cases, key) => { 
+                    
+                    const currentCost = parseFloat(cases.costETH * this.state.ethPrice.ethusd)
+                    const diff = (currentCost - cases.costUSD);
+                    return (
                     <Col
                       key={key}
                       lg={4}
@@ -766,7 +781,7 @@ class Collection extends Component {
                         <Card className="blog border-0 work-container work-classic shadow rounded-md overflow-hidden">
                           <img
                             src={
-                              typeof cases.media[0] === 'undefined'
+                              typeof cases.media === 'undefined'
                                 ? `${process.env.REACT_APP_BASE_CDN_URL}/default-image.jpg`
                                 : cases.media[0].gateway
                             }
@@ -860,16 +875,16 @@ class Collection extends Component {
                               <Row>
                                 <Col md="6">
                                   <Row>
-                                    <Col md="6" style={{ fontSize: '16px' }}>
-                                      $0.00
+                                    <Col md="6" style={{ fontSize: '16px' }} className="text-center font-weight-bold">
+                                    {formatter.format(cases.valueUSD)}{' '}
                                     </Col>
-                                    <Col md="6" style={{ fontSize: '16px' }}>
-                                      $0.00
+                                    <Col md="6" style={{ fontSize: '16px' }} className="text-center">
+                                    {formatter.format(cases.gasUSD)}{' '}
                                     </Col>
-                                    <Col md="6" style={{ fontSize: '16px' }}>
+                                    <Col md="6" style={{ fontSize: '16px' }} className="text-center">
                                       Cost
                                     </Col>
-                                    <Col md="6" style={{ fontSize: '16px' }}>
+                                    <Col md="6" style={{ fontSize: '16px' }} className="text-center">
                                       <i className="uil uil-angle-right-b align-middle"></i>
                                       Gas
                                     </Col>
@@ -877,19 +892,41 @@ class Collection extends Component {
                                 </Col>
                                 <Col md="6">
                                   <Row>
-                                    <Col md="12" style={{ fontSize: '32px' }}>
-                                      $0.00{' '}
-                                      <sup
+                                    <Col md="12" className="text-center h3">
+                                    {formatter.format(cases.costUSD)}
+                                    </Col>
+                                    <Col md="12" className="text-center">Cost Basis</Col>
+                                  </Row>
+                                </Col>
+                              </Row>
+                              <hr />
+                              <Row>
+                              <Col md="12">
+                                  <h6>Cost Today</h6>
+                                </Col>
+                                <Col md="3" className="text-center">
+                                        {formatter.format(currentCost)}
+                                </Col>
+                                <Col md="3" className="text-center">
+                                      {numFormatter.format(cases.costETH)}
+                                </Col>
+                                <Col md="6" className="text-center h3">
+                                <span
                                         style={{
-                                          fontSize: '16px',
-                                          color: 'red',
+                                          color: (diff <= 0 ? 'red' : 'green'),
                                         }}
                                       >
-                                        -$0.00
-                                      </sup>
-                                    </Col>
-                                    <Col md="12">Cost Basis</Col>
-                                  </Row>
+                                        {formatter.format(diff)}
+                                      </span>
+                                </Col>
+                                <Col md="3" className="text-center">
+                                    Cost
+                                </Col>
+                                <Col md="3" className="text-center">
+                                    ETH
+                                </Col>
+                                <Col md="6" className="text-center font-weight-bold">
+                                    P / L
                                 </Col>
                               </Row>
                               <hr />
@@ -897,8 +934,10 @@ class Collection extends Component {
                                 <Col md="12">
                                   <h6>ETH Prices</h6>
                                 </Col>
-                                <Col md="6">2/22/2020: $0.00</Col>
-                                <Col md="6">Current: $0.00</Col>
+                                <Col md="6" className="text-center">{formatter.format(cases.ethTransPriceUSD)}</Col>
+                                <Col md="6" className="text-center">{formatter.format(this.state.ethPrice.ethusd)}</Col>
+                                <Col md="6" className="text-center font-weight-bold">2/22/2020</Col>
+                                <Col md="6" className="text-center font-weight-bold">Current</Col>
                               </Row>
 
                               <hr />
@@ -996,7 +1035,7 @@ class Collection extends Component {
                         </Card>
                       </FadeIn>
                     </Col>
-                  ))}
+                  )})}
               </Row>
             )}
           </Container>

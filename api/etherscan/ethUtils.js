@@ -20,6 +20,7 @@ const dateformat = require("dateformat");
  */
 module.exports.getNFTtx = async (chain, address, contractaddress, tokenId) => {
     let valueETH, valueUSD, costUSD, costETH, gasETH, gasUSD, etherScanTxUrl, hash, price;
+    let mintTokenIds = [];
     try {
 
         //Check if the NFT already exists for this wallet
@@ -55,12 +56,15 @@ module.exports.getNFTtx = async (chain, address, contractaddress, tokenId) => {
                 }
             };
 
-            //console.log('tokenNftTx',tokenNftTx);
+            console.log('tokenNftTx unfiltered',tokenNftTx);
 
             const _ = require('lodash');
 
+            mintTokenIds = _.uniq(_.map(tokenNftTx.result, 'tokenID'));
+
             tokenNftTx = _.find(tokenNftTx.result, function (o) { return o.tokenID === tokenId; });
 
+           
             console.log('Filtered', tokenNftTx);
 
             //If there is multiple in the transaction, it was a multiple mint
@@ -116,7 +120,7 @@ module.exports.getNFTtx = async (chain, address, contractaddress, tokenId) => {
           gasETH = (Number(gasETH) + Number(gasToEth));//First the value
         };
 
-        gasUSD = parseFloat(gasETH * price.result[0].value);
+        gasUSD = parseFloat((Number(gasETH) + 0) * price.result[0].value);
 
         costETH = (Number(valueETH) + Number(gasETH));//Then the transaction cost in gas
 
@@ -137,7 +141,9 @@ module.exports.getNFTtx = async (chain, address, contractaddress, tokenId) => {
           valueUSD,
           valueETH,
           price.result[0].value,
-          tokenNftTx.hash
+          tokenNftTx.hash,
+          mintTokenIds,
+          date
         );
         console.log("saveNFT", saveNFT);
        
@@ -150,7 +156,9 @@ module.exports.getNFTtx = async (chain, address, contractaddress, tokenId) => {
             valueUSD,
             ethTransPriceUSD: price.result[0].value,
             etherScanTxUrl,
-            hash
+            hash,
+            mintTokenIds,
+            transactionDate: date
         }
     } catch (err) {
         console.error(err.message);
@@ -403,6 +411,66 @@ module.exports._tokenURI = async (contract, tokenId) => {
       }
     };
 
+/**
+ * Add NFT transaction
+ *
+ * @author Allyn j. Alford <Allyn@tenablylabs.com>
+ * @async
+ * @function _addNftTxHash
+ * @param {String} chain - ethereum
+ * @param {String} address - nft owner address
+ * @param {String} hash transaction hash
+ * @param {Array} result results
+ * @return {Promise<Array>} Response Array for next step to process.
+ */
+    module.exports._addNftTxHash = async (chain, address, hash, result) => {
+      try {
+        const dynamo = require('../common/dynamo');
+        const dateformat = require("dateformat");
+        return await dynamo.saveItemInDB({
+          TableName: process.env.DYNAMODB_TABLE_WALLET_TX_HASH,
+          Item: {
+            chainAddress: chain + '-' + address, 
+            hash,
+            result,
+            dt: dateformat(new Date(), "isoUtcDateTime"),
+            timestamp: new Date().getTime(),
+          },
+        });
+      } catch (e) {
+        console.error(e);
+        throw e;
+      }
+    };
+
+/**
+ * Returns NFT transaction data
+ *
+ * @author Allyn j. Alford <Allyn@tenablylabs.com>
+ * @async
+ * @function _getNftTxHash
+ * @param {String} chain - ethereum
+ * @param {String} address - nft owner address
+ * @param {String} hash transaction hash
+ * @return {Promise<Array>} Response Array for next step to process.
+ */
+module.exports._getNftTxHash = async (chain, address, hash) => {
+    try {
+        const dynamo = require('../common/dynamo');
+        const assets = await dynamo.qetFromDB({
+            TableName: process.env.DYNAMODB_TABLE_WALLET_TX_HASH,
+            Key: {
+                chainAddress: chain + '-' + address,
+                hash
+            }
+        });
+        return assets;
+    } catch (e) {
+        console.error(e);
+        throw e;
+    }
+};
+
 
        /**
  * Returns Wallet NFT data
@@ -452,9 +520,11 @@ module.exports._getWalletNFT = async (owner, contractAddressTokenId) => {
      * @param {Number} valueETH
      * @param {Number} ethTransPriceUSD
      * @param {String} hash
+     * @param {Array} mintTokenIds
+     * @param {Date} transactionDate
      * @return {Promise<Array>} Response Array for next step to process.
      */
-        module.exports._addWalletNFT = async (chain, owner, contractAddressTokenId, costETH, costUSD, valueUSD, valueETH, ethTransPriceUSD, hash) => {
+        module.exports._addWalletNFT = async (chain, owner, contractAddressTokenId, costETH, costUSD, valueUSD, valueETH, ethTransPriceUSD, hash, mintTokenIds, transactionDate) => {
           try {
             const dynamo = require('../common/dynamo');
             const dateformat = require("dateformat");
@@ -470,6 +540,8 @@ module.exports._getWalletNFT = async (owner, contractAddressTokenId) => {
                 valueETH, 
                 ethTransPriceUSD, 
                 hash,
+                mintTokenIds,
+                transactionDate,
                 createdatetime: dateformat(new Date(), "isoUtcDateTime"),
                 timestamp: new Date().getTime(),
               },

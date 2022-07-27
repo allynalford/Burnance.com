@@ -8,6 +8,8 @@ collectionAdd:
         cors: true
 collectionGet:
   handler: collection/handler.GetCollection
+  memorySize: 1024 # optional, in MB, default is 1024
+  timeout: 30 # optional, in seconds, default is 6
   events:
     - http:
         path: collection/{chain}/{address}
@@ -16,6 +18,8 @@ collectionGet:
         cors: true
 collectionView:
   handler: collection/handler.ViewCollection
+  memorySize: 1024 # optional, in MB, default is 1024
+  timeout: 30 # optional, in seconds, default is 6
   events:
     - http:
         path: collection/view/{chain}/{address}/{contractAddress}

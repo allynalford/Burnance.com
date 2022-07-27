@@ -39,6 +39,7 @@ provider:
     DYNAMODB_TABLE_WALLET_COLLECTION_CACHE: ${self:service}-${opt:stage, self:provider.stage}-wallet-collection-cache
     DYNAMODB_TABLE_WALLET_NFT_TX: ${self:service}-${opt:stage, self:provider.stage}-wallet-nft-tx
     DYNAMODB_TABLE_NFT_COLLECTION: ${self:service}-${opt:stage, self:provider.stage}-nft-collection
+    DYNAMODB_TABLE_WALLET_TX_HASH: ${self:service}-${opt:stage, self:provider.stage}-wallet-nft-tx-hash
     NODE: ${file(config.${self:provider.stage}.json):NODE}
     KEY: ${file(config.${self:provider.stage}.json):KEY}
     STATE_MACHINE_WALLET_ARN : arn:aws:states:${opt:region, self:provider.region}:${self:provider.environment.ACCOUNTID}:stateMachine:walletDetailsStateMachineArn
@@ -73,6 +74,7 @@ provider:
         - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE_NFT_IMAGE}"
         - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE_NFT_COLLECTION}"
         - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE_WALLET_COLLECTION_CACHE}" 
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE_WALLET_TX_HASH}" 
 package:
   individually: false
   exclude:
@@ -108,6 +110,28 @@ resources:
     #     RestApiId:
     #       Ref: 'ApiGatewayRestApi'
     #     StatusCode: '401'
+    NFTTxHashDynamoDBTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: chainAddress
+            AttributeType: S
+          -  
+            AttributeName: hash
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: chainAddress
+            KeyType: HASH
+          -
+            AttributeName: hash
+            KeyType: RANGE      
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.environment.DYNAMODB_TABLE_WALLET_TX_HASH}
     # NFTImageDynamoDBTable:
     #   Type: 'AWS::DynamoDB::Table'
     #   DeletionPolicy: Retain
