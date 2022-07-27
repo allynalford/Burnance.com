@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, CSSProperties } from "react";
 import { Container, Row, Col, Card, CardBody, Button, ButtonGroup} from "reactstrap";
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import Dropdown from 'react-bootstrap/Dropdown';
@@ -8,7 +8,7 @@ import FadeIn from "react-fade-in";
 import { getChain } from '../../../common/config';
 import ImageGrid from '../../../components/ImageGrid';
 import {initGA, PageView, Event} from '../../../common/gaUtils';
-
+import RingLoader from "react-spinners/RingLoader";
 
 //Import Images
 import bgImg from "../../../assets/images/nfts/ac1_unfit_digital_collage_of_locally_owned_nfts_by_annie_bur.jpg";
@@ -27,6 +27,13 @@ var formatter = new Intl.NumberFormat('en-US', {
 });
 
 var numFormatter = new Intl.NumberFormat('en-US', { maximumSignificantDigits: 3 })
+
+
+const override: CSSProperties = {
+  display: "block",
+  margin: "0 auto",
+  borderColor: "red",
+};
 
 class Collection extends Component {
   constructor(props, { match }) {
@@ -154,9 +161,9 @@ class Collection extends Component {
           totalSupply: (typeof collection.statistics !== "undefined" ? collection.statistics.total_supply : '-'),
           owners: (typeof collection.statistics !== "undefined" ? collection.statistics.num_owners : '-'),
           held: exists.nfts.length,
-          liquidity1d: (typeof collection.statistics !== "undefined" ? ((collection.statistics.one_day_sales / collection.statistics.num_owners) * 100).toFixed(2) : 0.0),
-          liquidity7d:(typeof collection.statistics !== "undefined" ? ((collection.statistics.seven_day_sales / collection.statistics.num_owners) * 100).toFixed(2) : 0.0),
-          liquidity30d:(typeof collection.statistics !== "undefined" ? ((collection.statistics.thirty_day_sales / collection.statistics.num_owners) * 100).toFixed(2) : 0.0),
+          liquidity1d: (typeof collection.statistics !== "undefined" ? ((collection.statistics.one_day_sales / (collection.statistics.total_supply - collection.statistics.num_owners)) * 100).toFixed(2) : 0.0),
+          liquidity7d:(typeof collection.statistics !== "undefined" ? ((collection.statistics.seven_day_sales / (collection.statistics.total_supply - collection.statistics.num_owners)) * 100).toFixed(2) : 0.0),
+          liquidity30d:(typeof collection.statistics !== "undefined" ? ((collection.statistics.thirty_day_sales / (collection.statistics.total_supply - collection.statistics.num_owners)) * 100).toFixed(2) : 0.0),
         });
       } else {
         
@@ -189,9 +196,9 @@ class Collection extends Component {
           totalSupply: (typeof collection.statistics !== "undefined" ? collection.statistics.total_supply : '-'),
           owners: (typeof collection.statistics !== "undefined" ? collection.statistics.num_owners : '-'),
           held: Collection.data.nfts.length,
-          liquidity1d: (typeof collection.statistics !== "undefined" ? ((collection.statistics.one_day_sales / collection.statistics.num_owners) * 100).toFixed(2) : 0.0),
-          liquidity7d:(typeof collection.statistics !== "undefined" ? ((collection.statistics.seven_day_sales / collection.statistics.num_owners) * 100).toFixed(2) : 0.0),
-          liquidity30d:(typeof collection.statistics !== "undefined" ? ((collection.statistics.thirty_day_sales / collection.statistics.num_owners) * 100).toFixed(2) : 0.0),
+          liquidity1d: (typeof collection.statistics !== "undefined" ? ((collection.statistics.one_day_sales / (collection.statistics.total_supply - collection.statistics.num_owners)) * 100).toFixed(2) : 0.0),
+          liquidity7d:(typeof collection.statistics !== "undefined" ? ((collection.statistics.seven_day_sales / (collection.statistics.total_supply - collection.statistics.num_owners)) * 100).toFixed(2) : 0.0),
+          liquidity30d:(typeof collection.statistics !== "undefined" ? ((collection.statistics.thirty_day_sales / (collection.statistics.total_supply - collection.statistics.num_owners)) * 100).toFixed(2) : 0.0),
         });
 
         sessionstorage.setItem(
@@ -288,41 +295,115 @@ class Collection extends Component {
                   alt=""
                 /> */}
                   <div className="flex-1 content ms-3">
-                    <BasicPopperToolTip title="Floor Price" text={"The real-time lowest listing price of NFTs in the collection in the market"} />
+                    <BasicPopperToolTip
+                      title="Floor Price"
+                      text={
+                        'The real-time lowest listing price of NFTs in the collection in the market'
+                      }
+                    />
+                    {this.state.loading === true ? (
+                      <RingLoader
+                        color={"#ff914d"}
+                        loading={this.state.loading}
+                        cssOverride={override}
+                        size={50}
+                      />
+                    ) : (
+                      <p className="text h3 mb-0">{this.state.floorPrice}</p>
+                    )}
+                  </div>
+                </div>
+              </Col>
+              <Col md="3">
+                <div
+                  key={1}
+                  className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
+                >
+                  {/* <img
+                  src={work1}
+                  className="avatar avatar-ex-sm"
+                  alt=""
+                /> */}
+                  <div className="flex-1 content ms-3">
+                    <BasicPopperToolTip
+                      title="Market Cap"
+                      text={
+                        'Market capitalization is calculated as the sum of each NFT valued at the greater of its last traded price and the floor price of the collection, respectively.'
+                      }
+                    />
+                    {this.state.loading === true ? (
+                      <RingLoader
+                        color={"#ff914d"}
+                        loading={this.state.loading}
+                        cssOverride={override}
+                        size={50}
+                      />
+                    ) : (
+                      <p className="text h3 mb-0">{this.state.marketCap}</p>
+                    )}
+                  </div>
+                </div>
+              </Col>
+              <Col md="3">
+                <div
+                  key={1}
+                  className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
+                >
+                  {/* <img
+                  src={work1}
+                  className="avatar avatar-ex-sm"
+                  alt=""
+                /> */}
+                  <div className="flex-1 content ms-3">
+                    <BasicPopperToolTip
+                      title="30 Day Volume"
+                      text={
+                        'Market capitalization is calculated as the sum of each NFT valued at the greater of its last traded price and the floor price of the collection, respectively.'
+                      }
+                    />
+                    {this.state.loading === true ? (
+                      <RingLoader
+                        color={"#ff914d"}
+                        loading={this.state.loading}
+                        cssOverride={override}
+                        size={50}
+                      />
+                    ) : (
+                      <p className="text h3 mb-0">{this.state.thirtyDayVolume}</p>
+                    )}
+                  </div>
+                </div>
+              </Col>
+              <Col md="3">
+                <div
+                  key={1}
+                  className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
+                >
+                  {/* <img
+                  src={work1}
+                  className="avatar avatar-ex-sm"
+                  alt=""
+                /> */}
+                  {/* The liquidity rate measures the relative liquidity of each collection. 
+                Liquidity = Sales / The number of NFTs * 100% */}
+                  <div className="flex-1 content ms-3">
+                    <BasicPopperToolTip
+                      title="Liquidity (1D)"
+                      text={
+                        'The liquidity rate measures the relative liquidity of each collection. Liquidity = 1 Day Sales / number of NFTs owners * 100%'
+                      }
+                    />
                     
-                    <p className="text h3 mb-0">{this.state.floorPrice}</p>
-                  </div>
-                </div>
-              </Col>
-              <Col md="3">
-                <div
-                  key={1}
-                  className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
-                >
-                  {/* <img
-                  src={work1}
-                  className="avatar avatar-ex-sm"
-                  alt=""
-                /> */}
-                  <div className="flex-1 content ms-3">
-                    <BasicPopperToolTip title="Market Cap" text={"Market capitalization is calculated as the sum of each NFT valued at the greater of its last traded price and the floor price of the collection, respectively."} />
-                    <p className="text h3 mb-0">{this.state.marketCap}</p>
-                  </div>
-                </div>
-              </Col>
-              <Col md="3">
-                <div
-                  key={1}
-                  className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
-                >
-                  {/* <img
-                  src={work1}
-                  className="avatar avatar-ex-sm"
-                  alt=""
-                /> */}
-                  <div className="flex-1 content ms-3">
-                    <BasicPopperToolTip title="30 Day Volume" text={"Market capitalization is calculated as the sum of each NFT valued at the greater of its last traded price and the floor price of the collection, respectively."} />
-                    <p className="text h3 mb-0">{this.state.thirtyDayVolume}</p>
+                    {this.state.loading === true ? (
+                      <RingLoader
+                        color={"#ff914d"}
+                        loading={this.state.loading}
+                        cssOverride={override}
+                        size={50}
+                      />
+                    ) : (
+                      <p className="text h3 mb-0">{this.state.liquidity1d}%</p>
+                    )}
                   </div>
                 </div>
               </Col>
@@ -339,8 +420,23 @@ class Collection extends Component {
                   {/* The liquidity rate measures the relative liquidity of each collection. 
                 Liquidity = Sales / The number of NFTs * 100% */}
                   <div className="flex-1 content ms-3">
-                    <BasicPopperToolTip title="Liquidity (1D)" text={"The liquidity rate measures the relative liquidity of each collection. Liquidity = 1 Day Sales / number of NFTs owners * 100%"} />
-                    <p className="text h3 mb-0">{this.state.liquidity1d}%</p>
+                    <BasicPopperToolTip
+                      title="Liquidity (7D)"
+                      text={
+                        'The liquidity rate measures the relative liquidity of each collection. Liquidity = 7 Day Sales / number of NFTs owners * 100%'
+                      }
+                    />
+                    
+                    {this.state.loading === true ? (
+                      <RingLoader
+                        color={"#ff914d"}
+                        loading={this.state.loading}
+                        cssOverride={override}
+                        size={50}
+                      />
+                    ) : (
+                      <p className="text h3 mb-0">{this.state.liquidity7d}%</p>
+                    )}
                   </div>
                 </div>
               </Col>
@@ -357,42 +453,22 @@ class Collection extends Component {
                   {/* The liquidity rate measures the relative liquidity of each collection. 
                 Liquidity = Sales / The number of NFTs * 100% */}
                   <div className="flex-1 content ms-3">
-                    <BasicPopperToolTip title="Liquidity (7D)" text={"The liquidity rate measures the relative liquidity of each collection. Liquidity = 7 Day Sales / number of NFTs owners * 100%"} />
-                    <p className="text h3 mb-0">{this.state.liquidity7d}%</p>
-                  </div>
-                </div>
-              </Col>
-              <Col md="3">
-                <div
-                  key={1}
-                  className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
-                >
-                  {/* <img
-                  src={work1}
-                  className="avatar avatar-ex-sm"
-                  alt=""
-                /> */}
-                  {/* The liquidity rate measures the relative liquidity of each collection. 
-                Liquidity = Sales / The number of NFTs * 100% */}
-                  <div className="flex-1 content ms-3">
-                    <BasicPopperToolTip title="Liquidity (30D)" text={"The liquidity rate measures the relative liquidity of each collection. Liquidity = 30 Day Sales / number of NFTs owners * 100%"} />
-                    <p className="text h3 mb-0">{this.state.liquidity30d}%</p>
-                  </div>
-                </div>
-              </Col>
-              <Col md="3">
-                <div
-                  key={1}
-                  className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
-                >
-                  {/* <img
-                  src={work1}
-                  className="avatar avatar-ex-sm"
-                  alt=""
-                /> */}
-                  <div className="flex-1 content ms-3">
-                    <BasicPopperToolTip title="Avg. Price" text={"Test Tool tip text: Sales (7D)"} />
-                    <p className="text h3 mb-0">{this.state.avgPrice}</p>
+                    <BasicPopperToolTip
+                      title="Liquidity (30D)"
+                      text={
+                        'The liquidity rate measures the relative liquidity of each collection. Liquidity = 30 Day Sales / number of NFTs owners * 100%'
+                      }
+                    />
+                    {this.state.loading === true ? (
+                      <RingLoader
+                        color={"#ff914d"}
+                        loading={this.state.loading}
+                        cssOverride={override}
+                        size={50}
+                      />
+                    ) : (
+                      <p className="text h3 mb-0">{this.state.liquidity30d}%</p>
+                    )}
                   </div>
                 </div>
               </Col>
@@ -407,30 +483,21 @@ class Collection extends Component {
                   alt=""
                 /> */}
                   <div className="flex-1 content ms-3">
-                    <BasicPopperToolTip title="Holding Value" text={"Test Tool tip text: Sales (7D)"} />
-                    <p className="text h3 mb-0">{this.state.holdingValue}</p>
-                  </div>
-                </div>
-              </Col>
-              <Col md="3">
-                <div
-                  key={1}
-                  className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
-                >
-                  <div className="flex-1 content ms-3">
-                    <BasicPopperToolTip title="Held" text={"Number of NFT's from this collection held in wallet"} />
-                    <p className="text h3 mb-0">{numFormatter.format(this.state.held)}</p>
-                  </div>
-                </div>
-              </Col>
-              <Col md="3">
-                <div
-                  key={1}
-                  className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
-                >
-                  <div className="flex-1 content ms-3">
-                    <BasicPopperToolTip title="Owners" text={"The number of unique addresses that hold at least one NFT of the collection currently."} />
-                    <p className="text h3 mb-0">{numFormatter.format(this.state.owners)}</p>
+                    <BasicPopperToolTip
+                      title="Avg. Price"
+                      text={'Test Tool tip text: Sales (7D)'}
+                    />
+                    
+                    {this.state.loading === true ? (
+                      <RingLoader
+                        color={"#ff914d"}
+                        loading={this.state.loading}
+                        cssOverride={override}
+                        size={50}
+                      />
+                    ) : (
+                      <p className="text h3 mb-0">{this.state.avgPrice}</p>
+                    )}
                   </div>
                 </div>
               </Col>
@@ -445,8 +512,108 @@ class Collection extends Component {
                   alt=""
                 /> */}
                   <div className="flex-1 content ms-3">
-                    <BasicPopperToolTip title="Total Supply" text={"Total NFT's within collection"} />
-                    <p className="text h3 mb-0">{numFormatter.format(this.state.totalSupply)}</p>
+                    <BasicPopperToolTip
+                      title="Holding Value"
+                      text={'Test Tool tip text: Sales (7D)'}
+                    />
+                 
+                    {this.state.loading === true ? (
+                      <RingLoader
+                        color={"#ff914d"}
+                        loading={this.state.loading}
+                        cssOverride={override}
+                        size={50}
+                      />
+                    ) : (
+                      <p className="text h3 mb-0">{this.state.holdingValue}</p>
+                    )}
+                  </div>
+                </div>
+              </Col>
+              <Col md="3">
+                <div
+                  key={1}
+                  className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
+                >
+                  <div className="flex-1 content ms-3">
+                    <BasicPopperToolTip
+                      title="Held"
+                      text={
+                        "Number of NFT's from this collection held in wallet"
+                      }
+                    />
+
+                    {this.state.loading === true ? (
+                      <RingLoader
+                        color={"#ff914d"}
+                        loading={this.state.loading}
+                        cssOverride={override}
+                        size={50}
+                      />
+                    ) : (
+                      <p className="text h3 mb-0">
+                      {numFormatter.format(this.state.held)}
+                    </p>
+                    )}
+                  </div>
+                </div>
+              </Col>
+              <Col md="3">
+                <div
+                  key={1}
+                  className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
+                >
+                  <div className="flex-1 content ms-3">
+                    <BasicPopperToolTip
+                      title="Owners"
+                      text={
+                        'The number of unique addresses that hold at least one NFT of the collection currently.'
+                      }
+                    />
+
+                    {this.state.loading === true ? (
+                      <RingLoader
+                        color={"#ff914d"}
+                        loading={this.state.loading}
+                        cssOverride={override}
+                        size={50}
+                      />
+                    ) : (
+                      <p className="text h3 mb-0">
+                      {numFormatter.format(this.state.owners)}
+                    </p>
+                    )}
+                  </div>
+                </div>
+              </Col>
+              <Col md="3">
+                <div
+                  key={1}
+                  className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
+                >
+                  {/* <img
+                  src={work1}
+                  className="avatar avatar-ex-sm"
+                  alt=""
+                /> */}
+                  <div className="flex-1 content ms-3">
+                    <BasicPopperToolTip
+                      title="Total Supply"
+                      text={"Total NFT's within collection"}
+                    />
+
+                    {this.state.loading === true ? (
+                      <RingLoader
+                        color={"#ff914d"}
+                        loading={this.state.loading}
+                        cssOverride={override}
+                        size={50}
+                      />
+                    ) : (
+                      <p className="text h3 mb-0">
+                      {numFormatter.format(this.state.totalSupply)}
+                    </p>
+                    )}
                   </div>
                 </div>
               </Col>
@@ -510,7 +677,7 @@ class Collection extends Component {
                       onClick={() => {
                         this.setCategory('Minted');
                         Event('Collection', 'FilterBy', 'Minted');
-                    }}
+                      }}
                       className={
                         this.state.displayCategory === 'Minted'
                           ? 'list-inline-item categories-name border text-dark rounded active'
@@ -523,8 +690,7 @@ class Collection extends Component {
                       onClick={() => {
                         this.setCategory('Purchased');
                         Event('Collection', 'FilterBy', 'Purchased');
-                      }
-                      }
+                      }}
                       className={
                         this.state.displayCategory === 'Purchased'
                           ? 'list-inline-item categories-name border text-dark rounded active'
@@ -537,8 +703,7 @@ class Collection extends Component {
                       onClick={() => {
                         this.setCategory('Transferred');
                         Event('Collection', 'FilterBy', 'Transferred');
-                    }
-                    }
+                      }}
                       className={
                         this.state.displayCategory === 'Transferred'
                           ? 'list-inline-item categories-name border text-dark rounded active'
@@ -600,7 +765,11 @@ class Collection extends Component {
                       <FadeIn delay={100}>
                         <Card className="blog border-0 work-container work-classic shadow rounded-md overflow-hidden">
                           <img
-                            src={(typeof cases.media[0] === "undefined" ? `${process.env.REACT_APP_BASE_CDN_URL}/default-image.jpg` : cases.media[0].gateway)}
+                            src={
+                              typeof cases.media[0] === 'undefined'
+                                ? `${process.env.REACT_APP_BASE_CDN_URL}/default-image.jpg`
+                                : cases.media[0].gateway
+                            }
                             className="img-fluid rounded work-image"
                             alt={cases.description}
                           />
@@ -626,18 +795,20 @@ class Collection extends Component {
                               {cases.isFinance && (
                                 <Link
                                   to="#"
-                                  onClick={ e =>{
+                                  onClick={(e) => {
                                     e.preventDefault();
-                                    window.open(`https://opensea.io/assets/${this.state.collection.chain}/${cases.contract.address}/${cases.tokenId}`);
+                                    window.open(
+                                      `https://opensea.io/assets/${this.state.collection.chain}/${cases.contract.address}/${cases.tokenId}`,
+                                    );
                                   }}
                                 >
                                   <img
-                                      alt="OpenSea listing"
-                                      align="right"
-                                      width="25"
-                                      height="25"
-                                      src="https://storage.googleapis.com/opensea-static/Logomark/Logomark-Blue.png"
-                                    />
+                                    alt="OpenSea listing"
+                                    align="right"
+                                    width="25"
+                                    height="25"
+                                    src="https://storage.googleapis.com/opensea-static/Logomark/Logomark-Blue.png"
+                                  />
                                 </Link>
                               )}
                               {cases.isHR && (
@@ -735,23 +906,69 @@ class Collection extends Component {
                               <Row>
                                 <Col md="12">
                                   <ButtonGroup size="sm" role="group">
-                                    <Button className="btn btn-mini btn-warning rounded">Approve</Button>
-                                    <DropdownButton as={ButtonGroup} title="Options" id="bg-nested-dropdown">
-                                      <Dropdown.Item className="btn-success" eventKey="1" onClick={ e =>{
-                                        console.log('Burn',cases.contract.address);
-                                        Event('Collection NFT', 'Option', 'Sell (Burn)');
-                                      }}>Sell (Burn)</Dropdown.Item>
-                                      <Dropdown.Item className="btn-success" eventKey="1" onClick={ e =>{
-                                        console.log('Buy Back',cases.contract.address);
-                                        Event('Collection NFT', 'Option', 'Sell (w/Buy Back)');
-                                      }}>Sell (w/Buy Back)</Dropdown.Item>
-                                      <Dropdown.Item defaultValue={"Add"} className="btn-info" eventKey="2" onClick={ e =>{
-                                        console.log('Add',cases.contract.address);
-                                        Event('Collection NFT', 'Option', 'Add to Batch');
-                                      }}>Add to Batch</Dropdown.Item>
+                                    <Button className="btn btn-mini btn-warning rounded">
+                                      Approve
+                                    </Button>
+                                    <DropdownButton
+                                      as={ButtonGroup}
+                                      title="Options"
+                                      id="bg-nested-dropdown"
+                                    >
+                                      <Dropdown.Item
+                                        className="btn-success"
+                                        eventKey="1"
+                                        onClick={(e) => {
+                                          console.log(
+                                            'Burn',
+                                            cases.contract.address,
+                                          );
+                                          Event(
+                                            'Collection NFT',
+                                            'Option',
+                                            'Sell (Burn)',
+                                          );
+                                        }}
+                                      >
+                                        Sell (Burn)
+                                      </Dropdown.Item>
+                                      <Dropdown.Item
+                                        className="btn-success"
+                                        eventKey="1"
+                                        onClick={(e) => {
+                                          console.log(
+                                            'Buy Back',
+                                            cases.contract.address,
+                                          );
+                                          Event(
+                                            'Collection NFT',
+                                            'Option',
+                                            'Sell (w/Buy Back)',
+                                          );
+                                        }}
+                                      >
+                                        Sell (w/Buy Back)
+                                      </Dropdown.Item>
+                                      <Dropdown.Item
+                                        defaultValue={'Add'}
+                                        className="btn-info"
+                                        eventKey="2"
+                                        onClick={(e) => {
+                                          console.log(
+                                            'Add',
+                                            cases.contract.address,
+                                          );
+                                          Event(
+                                            'Collection NFT',
+                                            'Option',
+                                            'Add to Batch',
+                                          );
+                                        }}
+                                      >
+                                        Add to Batch
+                                      </Dropdown.Item>
                                     </DropdownButton>
                                   </ButtonGroup>
-                               
+
                                   {/* <Link
                                     to="#"
                                     className="text h7 badge badge-link bg-warning"

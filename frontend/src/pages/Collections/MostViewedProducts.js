@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, CSSProperties } from 'react';
 import {
   Container,
   Row,
@@ -17,6 +17,7 @@ import FeatherIcon from "feather-icons-react";
 import DataTable from '../../components/DataTable';
 import bgImg from "../../assets/images/nfts/ac1_unfit_digital_collage_of_locally_owned_nfts_by_annie_bur.jpg";
 import BasicPopperToolTip from "../../components/BasicPopperToolTip";
+import RingLoader from "react-spinners/RingLoader";
 var sessionstorage = require('sessionstorage');
 var _ = require('lodash');
 var endpoint = require('../../common/endpoint');
@@ -34,7 +35,12 @@ var formatter = new Intl.NumberFormat('en-US', {
 
 var _collections = [],
   _openModal;
-
+  const override: CSSProperties = {
+    display: "block",
+    margin: "0 auto",
+    borderColor: "red",
+  };
+  
 class MostViewedProducts extends Component {
   constructor(props) {
     super(props);
@@ -154,7 +160,7 @@ class MostViewedProducts extends Component {
         ],
       ];
 
-      let EstHoldingValue = 0, SevenDaySales = 0, NumOwners = 0;
+      let EstHoldingValue = 0, SevenDaySales = 0, NumOwners = 0, totalSupply = 0;
       for (const collection of Collections.collections) {
 
         const floorPrice = (collection.FloorPrice !== "N/F" ? formatter.format(parseFloat(Number(collection.FloorPrice) * Number(ethusd))) : formatter.format(0.00));
@@ -168,9 +174,9 @@ class MostViewedProducts extends Component {
           holdingValue,
           '--',
           '--',
-          (typeof collection.statistics !== "undefined" ? (collection.statistics.one_day_sales / collection.statistics.num_owners) * 100 : 0.0),
-          (typeof collection.statistics !== "undefined" ? (collection.statistics.seven_day_sales / collection.statistics.num_owners) * 100 : 0.0),
-          (typeof collection.statistics !== "undefined" ? (collection.statistics.thirty_day_sales / collection.statistics.num_owners) * 100 : 0.0),
+          (typeof collection.statistics !== "undefined" ? (collection.statistics.one_day_sales / (collection.statistics.total_supply - collection.statistics.num_owners)) * 100 : 0.0),
+          (typeof collection.statistics !== "undefined" ? (collection.statistics.seven_day_sales / (collection.statistics.total_supply - collection.statistics.num_owners)) * 100 : 0.0),
+          (typeof collection.statistics !== "undefined" ? (collection.statistics.thirty_day_sales / (collection.statistics.total_supply - collection.statistics.num_owners)) * 100 : 0.0),
         ]);
 
 
@@ -187,6 +193,7 @@ class MostViewedProducts extends Component {
         if(typeof collection.statistics !== "undefined"){
           SevenDaySales = (Number(SevenDaySales) + Number(collection.statistics.seven_day_sales));
           NumOwners = (Number(NumOwners) + Number(collection.statistics.num_owners));
+          totalSupply = (Number(totalSupply) + Number(collection.statistics.total_supply));
         };
 
 
@@ -197,7 +204,7 @@ class MostViewedProducts extends Component {
       EstHoldingValue = parseFloat(Number(EstHoldingValue) * Number(ethusd));
 
       //Liquidity = Sales / The number of NFTs * 100%
-      const Liquidity7D = (SevenDaySales / NumOwners) * 100;
+      const Liquidity7D = (SevenDaySales / (totalSupply - NumOwners)) * 100;
       this.setState({ collections, loading: false, EstHoldingValue: EstHoldingValue.toFixed(4), Liquidity7D: Liquidity7D.toFixed(2) });
     } catch (e) {
       console.error(e);
@@ -395,8 +402,7 @@ class MostViewedProducts extends Component {
               <div className="col-lg-12 text-center">
                 <div className="page-next-level">
                   <h1 className="title text-white title-dark">
-                    {' '}
-                    {''}{' '}
+                   Wallet NFT Collections
                   </h1>
                   <div className="page-next">
                     <nav aria-label="breadcrumb" className="d-inline-block">
@@ -445,7 +451,17 @@ class MostViewedProducts extends Component {
                 /> */}
                   <div className="flex-1 content ms-3">
                     <BasicPopperToolTip title={"Est Holding Value"} text={"Holding value is calculated as: number of NFTs held * avg sale price of NFT's in the collection"} />
-                    <p className="text h3 mb-0">{formatter.format(this.state.EstHoldingValue)}</p>
+                    
+                    {this.state.loading === true ? (
+                      <RingLoader
+                        color={"#ff914d"}
+                        loading={this.state.loading}
+                        cssOverride={override}
+                        size={50}
+                      />
+                    ) : (
+                      <p className="text h3 mb-0">{formatter.format(this.state.EstHoldingValue)}</p>
+                    )}
                   </div>
                 </div>
               </Col>
@@ -477,7 +493,17 @@ class MostViewedProducts extends Component {
                 /> */}
                   <div className="flex-1 content ms-3">
                     <BasicPopperToolTip title={"Liquidity (7D)"} text={"Liquidity is calculated as: 7 day sales / The number of NFT holders * 100%"} />
-                    <p className="text h3 mb-0" >{this.state.Liquidity7D}%</p>
+                    
+                    {this.state.loading === true ? (
+                      <RingLoader
+                        color={"#ff914d"}
+                        loading={this.state.loading}
+                        cssOverride={override}
+                        size={50}
+                      />
+                    ) : (
+                      <p className="text h3 mb-0" >{this.state.Liquidity7D}%</p>
+                    )}
                   </div>
                 </div>
               </Col>
