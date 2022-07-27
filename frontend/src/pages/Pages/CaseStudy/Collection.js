@@ -16,6 +16,17 @@ import bgImg from "../../../assets/images/nfts/ac1_unfit_digital_collage_of_loca
 
 var sessionstorage = require('sessionstorage');
 var endpoint = require('../../../common/endpoint');
+// Create our number formatter.
+var formatter = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+
+  // These options are needed to round to whole numbers if that's what you want.
+  //minimumFractionDigits: 0, // (this suffices for whole numbers, but will print 2500.10 as $2,500.1)
+  //maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
+});
+
+var numFormatter = new Intl.NumberFormat('en-US', { maximumSignificantDigits: 3 })
 
 class Collection extends Component {
   constructor(props, { match }) {
@@ -29,10 +40,23 @@ class Collection extends Component {
       nfts: [],
       displayCategory: 'All',
       description: "",
+      floorPrice: 0,
+      avgPrice: 0,
+      holdingValue: 0,
+      ethPrice: 0,
+      marketCap: 0,
+      liquidity1d: 0,
+      liquidity7d:0,
+      liquidity30d: 0,
+      thirtyDayVolume: 0,
+      totalSupply: 0,
+      owners: 0,
+      held: 0
     };
     this.setCategory.bind(this);
     this.getNFTs.bind(this);
     this.accountsChanged.bind(this);
+    this.getEthPrice.bind(this);
   }
 
   setCategory(category) {
@@ -59,7 +83,7 @@ class Collection extends Component {
           ethereumAddress: window.ethereum._state.accounts[0],
           walletConnected: true,
         });
-        this.getNFTs(
+        this.getEthPrice(
           window.ethereum._state.accounts[0],
           this.props.match.params.address,
         );
@@ -95,7 +119,7 @@ class Collection extends Component {
     }
   };
 
-  getNFTs = async (ethereumAddress, contractAddress) => {
+  getNFTs = async (ethereumAddress, contractAddress, ethusd) => {
     //console.log('Loading Page:',pageNumber);
     try {
       this.setState({ loading: true });
@@ -103,30 +127,71 @@ class Collection extends Component {
         sessionstorage.getItem(ethereumAddress + '-' + contractAddress),
       );
 
-      console.log(exists)
+      console.log('Exists in Cache', exists);
+
 
       //Check if the records exists in storage
       if (typeof exists !== 'undefined' && exists !== null) {
+
+        const collection = exists.collection;
+        const floorPrice = (typeof collection.statistics !== "undefined" ? formatter.format(parseFloat(Number(collection.statistics.floor_price) * Number(ethusd))) : formatter.format(0.00));
+        const marketCap = (typeof collection.statistics !== "undefined" ? formatter.format(parseFloat(Number(collection.statistics.market_cap) * Number(ethusd))) : formatter.format(0.00));
+        const avgPrice = (typeof collection.statistics !== "undefined" ? formatter.format(parseFloat(Number(collection.statistics.average_price) * Number(ethusd))) : formatter.format(0.00))
+        const holdingValue = (typeof collection.statistics !== "undefined" ? formatter.format(parseFloat(Number((exists.nfts.length * collection.statistics.average_price)) * Number(ethusd))) : formatter.format(0.00))
+        const thirtyDayVolume = (typeof collection.statistics !== "undefined" ? formatter.format(parseFloat(Number(collection.statistics.thirty_day_volume) * Number(ethusd))) : formatter.format(0.00));
+        
+        console.log('Setting State');
         this.setState({
           collection: exists.collection,
           nfts: exists.nfts,
           loading: false,
-          description: exists.nfts[0].description
+          description: exists.nfts[0].description,
+          floorPrice,
+          marketCap,
+          avgPrice,
+          holdingValue,
+          thirtyDayVolume,
+          totalSupply: (typeof collection.statistics !== "undefined" ? collection.statistics.total_supply : '-'),
+          owners: (typeof collection.statistics !== "undefined" ? collection.statistics.num_owners : '-'),
+          held: exists.nfts.length,
+          liquidity1d: (typeof collection.statistics !== "undefined" ? ((collection.statistics.one_day_sales / collection.statistics.num_owners) * 100).toFixed(2) : 0.0),
+          liquidity7d:(typeof collection.statistics !== "undefined" ? ((collection.statistics.seven_day_sales / collection.statistics.num_owners) * 100).toFixed(2) : 0.0),
+          liquidity30d:(typeof collection.statistics !== "undefined" ? ((collection.statistics.thirty_day_sales / collection.statistics.num_owners) * 100).toFixed(2) : 0.0),
         });
       } else {
+        
         //Call the service to get the NFTs
         const Collection = await endpoint._get(
           getChain()['eth'].viewWalletCollectionApiUrl +
             `/ethereum/${ethereumAddress}/${contractAddress}`,
         );
 
-        console.log(Collection)
+        console.log('Called Service', Collection);
+
+        const collection = Collection.data.collection;
+        const floorPrice = (typeof collection.statistics !== "undefined" ? formatter.format(parseFloat(Number(collection.statistics.floor_price) * Number(ethusd))) : formatter.format(0.00));
+        const marketCap = (typeof collection.statistics !== "undefined" ? formatter.format(parseFloat(Number(collection.statistics.market_cap) * Number(ethusd))) : formatter.format(0.00));
+        const avgPrice = (typeof collection.statistics !== "undefined" ? formatter.format(parseFloat(Number(collection.statistics.average_price) * Number(ethusd))) : formatter.format(0.00))
+        const holdingValue = (typeof collection.statistics !== "undefined" ? formatter.format(parseFloat(Number((Collection.data.nfts.length * collection.statistics.average_price)) * Number(ethusd))) : formatter.format(0.00))
+        const thirtyDayVolume = (typeof collection.statistics !== "undefined" ? formatter.format(parseFloat(Number(collection.statistics.thirty_day_volume) * Number(ethusd))) : formatter.format(0.00));
+          
 
         this.setState({
           collection: Collection.data.collection,
           nfts: Collection.data.nfts,
           loading: false,
-          description: Collection.data.nfts[0].description
+          description: Collection.data.nfts[0].description,
+          floorPrice,
+          avgPrice,
+          holdingValue,
+          marketCap,
+          thirtyDayVolume,
+          totalSupply: (typeof collection.statistics !== "undefined" ? collection.statistics.total_supply : '-'),
+          owners: (typeof collection.statistics !== "undefined" ? collection.statistics.num_owners : '-'),
+          held: Collection.data.nfts.length,
+          liquidity1d: (typeof collection.statistics !== "undefined" ? ((collection.statistics.one_day_sales / collection.statistics.num_owners) * 100).toFixed(2) : 0.0),
+          liquidity7d:(typeof collection.statistics !== "undefined" ? ((collection.statistics.seven_day_sales / collection.statistics.num_owners) * 100).toFixed(2) : 0.0),
+          liquidity30d:(typeof collection.statistics !== "undefined" ? ((collection.statistics.thirty_day_sales / collection.statistics.num_owners) * 100).toFixed(2) : 0.0),
         });
 
         sessionstorage.setItem(
@@ -137,6 +202,22 @@ class Collection extends Component {
     } catch (e) {
       console.error(e);
     }
+  };
+
+  getEthPrice = async (ethereumAddress, contractAddress) => {
+
+    let ethPrice = JSON.parse(sessionstorage.getItem("ethPrice"));
+
+    if ((typeof ethPrice === 'undefined') | (ethPrice === null)) {
+      ethPrice = await endpoint._get(getChain()['eth'].getEthPriceApiUrl);
+      ethPrice = ethPrice.data.result;
+      sessionstorage.setItem("ethPrice", JSON.stringify(ethPrice));
+    };
+
+    console.log('EthPrice: Running getNFTs')
+    this.getNFTs(ethereumAddress, contractAddress, ethPrice.ethusd);
+
+    this.setState({ethPrice});
   };
   render() {
     return (
@@ -207,14 +288,9 @@ class Collection extends Component {
                   alt=""
                 /> */}
                   <div className="flex-1 content ms-3">
-                    <BasicPopperToolTip title="Floor Price" text={"Test Tool tip text: Floor Price"} />
+                    <BasicPopperToolTip title="Floor Price" text={"The real-time lowest listing price of NFTs in the collection in the market"} />
                     
-                    <p className="text-muted mb-0">--</p>
-                    <p className="text-muted mb-0" style={{ fontSize: '12px' }}>
-                      <Link to="#" className="text-primary">
-                        how this is calculated
-                      </Link>
-                    </p>
+                    <p className="text h3 mb-0">{this.state.floorPrice}</p>
                   </div>
                 </div>
               </Col>
@@ -229,13 +305,24 @@ class Collection extends Component {
                   alt=""
                 /> */}
                   <div className="flex-1 content ms-3">
-                    <BasicPopperToolTip title="Market Cap" text={"Test Tool tip text: Market Cap"} />
-                    <p className="text mb-0">--</p>
-                    <p className="text-muted mb-0" style={{ fontSize: '12px' }}>
-                      <Link to="#" className="text-primary">
-                        how this is calculated
-                      </Link>
-                    </p>
+                    <BasicPopperToolTip title="Market Cap" text={"Market capitalization is calculated as the sum of each NFT valued at the greater of its last traded price and the floor price of the collection, respectively."} />
+                    <p className="text h3 mb-0">{this.state.marketCap}</p>
+                  </div>
+                </div>
+              </Col>
+              <Col md="3">
+                <div
+                  key={1}
+                  className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
+                >
+                  {/* <img
+                  src={work1}
+                  className="avatar avatar-ex-sm"
+                  alt=""
+                /> */}
+                  <div className="flex-1 content ms-3">
+                    <BasicPopperToolTip title="30 Day Volume" text={"Market capitalization is calculated as the sum of each NFT valued at the greater of its last traded price and the floor price of the collection, respectively."} />
+                    <p className="text h3 mb-0">{this.state.thirtyDayVolume}</p>
                   </div>
                 </div>
               </Col>
@@ -252,13 +339,44 @@ class Collection extends Component {
                   {/* The liquidity rate measures the relative liquidity of each collection. 
                 Liquidity = Sales / The number of NFTs * 100% */}
                   <div className="flex-1 content ms-3">
-                    <BasicPopperToolTip title="Liquidity (7D)" text={"Test Tool tip text: Liquidity (7D)"} />
-                    <p className="text-muted mb-0">--</p>
-                    <p className="text-muted mb-0" style={{ fontSize: '12px' }}>
-                      <Link to="#" className="text-primary">
-                        how this is calculated
-                      </Link>
-                    </p>
+                    <BasicPopperToolTip title="Liquidity (1D)" text={"The liquidity rate measures the relative liquidity of each collection. Liquidity = 1 Day Sales / number of NFTs owners * 100%"} />
+                    <p className="text h3 mb-0">{this.state.liquidity1d}%</p>
+                  </div>
+                </div>
+              </Col>
+              <Col md="3">
+                <div
+                  key={1}
+                  className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
+                >
+                  {/* <img
+                  src={work1}
+                  className="avatar avatar-ex-sm"
+                  alt=""
+                /> */}
+                  {/* The liquidity rate measures the relative liquidity of each collection. 
+                Liquidity = Sales / The number of NFTs * 100% */}
+                  <div className="flex-1 content ms-3">
+                    <BasicPopperToolTip title="Liquidity (7D)" text={"The liquidity rate measures the relative liquidity of each collection. Liquidity = 7 Day Sales / number of NFTs owners * 100%"} />
+                    <p className="text h3 mb-0">{this.state.liquidity7d}%</p>
+                  </div>
+                </div>
+              </Col>
+              <Col md="3">
+                <div
+                  key={1}
+                  className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
+                >
+                  {/* <img
+                  src={work1}
+                  className="avatar avatar-ex-sm"
+                  alt=""
+                /> */}
+                  {/* The liquidity rate measures the relative liquidity of each collection. 
+                Liquidity = Sales / The number of NFTs * 100% */}
+                  <div className="flex-1 content ms-3">
+                    <BasicPopperToolTip title="Liquidity (30D)" text={"The liquidity rate measures the relative liquidity of each collection. Liquidity = 30 Day Sales / number of NFTs owners * 100%"} />
+                    <p className="text h3 mb-0">{this.state.liquidity30d}%</p>
                   </div>
                 </div>
               </Col>
@@ -273,13 +391,62 @@ class Collection extends Component {
                   alt=""
                 /> */}
                   <div className="flex-1 content ms-3">
-                    <BasicPopperToolTip title="Sales (7D)" text={"Test Tool tip text: Sales (7D)"} />
-                    <p className="text-muted mb-0">--</p>
-                    <p className="text-muted mb-0" style={{ fontSize: '12px' }}>
-                      <Link to="#" className="text-primary">
-                        how this is calculated
-                      </Link>
-                    </p>
+                    <BasicPopperToolTip title="Avg. Price" text={"Test Tool tip text: Sales (7D)"} />
+                    <p className="text h3 mb-0">{this.state.avgPrice}</p>
+                  </div>
+                </div>
+              </Col>
+              <Col md="3">
+                <div
+                  key={1}
+                  className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
+                >
+                  {/* <img
+                  src={work1}
+                  className="avatar avatar-ex-sm"
+                  alt=""
+                /> */}
+                  <div className="flex-1 content ms-3">
+                    <BasicPopperToolTip title="Holding Value" text={"Test Tool tip text: Sales (7D)"} />
+                    <p className="text h3 mb-0">{this.state.holdingValue}</p>
+                  </div>
+                </div>
+              </Col>
+              <Col md="3">
+                <div
+                  key={1}
+                  className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
+                >
+                  <div className="flex-1 content ms-3">
+                    <BasicPopperToolTip title="Held" text={"Number of NFT's from this collection held in wallet"} />
+                    <p className="text h3 mb-0">{numFormatter.format(this.state.held)}</p>
+                  </div>
+                </div>
+              </Col>
+              <Col md="3">
+                <div
+                  key={1}
+                  className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
+                >
+                  <div className="flex-1 content ms-3">
+                    <BasicPopperToolTip title="Owners" text={"The number of unique addresses that hold at least one NFT of the collection currently."} />
+                    <p className="text h3 mb-0">{numFormatter.format(this.state.owners)}</p>
+                  </div>
+                </div>
+              </Col>
+              <Col md="3">
+                <div
+                  key={1}
+                  className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
+                >
+                  {/* <img
+                  src={work1}
+                  className="avatar avatar-ex-sm"
+                  alt=""
+                /> */}
+                  <div className="flex-1 content ms-3">
+                    <BasicPopperToolTip title="Total Supply" text={"Total NFT's within collection"} />
+                    <p className="text h3 mb-0">{numFormatter.format(this.state.totalSupply)}</p>
                   </div>
                 </div>
               </Col>

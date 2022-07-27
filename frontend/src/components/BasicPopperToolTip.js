@@ -25,6 +25,7 @@ function BasicPopperToolTip(props) {
 
         {visible && (
           <div
+            style={{backgroundColor: 'black', color: 'white'}}
             ref={setTooltipRef}
             {...getTooltipProps({ className: 'tooltip-container' })}
           >
