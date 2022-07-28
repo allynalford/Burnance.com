@@ -540,6 +540,69 @@ module.exports._updateWalletNFTFields = async (chain, contractAddressTokenId, fi
 };
 
 
+
+/**
+* Returns wallet collections
+*
+* @author Allyn j. Alford <Allyn@tenablylabs.com>
+* @async
+* @function _getAlchemyWalletCollectionFromCache
+* @param {String} chain - ethereum
+* @param {String} address -  wallet owner address
+* @return {Promise<Array>} Response Array for next step to process.
+*/
+module.exports._getAlchemyWalletCollectionFromCache = async (chain, address) => {
+    try {
+        const dynamo = require('../common/dynamo');
+        const results = await dynamo.qetFromDB({
+            TableName: process.env.DYNAMODB_TABLE_ALCHEMY_WALLET_COLLECTION_CACHE,
+            Key: {
+                chain,
+                address
+            }
+        });
+
+        return results;
+    } catch (e) {
+        console.error(e);
+        throw e;
+    }
+};
+
+
+  /**
+* Add NFT transaction
+*
+* @author Allyn j. Alford <Allyn@tenablylabs.com>
+* @async
+* @function _addAlchemyWalletCollectionToCache
+* @param {String} chain - ethereum
+* @param {String} address - wallet owner address
+* @param {Array} addresses list of NFT collections addresses
+* @return {Promise<Array>} Response Array for next step to process.
+*/
+module.exports._addAlchemyWalletCollectionToCache = async (chain, address, addresses) => {
+    try {
+        const dynamo = require('../common/dynamo');
+        const dateformat = require("dateformat");
+        return await dynamo.saveItemInDB({
+            TableName: process.env.DYNAMODB_TABLE_ALCHEMY_WALLET_COLLECTION_CACHE,
+            Item: {
+                chain,
+                address,
+                addresses,
+                updatedAt: dateformat(new Date(), "isoUtcDateTime"),
+                createdatetime: dateformat(new Date(), "isoUtcDateTime"),
+                timestamp: new Date().getTime(),
+            },
+        });
+    } catch (e) {
+        console.error(e);
+        throw e;
+    }
+};
+
+
 /**
 * Returns wallet collections
 *

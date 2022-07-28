@@ -35,6 +35,7 @@
     "serverless": "^2.69.1",
     "serverless-offline": "^7.1.0",
     "serverless-prune-plugin": "^1.6.1",
-    "serverless-s3-sync": "^3.0.0"
+    "serverless-s3-sync": "^3.0.0",
+    "serverless-step-functions": "^3.8.0"
   }
 }

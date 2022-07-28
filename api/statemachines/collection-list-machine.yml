@@ -1,0 +1,30 @@
+name: collectionListStateMachine-${self:service}-${opt:stage, self:provider.stage}
+id: CollectionListStateMachine
+definition:
+  Comment: "Load wallet collections and data into database"
+  StartAt: CollectionLoad
+  States:
+    CollectionLoad:
+      Type: Task
+      Resource: 
+        Fn::GetAtt: [collectionLoad, Arn]
+      #"arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:${self:service}-${opt:stage, self:provider.stage}-languageStart"
+      Next: Stop
+    Stop:
+      Type: Task
+      Resource: 
+        Fn::GetAtt:
+          - collectionStop
+          - Arn
+      End: true       
+notifications:
+  ABORTED:
+    - lambda: arn:aws:lambda:us-east-1:297677912558:function:burnance-${opt:stage, self:provider.stage}-collectionNotification
+  FAILED:
+     - lambda: arn:aws:lambda:us-east-1:297677912558:function:burnance-${opt:stage, self:provider.stage}-collectionNotification
+  RUNNING:
+     - lambda: arn:aws:lambda:us-east-1:297677912558:function:burnance-${opt:stage, self:provider.stage}-collectionNotification
+  SUCCEEDED:
+     - lambda: arn:aws:lambda:us-east-1:297677912558:function:burnance-${opt:stage, self:provider.stage}-collectionNotification
+  TIMED_OUT:
+     - lambda: arn:aws:lambda:us-east-1:297677912558:function:burnance-${opt:stage, self:provider.stage}-collectionNotification   

@@ -58,3 +58,19 @@ collectionDelete:
         method: delete 
         authorizer: aws_iam
         cors: true
+collectionLoadStart:
+  handler: collection/handler.start
+  events:
+    - http:
+        path: collection/steps/load/start/{chain}/{address}
+        method: get 
+        authorizer: aws_iam
+        cors: true
+collectionLoad:
+    handler: collection/steps.loadWalletCollections  
+collectionNFTListLoad:
+    handler: collection/steps.loadWalletNFTList  
+collectionStop:
+    handler: collection/steps.stop   
+collectionNotification:
+    handler: collection/steps.notification

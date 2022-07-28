@@ -83,9 +83,8 @@ class Topbar extends Component {
           ethereumAddress: window.ethereum._state.accounts[0],
           walletConnected: true,
         });
-        this.getEthBalance(window.ethereum._state.accounts[0]);
-        this.addWallet('ethereum', window.ethereum._state.accounts[0]);
       }
+      this.getEthBalance(window.ethereum._state.accounts[0]);
     }
 
     initGA();
@@ -110,12 +109,23 @@ class Topbar extends Component {
 
   accountsChanged = () => {
     if (typeof window.ethereum._state.accounts[0] === 'undefined') {
+
+      //This is a disconnect
       this.setState({ walletConnected: false, ethereumAddress: '' });
+      console.info('disconnected');
+
+    }else if(typeof window.ethereum._state.accounts[0] !== 'undefined'){
+      if(this.state.ethereumAddress === ""){
+        console.info("Connected wallet...")
+        this.addWallet('ethereum', window.ethereum._state.accounts[0]);
+      }
     }
   };
 
   addWallet =  async (chain, address) => {
+    console.log("Running Wallet Add..")
     if (typeof address !== 'undefined' && typeof chain !== 'undefined') {
+      console.log("adding wallet")
       endpoint._post(getChain()['eth'].addWalletApiUrl, {chain, address})
     }
   };

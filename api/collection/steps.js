@@ -65,6 +65,186 @@ module.exports.start = async event => {
 };
 
 
+module.exports.loadWalletCollections = async (event) => {
+    let req, dt, chain, address, statistics;
+    try {
+        dt = dateFormat(new Date(), "isoUtcDateTime");
+        //req = (event.body !== "" ? JSON.parse(event.body) : event);
+        req = event;
+
+        //POST parameters
+        chain = req.chain;
+        address = req.address;
+
+        if (typeof chain === "undefined") throw new Error("chain is undefined");
+        if (typeof address === "undefined") throw new Error("address is undefined");
+
+    } catch (e) {
+        console.error(e);
+        const error = new CustomError('HandledError', e.message);
+        return error;
+    };
+
+    const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+
+    try {
+        const collectionUtils = require('./collectionUtils');
+        const nftPortUtils = require('../nftport/utils');
+        const alchemyUtils = require('../alchemy/utils');
+        const rariableUtils = require('../rarible/utils');
+        const walletUtils = require('../wallet/utils');
+
+
+        //Then grab the collections for this wallet
+        const addresses = await alchemyUtils.getCollections(chain, address);
+
+        //Log the address count
+        console.info('Wallet Collection Count:', addresses.length);
+
+        let loaded = 0, enriched = 0, existed = 0, saved = 0;
+        //loop the addresses and add them to the database
+        for (const addr of addresses) {
+
+            //Check if the collection exists
+            let collection = await collectionUtils._getCollection(chain, addr.address);
+
+            //If the collection doesn't already exists in the database
+            if (typeof collection === "undefined") {
+
+                //Grab the wallets information
+                const metaData = await alchemyUtils.getContractMetadata(chain, addr.address);
+
+                collection = metaData.contractMetadata;
+                collection.chain = chain;
+                collection.address = metaData.address;
+
+
+                try {
+                    statistics = await nftPortUtils._getCollectionStats(chain, addr.address);
+                } catch (s) {
+                    console.log(`${addr.address} Failed and didn't exists for: (${metaData.contractMetadata.name})`,s.message);
+                    statistics = {};
+                    delay(7000);
+                    //We need to look up the data elsewhere
+                }
+
+
+                if (typeof statistics.statistics !== "undefined") {
+
+                    console.log('Loaded Stats for new Collection', metaData.contractMetadata.name);
+
+                    collection.statistics = statistics.statistics;
+
+                    //Add the collection
+                    await collectionUtils._addCollectionWithStats(
+                        chain,
+                        metaData.address,
+                        metaData.contractMetadata.name,
+                        metaData.contractMetadata.symbol,
+                        metaData.contractMetadata.totalSupply,
+                        metaData.contractMetadata.tokenType,
+                        collection.statistics
+                    );
+
+                        enriched++;
+                        loaded++;
+                        saved++;
+                } else {
+                    console.log("Couldn't Load Collection Stats")
+                    //Add the collection
+                    await collectionUtils._addCollection(
+                        chain,
+                        metaData.address,
+                        metaData.contractMetadata.name,
+                        metaData.contractMetadata.symbol,
+                        metaData.contractMetadata.totalSupply,
+                        metaData.contractMetadata.tokenType
+                    );
+                    loaded++;
+                    saved++
+                }
+
+                await collectionUtils._updateCollectionFields(chain, addr.address, [{ name: 'loaded', value: true }]);
+
+                delay(3000);
+
+            } else {
+                existed++;
+
+                //Does the collection have the needed data
+                if (typeof collection.statistics === "undefined") {
+                    let statistics;
+
+                    try {
+                        statistics = await nftPortUtils._getCollectionStats(chain, addr.address);
+                    } catch (s) {
+                        console.log(`${addr.address} Failed and needs data`,s.message);
+                        statistics = {};
+                        delay(7000);
+                        //We need to look up the data elsewhere
+                    }
+
+                    if (typeof statistics.statistics !== "undefined") {
+
+                        console.log('Adding Stats for Existing Collection', statistics.statistics);
+
+                        await collectionUtils._updateCollectionFields(
+                          chain,
+                          addr.address,
+                          [
+                            {
+                              name: "statistics",
+                              value: statistics.statistics,
+                            },
+                            { name: "loaded", value: true },
+                          ]
+                        );
+
+                        delay(2000);
+                        enriched++;
+                    } else if(typeof collection.rariable === "undefined") {
+                        console.log("No Stats to load. Loading rariable stats...");
+
+                        //Get stats from rariable
+                        const raribleStats = await rariableUtils._getCollectionStats(chain, addr.address);
+                        console.log("No Stats.. Loaded Rariable Stats..", raribleStats.data);
+
+                        await collectionUtils._updateCollectionFields(
+                          chain,
+                          addr.address,
+                          [
+                            { name: "rariable", value: raribleStats.data },
+                            { name: "loaded", value: true },
+                          ]
+                        );
+                   
+                        enriched++;
+                    }else if(typeof collection.rariable !== "undefined") {
+                        console.log(`Alternate Stats loaded for ${addr.address}`);
+                    }
+                }
+            }
+        }
+
+        if(loaded !== 0){
+            await walletUtils._updateWalletFields(chain, address, [
+                {name: "collections", value: true},
+                {name: "enriched", value: enriched},
+                {name: "loaded", value: loaded},
+                {name: "existed", value: true},
+                {name: "saved", value: saved}
+            ])
+        }
+
+
+        return { error: false, success: true, chain, address, enriched, loaded, existed, saved }
+    } catch (e) {
+        console.error(e);
+        const error = new CustomError('HandledError', e.message);
+        return error;
+    }
+};
 
 
 module.exports.loadCollections = async event => {
@@ -106,15 +286,6 @@ module.exports.loadCollections = async event => {
             //Get the collection Name
             const collection = await alchemyUtils.getContractMetadata(chain, address);
 
-            // {
-            //     "address": "0x004dd1904b75b7e8a46711dde8a0c608578e0302",
-            //         "contractMetadata": {
-            //         "name": "JetPack420",
-            //             "symbol": "DCL-JTPCK420",
-            //                 "totalSupply": "307",
-            //                     "tokenType": "erc721"
-            //     }
-            // }
 
             //Save the collection
             await collectionUtils._addCollection(chain, address, collection.name, collection.symbol, collection.totalSupply, collection.tokenType);

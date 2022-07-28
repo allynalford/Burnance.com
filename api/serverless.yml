@@ -37,6 +37,7 @@ provider:
     DYNAMODB_TABLE_WALLET_NFT: ${self:service}-${opt:stage, self:provider.stage}-wallet-nft
     DYNAMODB_TABLE_WALLET_NFT_CACHE: ${self:service}-${opt:stage, self:provider.stage}-wallet-nft-cache
     DYNAMODB_TABLE_WALLET_COLLECTION_CACHE: ${self:service}-${opt:stage, self:provider.stage}-wallet-collection-cache
+    DYNAMODB_TABLE_ALCHEMY_WALLET_COLLECTION_CACHE: ${self:service}-${opt:stage, self:provider.stage}-alchemy-wallet-collection-cache
     DYNAMODB_TABLE_WALLET_NFT_TX: ${self:service}-${opt:stage, self:provider.stage}-wallet-nft-tx
     DYNAMODB_TABLE_NFT_COLLECTION: ${self:service}-${opt:stage, self:provider.stage}-nft-collection
     DYNAMODB_TABLE_WALLET_TX_HASH: ${self:service}-${opt:stage, self:provider.stage}-wallet-nft-tx-hash
@@ -44,7 +45,17 @@ provider:
     KEY: ${file(config.${self:provider.stage}.json):KEY}
     STATE_MACHINE_WALLET_ARN : arn:aws:states:${opt:region, self:provider.region}:${self:provider.environment.ACCOUNTID}:stateMachine:walletDetailsStateMachineArn
     STATE_MACHINE_WALLET_NFT_LIST_ARN : arn:aws:states:${opt:region, self:provider.region}:${self:provider.environment.ACCOUNTID}:stateMachine:walletNftListStateMachine
-  iamRoleStatements:  
+    STATE_MACHINE_COLLECTION_LIST_ARN: arn:aws:states:${opt:region, self:provider.region}:${self:provider.environment.ACCOUNTID}:stateMachine:collectionListStateMachine-${self:service}-${opt:stage, self:provider.stage}
+  iamRoleStatements: 
+    - Effect: "Allow"
+      Action:
+        - states:StartExecution
+        - states:SendTaskSuccess
+        - states:ListExecutions
+        - states:GetExecutionHistory
+        - states:StopExecution
+      Resource: 
+        - arn:aws:states:${opt:region, self:provider.region}:${self:provider.environment.ACCOUNTID}:stateMachine:collectionListStateMachine-${self:service}-${opt:stage, self:provider.stage}
     - Effect: "Allow"
       Action:
         - s3:PutObject
@@ -76,6 +87,7 @@ provider:
         - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE_NFT_COLLECTION}"
         - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE_WALLET_COLLECTION_CACHE}" 
         - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE_WALLET_TX_HASH}" 
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE_ALCHEMY_WALLET_COLLECTION_CACHE}"
 package:
   individually: false
   exclude:
@@ -90,8 +102,8 @@ functions:
 stepFunctions: 
   validate: false
   stateMachines:
-    walletDetails:
-      ${file(./statemachines/wallet-details-machine.yml)}   
+    collectionLoad:
+      ${file(./statemachines/collection-list-machine.yml)}    
 resources:
   Resources:
     # NFTImageBucket:
@@ -111,28 +123,50 @@ resources:
     #     RestApiId:
     #       Ref: 'ApiGatewayRestApi'
     #     StatusCode: '401'
-    NFTTxHashDynamoDBTable:
+    # NFTTxHashDynamoDBTable:
+    #   Type: 'AWS::DynamoDB::Table'
+    #   DeletionPolicy: Retain
+    #   Properties:
+    #     AttributeDefinitions:
+    #       -
+    #         AttributeName: chainAddress
+    #         AttributeType: S
+    #       -  
+    #         AttributeName: hash
+    #         AttributeType: S
+    #     KeySchema:
+    #       -
+    #         AttributeName: chainAddress
+    #         KeyType: HASH
+    #       -
+    #         AttributeName: hash
+    #         KeyType: RANGE      
+    #     ProvisionedThroughput:
+    #       ReadCapacityUnits: 1
+    #       WriteCapacityUnits: 1
+    #     TableName: ${self:provider.environment.DYNAMODB_TABLE_WALLET_TX_HASH}
+    AlchemyCollectionCacheDynamoDBTable:
       Type: 'AWS::DynamoDB::Table'
       DeletionPolicy: Retain
       Properties:
         AttributeDefinitions:
           -
-            AttributeName: chainAddress
+            AttributeName: chain
             AttributeType: S
           -  
-            AttributeName: hash
+            AttributeName: address
             AttributeType: S
         KeySchema:
           -
-            AttributeName: chainAddress
+            AttributeName: chain
             KeyType: HASH
           -
-            AttributeName: hash
+            AttributeName: address
             KeyType: RANGE      
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-        TableName: ${self:provider.environment.DYNAMODB_TABLE_WALLET_TX_HASH}
+        TableName: ${self:provider.environment.DYNAMODB_TABLE_ALCHEMY_WALLET_COLLECTION_CACHE}
     # NFTImageDynamoDBTable:
     #   Type: 'AWS::DynamoDB::Table'
     #   DeletionPolicy: Retain
@@ -389,4 +423,5 @@ custom:
 plugins:
   - serverless-offline
   - serverless-prune-plugin
+  - serverless-step-functions
 

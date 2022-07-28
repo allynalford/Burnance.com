@@ -76,18 +76,23 @@ module.exports.start = async event => {
 
 module.exports.startWalletLoad = async event => {
   let req, dt, address, chain, stateMachineArn;
-
+  let AWS, stepfunctions, alchemyUtils;
   try{
     req = JSON.parse(event.body);
     dt = dateFormat(new Date(), "isoUtcDateTime");
 
     address  = req.address;
     chain  = req.chain;
-    stateMachineArn = process.env.STATE_MACHINE_WALLET_NFT_LIST_ARN;
+    walletNftListStateMachineARN = process.env.STATE_MACHINE_WALLET_NFT_LIST_ARN;
+    collectionListStateMachineARN = process.env.STATE_MACHINE_COLLECTION_LIST_ARN;
+
+    AWS = require('aws-sdk');
+    stepfunctions = new AWS.StepFunctions();
+    alchemyUtils = require('../alchemy/utils');
 
     if(typeof address  === 'undefined') throw new Error("address is undefined");
     if(typeof chain  === 'undefined') throw new Error("chain is undefined");
-    if(typeof stateMachineArn  === 'undefined') throw new Error("Critical Error");
+    if(typeof walletNftListStateMachineARN  === 'undefined') throw new Error("Critical Error: walletNftListStateMachineARN");
 }catch(e){
   console.error(e);
     return respond({
@@ -105,34 +110,70 @@ module.exports.startWalletLoad = async event => {
   //region, and state machine for 90 days. For more information, see Limits Related 
   try {
 
+    let collectionStateMachineName = uuid.v4(), nftStateMachineNames = [], nftStateMachineName;
     //Grab a list of Collections and TokenIds
 
+    //Call the Collection Loading State Machine
+    const CollectionExec = await stepfunctions
+      .startExecution({
+        stateMachineArn,
+        name: collectionStateMachineName,
+        input: JSON.stringify({ address, chain }),
+      })
+      .promise();
+
+      console.log(CollectionExec);
+
+    //       //Load the data
+    // const addresses = await alchemyUtils.getCollections(chain, address);
+
+    // //Loop the collections and call the NFT state Machine for every 5 addresses
+    // let contractAddresses = [], index = 0;
+    // for(const address of addresses){
+
+    //   if(contractAddresses.length === 5){
+    //     //Make call to service
+    //     nftStateMachineName = uuid.v4();
+    //   //Start the execution
+    //     const collectionNFTLoadExec = await stepfunctions.startExecution({
+    //       walletNftListStateMachineARN,
+    //       name: nftStateMachineName,
+    //       input: JSON.stringify({ chain, address, contractAddresses })
+    //     }).promise();
+
+    //     console.log(collectionNFTLoadExec);
+
+    //     nftStateMachineNames.push(nftStateMachineName);
+
+    //     //Clear out the list
+    //     contractAddresses = [];
+
+    //     //Add this address
+    //     contractAddresses.push(address);
+    //   }else{
+
+    //     //Since we don't have 5, add the address
+    //     contractAddresses.push(address)
+    //   }
+
+    //   index++;
+
+    //   if(index === addresses.length){
+    //     //Make a call with the last of the addresses
+    //     console.log('last load of addresses', addresses);
+    //   };
+
+    // }
 
 
 
-       //to State Machine Executions in the AWS Step Functions Developer Guide.
-      const name = uuid.v4();
-
-      const params = {
-          stateMachineArn,
-          name,
-          input: JSON.stringify({address, chain})
-      };
-
-      console.log(params);
-      //arn:aws:states:us-east-1:111122223333:stateMachine:HelloWorld-StateMachine
-      const AWS = require('aws-sdk');
-      const stepfunctions = new AWS.StepFunctions();
-
-      //Start the execution
-      const exec = await stepfunctions.startExecution(params).promise();
 
       //Check it's status
       //const stats = await stepfunctions.describeExecution({executionArn: exec.executionArn}).promise();
 
       //console.log(stats)
 
-      return responses.respond({stateMachineArn, name, exec}, 200);
+      return responses.respond({stateMachineArn, nftStateMachineNames, collectionStateMachineName}, 200);
 
       // return stepfunctions.startExecution(params).promise().then((err, data) => {
       //     if (err) console.log(err, err.stack); // an error occurred
@@ -151,7 +192,7 @@ module.exports.startWalletLoad = async event => {
 
 
 module.exports.AddWallet = async (event) => {
-  let req, chain, address, dt, add;
+  let req, chain, address, dt, add, name;
   try {
     req = JSON.parse(event.body);
     dt = dateFormat(new Date(), "isoUtcDateTime");
@@ -182,13 +223,27 @@ module.exports.AddWallet = async (event) => {
       //Add the wallet
       add = await walletUtils._addWallet(chain, address);
       console.log('Added', dt);
+
+      //Make the call to load the wallet collections
+      const stateMachineArn = process.env.STATE_MACHINE_COLLECTION_LIST_ARN;
+      const AWS = require("aws-sdk");
+      const stepfunctions = new AWS.StepFunctions();
+      name = `${chain}-${address}-` + Date.now();
+      const collectionLoad = await stepfunctions
+        .startExecution({
+          stateMachineArn: process.env.STATE_MACHINE_COLLECTION_LIST_ARN,
+          name,
+          input: JSON.stringify({ address, chain }),
+        })
+        .promise();
+        console.log('State Machine Called:', {collectionLoad, name})
     }else{
       //Update the last connectionDate
       add = await walletUtils._updateWalletFields(chain, address, [{name: 'lastConnectionDateTime', value: dt}]);
       console.log('lastConnectionDateTime', dt);
     }
 
-    return responses.respond({ error: false, success: true, add, dt }, 200);
+    return responses.respond({ error: false, success: true, add, name, dt }, 200);
   } catch (err) {
     console.error(err);
     const res = {

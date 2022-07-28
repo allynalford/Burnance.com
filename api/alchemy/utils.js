@@ -20,6 +20,15 @@ const settings = {
 
 const alchemy = alchemySDK.initializeAlchemy(settings);
 
+function expired(date) {
+    const today = new Date();
+    var Christmas = new Date(date);
+    var diffMs = (Christmas - today); // milliseconds between now & Christmas
+    var diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000);
+    console.log(diffMins);
+    return diffMins;
+}
+
 /**
 * Gets all NFTs currently owned by a given address
 * This endpoint is supported on the following chains and networks:
@@ -36,36 +45,58 @@ const alchemy = alchemySDK.initializeAlchemy(settings);
 */
 module.exports.getCollections = async (chain, address) => {
     try {
-      //const results = await endpoint._get(`${baseURL}/getNFTs/?owner=${address}`);
+      let expired = false, addresses;
+      const walletUtils = require('../wallet/utils');
+      const _ = require("lodash");
 
-      // Print total NFT count returned in the response:
-      const nfts = await this.getNFTs(chain, address);
-      //console.log('API First Pull FULL',nfts);
-      //Add the wallet
-      var wallet = [...nfts.ownedNfts];
-      console.log('API First Pull',{length: wallet.length, key: nfts.pageKey});
+      let addressesResp = await walletUtils._getAlchemyWalletCollectionFromCache(chain, address);
 
-      //Check if the list has more NFTs
-      if (typeof nfts.pageKey !== "undefined") {
-        const page = await this.getNFTsByPageKey(
-          chain,
-          address,
-          nfts.pageKey
-        );
-        //console.log("Next Page", page);
-        wallet.push(...page.ownedNfts);
+      console.log('Alchemy Wallet Collection Cache: ',addressesResp);
+
+        if (typeof addressesResp !== "undefined") {
+            addresses = addressesResp.addresses;
+        }
+
+      if (typeof addresses === "undefined" | expired === true) {
+        //Lets process the wallet list
+        // Print total NFT count returned in the response:
+        const nfts = await this.getNFTs(chain, address);
+        //console.log('API First Pull FULL',nfts);
+        //Add the wallet
+        var wallet = [...nfts.ownedNfts];
+        
+        console.log("API First Pull", {
+          length: wallet.length,
+          key: nfts.pageKey,
+        });
+
+        //Check if the list has more NFTs
+        if (typeof nfts.pageKey !== "undefined") {
+          const page = await this.getNFTsByPageKey(
+            chain,
+            address,
+            nfts.pageKey
+          );
+          //console.log("Next Page", page);
+          wallet.push(...page.ownedNfts);
+        }
+
+        
+
+        //Filter out the addresses for collections
+        addresses = _.uniq(_.map(wallet, "contract.address"));
+
+        await walletUtils._addAlchemyWalletCollectionToCache(chain, address, addresses);
       }
 
-      const _ = require('lodash');
 
-      //Filter out the addresses for collections
-      const addresses = _.uniq(_.map(wallet, 'contract.address'));
 
       //Responses object
       let resp = [];
 
       //Loop the addresses and produce a NFT count
       for(const address of addresses){
+
         //Count the amount of NFTs with the same contract address
         const obj = _.countBy(wallet, (rec) => {
             return rec.contract.address === address;
@@ -125,11 +156,6 @@ module.exports.getCollectionsAndTokenIds = async (chain, address) => {
       //Filter out the addresses for collections
       const addresses = _.uniq(_.map(wallet, 'contract.address'));
 
-      //mintTokenIds = _.uniq(_.map(tokenNftTx.result, 'tokenID'));
-
-      //Loop the list of addresses
-      const addresses and 
-      tokenNftTx = 
 
 
 
@@ -144,7 +170,10 @@ module.exports.getCollectionsAndTokenIds = async (chain, address) => {
         });
 
         const nfts = _.find(wallet, function (o) { return o.contract.address === address;  });
+
         console.log('nfts', nfts);
+
+        const tokenIds = _.uniq(_.map(nfts, 'tokenId'));
 
         //Add the address tot he response with the count
         resp.push({address, count: obj.true});
