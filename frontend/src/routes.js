@@ -20,6 +20,7 @@ const PageInvoice = React.lazy(() =>
 const Dashboard = React.lazy(() => import('./pages/Dashboard/index'));
 const Collection = React.lazy(() => import("./pages/Pages/CaseStudy/Collection"));
 const Batch = React.lazy(() => import("./pages/Pages/Batch/Cart"));
+const Account = React.lazy(() => import("./pages/Account/MyAccount"));
 const routes = [
   
 
@@ -34,13 +35,15 @@ const routes = [
   //{ path: "/widget", component: Widget, isTopbarDark: true },
 
   { path: "/collections", component: Collections, isTopbarDark: true },
-  { path: "/account", component: PageInvoice, isTopbarDark: true },
+  { path: "/ledger", component: PageInvoice, isTopbarDark: true },
   { path: "/dashboard", component: Dashboard },
 
   { path: "/collection/:address", component: Collection },
 
   { path: "/test", component: Test, isWithoutLayout: true, exact: false },
   { path: "/batch", component: Batch, isTopbarDark: true },
+  { path: "/account", component: Account, isTopbarDark: true },
+  
 
   //Index Main
   { path: "/index", component: HomePage, isTopbarDark: true },

@@ -7,7 +7,9 @@
     "set": "SET AWS_PROFILE=allyn-burnance",
     "test": "serverless offline",
     "deploy": "sls deploy --stage dev --aws-profile allyn-burnance",
-    "deployprod": "sls deploy --stage prod --aws-profile allyn-burnance"
+    "deploy:goerli": "sls deploy --stage goerli --aws-profile allyn-burnance",
+    "deploy:rinkeby": "sls deploy --stage rinkeby --aws-profile allyn-burnance",
+    "deploy:prod": "sls deploy --stage prod --aws-profile allyn-burnance"
   },
   "author": "Allyn j. Alford",
   "license": "ISC",

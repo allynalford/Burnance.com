@@ -31,8 +31,9 @@ class Topbar extends Component {
       navLinks: [
         //Note : each child and nested child must have unique id
         { id: 1, title: 'Home', link: '/' },
-        { id: 2, title: 'Collections', link: '/collections' },
-        { id: 3, title: 'Batch', link: '/batch' },
+        { id: 2, title: 'Account', link: '/account' },
+        { id: 3, title: 'Collections', link: '/collections' },
+        { id: 4, title: 'Batch', link: '/batch' },
       ],
       wishlistModal: false,
       dropdownIsOpen: false,

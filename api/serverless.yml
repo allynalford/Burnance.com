@@ -116,23 +116,23 @@ stepFunctions:
       ${file(./statemachines/wallet-nft-list-start-machine.yml)}    
 resources:
   Resources:
-    # NFTImageBucket:
-    #  Type: AWS::S3::Bucket
-    #  Properties:
-    #    BucketName: ${self:provider.environment.NFT_IMAGE_CDN_BUCKET} 
-    # NFTBucket:
-    #  Type: AWS::S3::Bucket
-    #  Properties:
-    #    BucketName: ${self:provider.environment.CDN_BUCKET} 
-    # GatewayResponse:
-    #   Type: 'AWS::ApiGateway::GatewayResponse'
-    #   Properties:
-    #     ResponseParameters:
-    #       gatewayresponse.header.WWW-Authenticate: "'Basic'"
-    #     ResponseType: UNAUTHORIZED
-    #     RestApiId:
-    #       Ref: 'ApiGatewayRestApi'
-    #     StatusCode: '401'
+    NFTImageBucket:
+     Type: AWS::S3::Bucket
+     Properties:
+       BucketName: ${self:provider.environment.NFT_IMAGE_CDN_BUCKET} 
+    NFTBucket:
+     Type: AWS::S3::Bucket
+     Properties:
+       BucketName: ${self:provider.environment.CDN_BUCKET} 
+    GatewayResponse:
+      Type: 'AWS::ApiGateway::GatewayResponse'
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.WWW-Authenticate: "'Basic'"
+        ResponseType: UNAUTHORIZED
+        RestApiId:
+          Ref: 'ApiGatewayRestApi'
+        StatusCode: '401'
     # NFTTxHashDynamoDBTable:
     #   Type: 'AWS::DynamoDB::Table'
     #   DeletionPolicy: Retain
@@ -155,28 +155,28 @@ resources:
     #       ReadCapacityUnits: 1
     #       WriteCapacityUnits: 1
     #     TableName: ${self:provider.environment.DYNAMODB_TABLE_WALLET_TX_HASH}
-    AlchemyNFTCacheDynamoDBTable:
-      Type: 'AWS::DynamoDB::Table'
-      DeletionPolicy: Retain
-      Properties:
-        AttributeDefinitions:
-          -
-            AttributeName: chain
-            AttributeType: S
-          -  
-            AttributeName: address
-            AttributeType: S
-        KeySchema:
-          -
-            AttributeName: chain
-            KeyType: HASH
-          -
-            AttributeName: address
-            KeyType: RANGE      
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-        TableName: ${self:provider.environment.DYNAMODB_TABLE_ALCHEMY_WALLET_NFT_CACHE}
+    # AlchemyNFTCacheDynamoDBTable:
+    #   Type: 'AWS::DynamoDB::Table'
+    #   DeletionPolicy: Retain
+    #   Properties:
+    #     AttributeDefinitions:
+    #       -
+    #         AttributeName: chain
+    #         AttributeType: S
+    #       -  
+    #         AttributeName: address
+    #         AttributeType: S
+    #     KeySchema:
+    #       -
+    #         AttributeName: chain
+    #         KeyType: HASH
+    #       -
+    #         AttributeName: address
+    #         KeyType: RANGE      
+    #     ProvisionedThroughput:
+    #       ReadCapacityUnits: 1
+    #       WriteCapacityUnits: 1
+    #     TableName: ${self:provider.environment.DYNAMODB_TABLE_ALCHEMY_WALLET_NFT_CACHE}
     # AlchemyCollectionCacheDynamoDBTable:
     #   Type: 'AWS::DynamoDB::Table'
     #   DeletionPolicy: Retain
@@ -199,7 +199,7 @@ resources:
     #       ReadCapacityUnits: 1
     #       WriteCapacityUnits: 1
     #     TableName: ${self:provider.environment.DYNAMODB_TABLE_ALCHEMY_WALLET_COLLECTION_CACHE}
-    # NFTImageDynamoDBTable:
+    # CollectionCacheDynamoDBTable:
     #   Type: 'AWS::DynamoDB::Table'
     #   DeletionPolicy: Retain
     #   Properties:
