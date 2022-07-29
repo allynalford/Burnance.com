@@ -1,5 +1,5 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.9;
+pragma solidity >=0.8.0 <0.9.0;
+//SPDX-License-Identifier: MIT
 
 // ⠀⡠⡤⢤⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 // ⠀⠀⠀⢿⡢⣁⢄⢫⡲⢤⡀⠀⠀⠀⠀⢀⠄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
@@ -14,10 +14,9 @@ pragma solidity ^0.8.9;
 // ⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⠋⠀⠀⠀⠀⠀⠙⠿⣿⣿⣿⣿⣿⣿⣿⠂⠀⠀⠀⠀
 // ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠻⠿⠋⠁
 
-import "@openzeppelin/contracts/access/Ownable.sol"; 
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "hardhat/console.sol";
 
 interface ERCBase {
     function supportsInterface(bytes4 interfaceId) external view returns (bool);
@@ -39,27 +38,16 @@ contract HarvestArt is ReentrancyGuard, Pausable, Ownable {
 
     address public barn = address(0);
     uint256 public defaultPrice = 1 gwei;
-    uint256 public guaranteeFee = 1 gwei;
     uint256 public maxTokensPerTx = 100;
 
-    struct GauranteeIntent {
-        address contractAddress;
-        uint256 tokenId;
-    }
-
     mapping (address => uint256) private _contractPrices;
-    mapping (address => GauranteeIntent[]) private _gauranteeTransfer;
 
-    function setFurnace(address _furnance) onlyOwner public {
-        barn = _furnance;
+    function setBarn(address _barn) onlyOwner public {
+        barn = _barn;
     }
 
     function setDefaultPrice(uint256 _defaultPrice) onlyOwner public {
         defaultPrice = _defaultPrice;
-    }
-
-    function setGuaranteeFee(uint256 _guaranteeFee) onlyOwner public {
-        guaranteeFee = _guaranteeFee;
     }
 
     function setMaxTokensPerTx(uint256 _maxTokensPerTx) onlyOwner public {
@@ -125,27 +113,6 @@ contract HarvestArt is ReentrancyGuard, Pausable, Ownable {
 
         (bool sent, ) = payable(msg.sender).call{ value: totalPrice }("");
         require(sent, "Failed to send ether.");
-    }
-
-    function gauranteeTransfer(address _tokenContract, uint256 _tokenId) public payable whenNotPaused{
-        require(barn != address(0), "Barn cannot be the 0x0 address");
-        require(msg.value >= defaultPrice, "Not enough ether in contract.");
-        
-        ERCBase tokenContract;
-        tokenContract = ERCBase(_tokenContract);
-        require(tokenContract.isApprovedForAll(msg.sender, address(this)), "Token not yet approved for all transfers");
-        
-        if (tokenContract.supportsInterface(_ERC721)) {
-            ERC721Partial(_tokenContract).transferFrom(msg.sender, barn, _tokenId);
-        } else {
-            ERC1155Partial(_tokenContract).safeTransferFrom(msg.sender, barn, _tokenId, 1, "");
-        }
-
-        GauranteeIntent memory currentEntry;
-        currentEntry.contractAddress = _tokenContract;
-        currentEntry.tokenId = _tokenId;
-
-        _gauranteeTransfer[msg.sender].push(currentEntry);
     }
 
     receive () external payable { }

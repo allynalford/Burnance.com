@@ -10,6 +10,7 @@ const alchemySDK = require('@alch/alchemy-sdk');
 const baseURL = `https://eth-mainnet.alchemyapi.io/nft/v2/${process.env.ALCHEMY_API_KEY}`;
 
 
+
 // Optional Config object, but defaults to demo api-key and eth-mainnet.
 const settings = {
   apiKey: process.env.ALCHEMY_API_KEY, // Replace with your Alchemy API Key.
@@ -443,4 +444,50 @@ module.exports.getOwnersForToken = async (chain, contractAddress, tokenId) => {
         console.error(e);
         throw e;
     }
+};
+
+/**
+* Returns the current price per gas in wei.
+* @author Allyn j. Alford <Allyn@tenablylabs.com>
+* @async
+* @function gasPrice
+* @return {Promise<BigInt>} integer of the current gas price in wei.
+* // {
+        //   "jsonrpc": "2.0",
+        //   "id": 0,
+        //   "result": "0x98bca5a00"
+        // }
+*/
+module.exports.gasPrice = async () => {
+  try {
+      //const ethers = require('ethers');
+
+      //const provider = new ethers.providers.AlchemyProvider("homestead", process.env.ALCHEMY_API_KEY);
+
+	    // Query the blockchain (replace example parameters)
+    	//const gasPrice = await provider.gasPrice(); 
+
+      //const gasPrice = await alchemySDK.gasPrice();
+        // {
+        //   "jsonrpc": "2.0",
+        //   "id": 0,
+        //   "result": "0x98bca5a00"
+        // }
+
+     //const gasPrice = BigInt(gasPrice.result).toString();
+
+     const gasPrice = await endpoint._post(`https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_API_KEY}`, {
+       jsonrpc: "2.0",
+       method: "eth_gasPrice",
+       params: [],
+       id: 0,
+     });
+
+     console.log('gasPrice', gasPrice);
+
+      return gasPrice.data.result;
+  } catch (e) {
+      console.error(e);
+      throw e;
+  }
 };

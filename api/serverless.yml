@@ -104,6 +104,7 @@ functions:
   - ${file(./functions/quicknode.yml)} 
   - ${file(./functions/wallet.yml)}
   - ${file(./functions/collection.yml)}
+  - ${file(./functions/alchemy.yml)}
 stepFunctions: 
   validate: false
   stateMachines:

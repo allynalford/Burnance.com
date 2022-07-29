@@ -1,3 +1,4 @@
+/* global BigInt */
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import { withRouter } from "react-router";
@@ -6,15 +7,12 @@ import Badge from 'react-bootstrap/Badge'
 import {Event, initGA} from "../../common/gaUtils";
 import { getChain } from "../../common/config";
 import dateFormat from "dateformat";
+const ethers = require('ethers');
 var endpoint = require('../../common/endpoint');
 var sessionstorage = require('sessionstorage');
-var formatter = new Intl.NumberFormat('en-US', {
-  style: 'currency',
-  currency: 'USD',
-  // These options are needed to round to whole numbers if that's what you want.
-  //minimumFractionDigits: 0, // (this suffices for whole numbers, but will print 2500.10 as $2,500.1)
-  //maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
-});
+
+var USD = new Intl.NumberFormat('en-US', {style: 'currency',currency: 'USD'});
+var WEI = new Intl.NumberFormat('en-US', { maximumSignificantDigits: 6 })
 
 
 class Topbar extends Component {
@@ -24,7 +22,9 @@ class Topbar extends Component {
       ethereumAddress: '',
       walletConnected: false,
       isValidSig: false,
+      provider: {},
       ethPrice: 0,
+      gasPrice: 0.00000,
       ethBalance: 0,
       isOpen: false,
       dropdownOpenShop: false,
@@ -86,6 +86,10 @@ class Topbar extends Component {
 
     if (window.ethereum) {
       window.ethereum.on('accountsChanged', this.accountsChanged);
+      //We need ethers for this
+      const ethers = require("ethers");
+      const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+      this.setState({provider});
 
       if (
         window.ethereum &&
@@ -98,7 +102,16 @@ class Topbar extends Component {
           walletConnected: true,
         });
       }
+
       this.getEthPrice();
+
+      const interval = setInterval(()=>{
+        //console.log("Gwei:", gasPrice.gwei);
+        //alert(gasPrice.gwei);
+        this.getEthPrice();
+      }, 120000);
+      //console.log('interval', interval);
+ 
     }
 
     initGA();
@@ -140,30 +153,48 @@ class Topbar extends Component {
   };
 
   getEthPrice = async () => {
-
     function expired(date) {
       const today = new Date();
       var Christmas = new Date(date);
-      var diffMs = (today - Christmas); // milliseconds between now & Christmas
+      var diffMs = today - Christmas; // milliseconds between now & Christmas
       var diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000);
-      console.log(diffMins);
-      return (diffMins < 2 ? false : true);
-  }
+      console.debug('cache age:', diffMins + ' | ' + dateFormat(new Date(), 'isoUtcDateTime'));
+      return diffMins < 2 ? false : true;
+    }
 
-    let ethPrice = JSON.parse(sessionstorage.getItem("ethPrice"));
+    let ethPrice = JSON.parse(sessionstorage.getItem('ethPrice'));
+    let gasPrice = JSON.parse(sessionstorage.getItem('gasPrice'));
 
-    if((typeof ethPrice !== 'undefined') | (ethPrice !== null) && expired(ethPrice.dt) === true){
+    if (ethPrice !== null &&
+      typeof ethPrice.dt !== 'undefined' &&
+      expired(ethPrice.dt) === true
+    ) {
+      //Set the price temporarily
+      this.setState({ ethPrice: ethPrice.ethusd });
+      //Prompt for a price update
       ethPrice = undefined;
-    };
+    }
 
     if ((typeof ethPrice === 'undefined') | (ethPrice === null)) {
+      const dt = dateFormat(new Date(), 'isoUtcDateTime');
+
       ethPrice = await endpoint._get(getChain()['eth'].getEthPriceApiUrl);
       ethPrice = ethPrice.data.result;
-      ethPrice.dt = dateFormat(new Date(), "isoUtcDateTime");
-      sessionstorage.setItem("ethPrice", JSON.stringify(ethPrice));
+      ethPrice.dt = dt;
+      sessionstorage.setItem('ethPrice', JSON.stringify(ethPrice));
+
+      gasPrice = await endpoint._get(getChain()['eth'].getGasPriceApiUrl);
+      gasPrice = gasPrice.data;
+      gasPrice.dt = dt;
+
+      gasPrice.gwei = ethers.utils.formatUnits(BigInt(gasPrice.result).toString(), "gwei");
+
+      sessionstorage.setItem("gasPrice", JSON.stringify(gasPrice));
     };
 
-    this.setState({ethPrice: ethPrice.ethusd});
+    this.setState({ ethPrice: ethPrice.ethusd, gasPrice:  gasPrice.gwei});
+
+  
   };
 
   signAndVerify = async () =>{
@@ -280,15 +311,13 @@ class Topbar extends Component {
             </div> */}
 
             <div className="buy-button">
-            {/* className="badge rounded-pill bg-primary ms-2 text h6" */}
-            {/* <span className="btn btn-outline-primary rounded-pill ms-0 mb-0"
-             
-                  style={{marginRight: '20px'}}>
-                  ETH {formatter.format(this.state.ethPrice)}
-            </span> */}
-            <Badge style={{marginRight: '20px', borderColor: 'black', border: '2px', backgroundColor: '#4183D7'}} 
-                   className="badge-outline text h5" pill> 
-            ETH {formatter.format(this.state.ethPrice)}
+            <Badge bg="#00AA55" style={{marginRight: '5px',  backgroundColor: '#00AA55'}} 
+                   className="badge-outline text h6" pill> 
+            {WEI.format(this.state.gasPrice)}{' '}<i className="mdi mdi-fuel h6" style={{color: '#F22613'}}> </i>
+            </Badge>
+            <Badge style={{marginRight: '20px', backgroundColor: '#4183D7'}} 
+                   className="badge-outline text h6" pill> 
+            {USD.format(this.state.ethPrice)}<i className="mdi mdi-ethereum h6" style={{color: '#939393'}}> </i>
             </Badge>
               <Link
                 to="#"

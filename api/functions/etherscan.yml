@@ -14,7 +14,7 @@
     timeout: 30 # optional, in seconds, default is 6
     events:
       - http:
-          path: etherscan/tokenNftTx
+          path: utils/tokenNftTx
           method: post
           authorizer: aws_iam
           cors: true
@@ -24,7 +24,7 @@
     timeout: 30 # optional, in seconds, default is 6
     events:
       - http:
-          path: etherscan/ethprice
+          path: utils/ethprice
           method: get
           authorizer: aws_iam
           cors: true        
