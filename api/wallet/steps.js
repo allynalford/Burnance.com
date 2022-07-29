@@ -112,9 +112,119 @@ module.exports.start = async event => {
   
 };
 
+module.exports.startLoadWalletNFTList = async event => {
+    let req, dt, address, chain, stateMachineArn;
+    try{
+        req = (typeof event.body !== "undefined" ? JSON.parse(event.body) : event);
+        //req = event;
+
+        log.options.tags = ['log', '<<level>>'];
+        dt = dateFormat(new Date(), "isoUtcDateTime");
+
+        address  = req.address;
+        chain  = req.chain;
+
+        stateMachineArn = process.env.STATE_MACHINE_WALLET_NFT_LIST_ARN;
+
+        if(typeof address  === 'undefined') throw new Error("address is undefined");
+        if(typeof chain  === 'undefined') throw new Error("chain is undefined");
+        if(typeof stateMachineArn  === 'undefined') throw new Error("Critical Error");
+    }catch(e){
+      console.error(e);
+      const error = new CustomError('HandledError', e.message);
+      return error;
+    }
+
+    try{
+        //We use these to call the step function
+        const AWS = require('aws-sdk');
+        const stepfunctions = new AWS.StepFunctions();
+
+        //we need this API util
+        const alchemyUtils = require('../alchemy/utils');
+
+        //Grab a list of collections from the API or cache
+        const addresses = await alchemyUtils.getCollections(chain, address);
+
+        //We will return this list for tracking
+        const executions = [];
+
+        //Init variables used in loop
+        let contractAddresses = [], index = 0, exec = {};
+
+        //console.log('Addresses:', addresses);
+
+
+        for(const address of addresses){
+
+            //If the list of addresses is 5, execute the state machine
+            if(contractAddresses.length === 5){
+
+                console.log('Sending:', contractAddresses);
+
+                //Send to the state machine
+                exec = await stepfunctions.startExecution({
+                    stateMachineArn,
+                    name: `${chain}-${address.address}-` + Date.now(),
+                    input: JSON.stringify({address: address.address, chain, contractAddresses})
+                }).promise();
+                //exec = {called: "5"}
+
+                //Add to list of executions
+                executions.push(exec);
+
+                //Clear the list
+                contractAddresses = [];
+
+                //Add to the list
+                contractAddresses.push(address.address);
+            }else{
+                //Just add the address to the list
+                contractAddresses.push(address.address);
+            };
+
+            //Increment the index so we know when the last address is being processed
+            index++;
+
+            if(addresses.length === index){
+                console.log('Last Address set', contractAddresses );
+                //Send the remainder to the service
+                exec = await stepfunctions.startExecution({
+                    stateMachineArn,
+                    name: `${chain}-${address.address}-` + Date.now(),
+                    input: JSON.stringify({address, chain, contractAddresses})
+                }).promise();
+
+                //exec = {called: "final"}
+
+                //Add to list of executions
+                executions.push(exec);
+            }
+        }
+
+        //Pass the list of non-loaded NFTs to the load step
+        const response = {
+            address, 
+            chain,
+            executions
+        };
+
+        console.log('response', response)
+
+
+
+       return response;
+    }catch(e){
+        console.error(e);
+        const error = new CustomError('HandledError', e.message);
+        return error;
+    }
+  
+};
+
 module.exports.loadWalletNFTList = async (event) => {
-    let req, dt, pupUtils, etherUtils, walletUtils, web3, loaded;
-    let chain, address, contractAddress, tokenIds;
+    let req, dt, pupUtils, etherUtils, walletUtils, alchemyUtils, web3, loaded;
+    let chain, address, contractAddresses;
 
     try{
         //req = (event.body !== "" ? JSON.parse(event.body) : event);
@@ -124,19 +234,18 @@ module.exports.loadWalletNFTList = async (event) => {
 
         address  = req.address;
         chain  = req.chain;
-        contractAddress  = req.contractAddress;
-        tokenIds = req.tokenIds;
+        contractAddresses  = req.contractAddresses;
 
 
         if(typeof address  === 'undefined') throw new Error("address is undefined");
         if(typeof chain  === 'undefined') throw new Error("chain is undefined");
-        if(typeof contractAddress  === 'undefined') throw new Error("contractAddress is undefined");
-        if(typeof tokenIds  === 'undefined') throw new Error("tokenIds is undefined");
+        if(typeof contractAddresses  === 'undefined') throw new Error("contractAddresses is undefined");
 
 
         pupUtils = require('../pup/utils');
         etherUtils = require('../etherscan/ethUtils');
         walletUtils = require('../wallet/utils');
+        alchemyUtils = require('../alchemy/utils');
         const Web3 = require('web3');
         //add provider to it
         web3 = new Web3(process.env.QUICK_NODE_HTTP);
@@ -156,7 +265,20 @@ module.exports.loadWalletNFTList = async (event) => {
         //const page = await browser.newPage();
         const page = (await browser.pages())[0];
 
-        await page.setUserAgent(pupUtils.getRandomAgent());
+        await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36');
+
+
+        await page.setExtraHTTPHeaders({
+            //'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36',
+            'sec-fetch-mode': 'navigate',
+            'sec-fetch-site': 'none',
+            'sec-fetch-user': '?1',
+            'upgrade-insecure-requests': '1',
+            'cache-control': 'max-age=0',
+            'accept-encoding': 'gzip, deflate, br',
+            'accept-language': 'en-US,en;q=0.9',
+            'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+        })
 
         await page.setRequestInterception(true);
 
@@ -174,15 +296,28 @@ module.exports.loadWalletNFTList = async (event) => {
 
             const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-            console.log(tokenIds)
+            console.log('Contract Addresses', contractAddresses);
 
-            for(const token of tokenIds){
-                const tx = await etherUtils.getNFTtx(chain, address, contractAddress, token.tokenId);
+            //Grab all NFTs for these addresses
+            const nfts = await alchemyUtils.getNFTsByContract(chain, address, contractAddresses);
+
+            if(typeof nfts !== "undefined" && typeof nfts.ownedNfts !== "undefined"){
+                console.log("NFT Count:", nfts.ownedNfts.length);
+            };
+
+            //List of NFTs to retry loading
+            const retryList = [];
+
+            for(const nft of nfts.ownedNfts){
+
+                console.info('Loading:', nft.contract.address + ' | ' + nft.tokenId);
+
+                const tx = await etherUtils.getNFTtx(chain, address, nft.contract.address, nft.tokenId);
                 console.log('txs', tx);
     
                 const url = `https://etherscan.io/tx/${tx.hash}`;
     
-                let gasData = {retry: true};
+                let gasData = {retry: true}, retries = 0;
     
     
                 if(typeof tx.gasData === "undefined"){
@@ -204,15 +339,30 @@ module.exports.loadWalletNFTList = async (event) => {
                         }
     
                                  
-                        if(typeof gasData.retry !== "undefined"){
+                        if(typeof gasData.retry !== "undefined" && retries < 3){
                             console.log("Delaying 12000");
     
                             //delay next call
-                            await delay(12000);
-    
-                            //change the user agent
-                            await page.setUserAgent(pupUtils.getRandomAgent());
-    
+                            await delay(10000);
+                            retries++;
+                           
+                        }else if(typeof gasData.retry !== "undefined" && retries >= 3){
+                            //We need to skip this NFT for now and try again later for gas data
+
+                             console.log('Adding NFT to Retry List:', nft);
+                            //Add the NFT to a list
+                            retryList.push(nft);
+
+                            //reset retries
+                            console.log('resetting retry')
+                            retries = 0;
+                            
+                            console.log('Deleting retry property')
+                            delete gasData.retry;
+
+                            //Update the NFT as needing a retry for gas data
+                            walletUtils._updateWalletNFTFields(chain, nft.contract.address + nft.tokenId, [{name: "gasRetry", value: true}]);
+                       
                         }else{
     
                             etherUtils._addNftTxHash(chain, address, tx.hash, gasData);
@@ -250,21 +400,16 @@ module.exports.loadWalletNFTList = async (event) => {
                             fields.push({name: 'costETH', value:  gasData.costETH});
                             fields.push({name: 'costUSD', value:  gasData.costUSD});
     
-                            const update = await walletUtils._updateWalletNFTFields(chain, contractAddress + token.tokenId, fields);
-                            console.log('Update',update);
+                            const update = await walletUtils._updateWalletNFTFields(chain, nft.contract.address + nft.tokenId, fields);
+                            console.log(nft.contract.address + nft.tokenId + ' Update', update);
                         }
         
                         
                     }
-                    token.loaded = true;
                 }else{
                     console.log("NFT already loaded");
-                    token.loaded = false;
-                    token.message = "NFT already loaded";
                 }
             }
-
- 
 
         //Start cleaning up the browser session
         page.removeAllListeners();
@@ -277,7 +422,8 @@ module.exports.loadWalletNFTList = async (event) => {
         
        
         const resp = {
-            tokenIds,
+            contractAddresses,
+            retryList,
             dt
         }
 
@@ -286,7 +432,7 @@ module.exports.loadWalletNFTList = async (event) => {
      
         return resp
     }catch(e){
-        const error = new CustomError('HandledError',e.message);
+        const error = new CustomError('HandledError', e.message);
         return error;
     }
 

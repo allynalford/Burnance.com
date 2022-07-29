@@ -2,9 +2,20 @@ import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import { withRouter } from "react-router";
 import {Container} from "reactstrap";
+import Badge from 'react-bootstrap/Badge'
 import {Event, initGA} from "../../common/gaUtils";
 import { getChain } from "../../common/config";
+import dateFormat from "dateformat";
 var endpoint = require('../../common/endpoint');
+var sessionstorage = require('sessionstorage');
+var formatter = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  // These options are needed to round to whole numbers if that's what you want.
+  //minimumFractionDigits: 0, // (this suffices for whole numbers, but will print 2500.10 as $2,500.1)
+  //maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
+});
+
 
 class Topbar extends Component {
   constructor(props) {
@@ -12,6 +23,8 @@ class Topbar extends Component {
     this.state = {
       ethereumAddress: '',
       walletConnected: false,
+      isValidSig: false,
+      ethPrice: 0,
       ethBalance: 0,
       isOpen: false,
       dropdownOpenShop: false,
@@ -30,9 +43,10 @@ class Topbar extends Component {
     this.toggleWishlistModal.bind(this);
     this.toggleDropdownIsOpen.bind(this);
     this.connectWallet.bind(this);
-    this.getEthBalance.bind(this);
     this.accountsChanged.bind(this);
     this.addWallet.bind(this);
+    this.signAndVerify.bind(this);
+    this.getEthPrice.bind(this);
   }
 
   toggleWishlistModal = () => {
@@ -84,7 +98,7 @@ class Topbar extends Component {
           walletConnected: true,
         });
       }
-      this.getEthBalance(window.ethereum._state.accounts[0]);
+      this.getEthPrice();
     }
 
     initGA();
@@ -118,9 +132,69 @@ class Topbar extends Component {
       if(this.state.ethereumAddress === ""){
         console.info("Connected wallet...")
         this.addWallet('ethereum', window.ethereum._state.accounts[0]);
+
+        //Ask them to sign a mesage
+        this.signAndVerify();
       }
     }
   };
+
+  getEthPrice = async () => {
+
+    function expired(date) {
+      const today = new Date();
+      var Christmas = new Date(date);
+      var diffMs = (today - Christmas); // milliseconds between now & Christmas
+      var diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000);
+      console.log(diffMins);
+      return (diffMins < 2 ? false : true);
+  }
+
+    let ethPrice = JSON.parse(sessionstorage.getItem("ethPrice"));
+
+    if((typeof ethPrice !== 'undefined') | (ethPrice !== null) && expired(ethPrice.dt) === true){
+      ethPrice = undefined;
+    };
+
+    if ((typeof ethPrice === 'undefined') | (ethPrice === null)) {
+      ethPrice = await endpoint._get(getChain()['eth'].getEthPriceApiUrl);
+      ethPrice = ethPrice.data.result;
+      ethPrice.dt = dateFormat(new Date(), "isoUtcDateTime");
+      sessionstorage.setItem("ethPrice", JSON.stringify(ethPrice));
+    };
+
+    this.setState({ethPrice: ethPrice.ethusd});
+  };
+
+  signAndVerify = async () =>{
+    //We need ethers for this
+    const ethers = require("ethers");
+    //Use this module to verify the signature
+    const { verifyMessage } = require('@ambire/signature-validator');
+    //The message to be signed
+    const message = "Welcome to Burnance....";
+    //Request accounts from MetaMask
+    await window.ethereum.request({method: 'eth_requestAccounts'});
+    //Use MetaMask as the provider
+    const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+    //Pull the accounts
+    await provider.send("eth_requestAccounts", []);
+    //Get a signer
+    const signer = provider.getSigner();
+    //Grab the address
+    const address = await signer.getAddress();
+    //Request the user sign the message
+    const signature = await signer.signMessage(message);
+    //Validate the message signature
+    const isValidSig = await verifyMessage({
+	    signer: address,
+	    message,
+	    signature,
+	    provider,
+	});
+	  console.info('is the sig valid: ', isValidSig);
+    this.setState({isValidSig});
+  }
 
   addWallet =  async (chain, address) => {
     console.log("Running Wallet Add..")
@@ -130,23 +204,6 @@ class Topbar extends Component {
     }
   };
 
-  getEthBalance = (address) => {
-    if (window.ethereum) {
-      window.ethereum
-        .request({
-          method: 'eth_getBalance',
-          params: [address, 'latest'],
-        })
-        .then((balance) => {
-          // Return string value to convert it into int balance
-          //console.log(balance)
-          // Yarn add ethers for using ethers utils or
-          // npm install ethers
-          //console.log(ethers.utils.formatEther(balance))
-          // Format the string into main latest balance
-        });
-    }
-  };
 
   activateParentDropdown = (item) => {
     const parent = item.parentElement;
@@ -223,6 +280,16 @@ class Topbar extends Component {
             </div> */}
 
             <div className="buy-button">
+            {/* className="badge rounded-pill bg-primary ms-2 text h6" */}
+            {/* <span className="btn btn-outline-primary rounded-pill ms-0 mb-0"
+             
+                  style={{marginRight: '20px'}}>
+                  ETH {formatter.format(this.state.ethPrice)}
+            </span> */}
+            <Badge style={{marginRight: '20px', borderColor: 'black', border: '2px', backgroundColor: '#4183D7'}} 
+                   className="badge-outline text h5" pill> 
+            ETH {formatter.format(this.state.ethPrice)}
+            </Badge>
               <Link
                 to="#"
                 target="_blank"

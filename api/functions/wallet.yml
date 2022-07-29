@@ -7,7 +7,7 @@
           authorizer: aws_iam
           cors: true
   walletStart:
-    handler: wallet/steps.start
+    handler: wallet/wallet.start
     events:
       - http:
           path: wallet/step/start
@@ -18,8 +18,16 @@
       - http:
           path: wallet/step/details/load
           method: post
+  walletLoadStart:
+    handler: wallet/steps.startLoadWalletNFTList 
+    events:
+      - http:
+          path: wallet/step/load/start
+          method: post  
   walletNFTListLoad:
-    handler: wallet/steps.loadWalletNFTList  
+    handler: wallet/steps.loadWalletNFTList 
+    memorySize: 1024 # optional, in MB, default is 1024
+    timeout: 300 # optional, in seconds, default is 6
   walletStop:
     handler: wallet/steps.stop   
   walletNotification:

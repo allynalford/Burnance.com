@@ -1,20 +1,17 @@
 /*jshint esversion: 8 */
 /* jshint -W117 */
 /* jshint -W097 */
+/* global BigInt */
 import React, { Component } from "react";
 import {
   Container,
   Row,
-  Col,
-  Alert,
-  FormGroup,
-  Label
+  Col
 } from "reactstrap";
 import { Link } from "react-router-dom";
 import logodark from "../../assets/images/burnance_logo.png";
 import {initGA, PageView, Event} from "../../common/gaUtils";
 import { getUser } from "../../common/config";
-import { AvForm, AvField } from 'availity-reactstrap-validation';
 const endpoint = require('../../common/endpoint');
 const Swal = require('sweetalert2');
 
@@ -51,6 +48,7 @@ class Section extends Component {
   openModal() {
     window.open(this.state.openSeaUrl, "_new");
   }
+
 
 
   fireMsg(title, text, icon){

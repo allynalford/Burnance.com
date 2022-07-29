@@ -12,7 +12,7 @@ import React from "react";
 const HomePage = React.lazy(() => import("./pages/HomePage/index"));
 const PageError = React.lazy(() => import("./pages/Pages/Special/PageError"));
 const Collections = React.lazy(() => import("./pages/Collections/index"));
-
+const Test = React.lazy(() => import("./pages/test/PageError"));
 const PageInvoice = React.lazy(() =>
   import("./pages/Pages/Account/AccountView")
 );
@@ -38,6 +38,8 @@ const routes = [
   { path: "/dashboard", component: Dashboard },
 
   { path: "/collection/:address", component: Collection },
+
+  { path: "/test", component: Test, isWithoutLayout: true, exact: false },
 
   //Index Main
   { path: "/index", component: HomePage, isTopbarDark: true },

@@ -1,0 +1,30 @@
+name: walletListStartStateMachine-${self:service}-${opt:stage, self:provider.stage}
+id: WalletListStartStateMachine
+definition:
+  Comment: "send several request to load contract addresses for a wallet"
+  StartAt: WalletListStart
+  States:
+    WalletListStart:
+      Type: Task
+      Resource: 
+        Fn::GetAtt: [walletLoadStart, Arn]
+      #"arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:${self:service}-${opt:stage, self:provider.stage}-languageStart"
+      Next: Stop
+    Stop:
+      Type: Task
+      Resource: 
+        Fn::GetAtt:
+          - walletStop
+          - Arn
+      End: true      
+notifications:
+  ABORTED:
+    - lambda: arn:aws:lambda:${self:provider.region}:${self:provider.environment.ACCOUNTID}:function:${self:service}-${opt:stage, self:provider.stage}-walletNotification
+  FAILED:
+     - lambda: arn:aws:lambda:${self:provider.region}:${self:provider.environment.ACCOUNTID}:function:${self:service}-${opt:stage, self:provider.stage}-walletNotification
+  RUNNING:
+     - lambda: arn:aws:lambda:${self:provider.region}:${self:provider.environment.ACCOUNTID}:function:${self:service}-${opt:stage, self:provider.stage}-walletNotification
+  SUCCEEDED:
+     - lambda: arn:aws:lambda:${self:provider.region}:${self:provider.environment.ACCOUNTID}:function:${self:service}-${opt:stage, self:provider.stage}-walletNotification
+  TIMED_OUT:
+     - lambda: arn:aws:lambda:${self:provider.region}:${self:provider.environment.ACCOUNTID}:function:${self:service}-${opt:stage, self:provider.stage}-walletNotification   

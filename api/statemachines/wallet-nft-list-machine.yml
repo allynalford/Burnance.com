@@ -1,7 +1,7 @@
 name: walletNftListStateMachine-${self:service}-${opt:stage, self:provider.stage}
 id: WalletNftListStateMachine
 definition:
-  Comment: "Wallet loading business process for a list of NFT tokenIds"
+  Comment: "load a list of NFT based on a list of contract addresses"
   StartAt: WalletNftListWorkflow
   States:
     WalletNftListWorkflow:
@@ -16,17 +16,15 @@ definition:
         Fn::GetAtt:
           - walletStop
           - Arn
-      End: true
-    Completed:
-      Type: Succeed       
-notifications:
-  ABORTED:
-    - lambda: arn:aws:lambda:us-east-1:297677912558:function:burnance-dev-walletNotification
-  FAILED:
-     - lambda: arn:aws:lambda:us-east-1:297677912558:function:burnance-dev-walletNotification
-  RUNNING:
-     - lambda: arn:aws:lambda:us-east-1:297677912558:function:burnance-dev-walletNotification
-  SUCCEEDED:
-     - lambda: arn:aws:lambda:us-east-1:297677912558:function:burnance-dev-walletNotification
-  TIMED_OUT:
-     - lambda: arn:aws:lambda:us-east-1:297677912558:function:burnance-dev-walletNotification   
+      End: true      
+# notifications:
+#   ABORTED:
+#     - lambda: arn:aws:lambda:us-east-1:297677912558:function:burnance-dev-walletNotification
+#   FAILED:
+#      - lambda: arn:aws:lambda:us-east-1:297677912558:function:burnance-dev-walletNotification
+#   RUNNING:
+#      - lambda: arn:aws:lambda:us-east-1:297677912558:function:burnance-dev-walletNotification
+#   SUCCEEDED:
+#      - lambda: arn:aws:lambda:us-east-1:297677912558:function:burnance-dev-walletNotification
+#   TIMED_OUT:
+#      - lambda: arn:aws:lambda:us-east-1:297677912558:function:burnance-dev-walletNotification   

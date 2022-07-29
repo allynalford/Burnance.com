@@ -9,17 +9,26 @@ const _ = require('lodash');
 
 	
 module.exports.start = async event => {
-    let req, dt, address, chain, stateMachineArn;
+    let req, dt, address, contractAddresses, chain, stateMachineArn;
   
     try{
       req = JSON.parse(event.body);
       dt = dateFormat(new Date(), "isoUtcDateTime");
+
       address  = req.address;
       chain  = req.chain;
-      stateMachineArn = process.env.state_machine_arn;
+      contractAddresses = req.contractAddresses;
+
+      address  = req.address;
+      chain  = req.chain;
+      contractAddresses  = req.contractAddresses;
+
+      stateMachineArn = process.env.STATE_MACHINE_WALLET_NFT_LIST_ARN;
+
       if(typeof address  === 'undefined') throw new Error("address is undefined");
       if(typeof chain  === 'undefined') throw new Error("chain is undefined");
       if(typeof stateMachineArn  === 'undefined') throw new Error("Critical Error");
+
   }catch(e){
     console.error(e);
       return respond({
@@ -37,11 +46,11 @@ module.exports.start = async event => {
     //region, and state machine for 90 days. For more information, see Limits Related 
     try {
          //to State Machine Executions in the AWS Step Functions Developer Guide.
-        const name = uuid.v4();
+        const name = `${chain}-${address}-` + Date.now();
         const params = {
             stateMachineArn,
             name,
-            input: JSON.stringify({address, chain})
+            input: JSON.stringify({address, chain, contractAddresses})
         };
 
         console.log(params);
@@ -52,22 +61,9 @@ module.exports.start = async event => {
         //Start the execution
         const exec = await stepfunctions.startExecution(params).promise();
 
-        //Check it's status
-        //const stats = await stepfunctions.describeExecution({executionArn: exec.executionArn}).promise();
-
-        //console.log(stats)
 
         return responses.respond({stateMachineArn, name, exec}, 200);
 
-        // return stepfunctions.startExecution(params).promise().then((err, data) => {
-        //     if (err) console.log(err, err.stack); // an error occurred
-        //     else     console.log(data);           // successful response
-        //     responses.respond({stateMachineArn}, 200);
-        //     //callback(null, `Your state machine ${stateMachineArn} executed successfully`);
-        // }).catch(error => {
-        //     console.log(error);
-        //     responses.respond(error, 200);
-        // });
     } catch (e) {
         console.error(e);
         return e;
@@ -175,15 +171,6 @@ module.exports.startWalletLoad = async event => {
 
       return responses.respond({stateMachineArn, nftStateMachineNames, collectionStateMachineName}, 200);
 
-      // return stepfunctions.startExecution(params).promise().then((err, data) => {
-      //     if (err) console.log(err, err.stack); // an error occurred
-      //     else     console.log(data);           // successful response
-      //     responses.respond({stateMachineArn}, 200);
-      //     //callback(null, `Your state machine ${stateMachineArn} executed successfully`);
-      // }).catch(error => {
-      //     console.log(error);
-      //     responses.respond(error, 200);
-      // });
   } catch (e) {
       console.error(e);
       return e;

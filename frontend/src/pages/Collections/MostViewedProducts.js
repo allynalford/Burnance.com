@@ -46,6 +46,7 @@ class MostViewedProducts extends Component {
     super(props);
     this.state = {
       ethereumAddress: '',
+      wallet: {},
       walletConnected: false,
       loading: true,
       nfts: [],
@@ -71,6 +72,7 @@ class MostViewedProducts extends Component {
     this.fireMsg.bind(this);
     this.openModal.bind(this);
     this.getEthPrice.bind(this);
+    this.getWallet.bind(this);
 
     _openModal = this.openModal;
   }
@@ -91,14 +93,22 @@ class MostViewedProducts extends Component {
       window.ethereum._state.isConnected &&
       typeof window.ethereum._state.accounts[0] !== 'undefined'
     ) {
-      this.setState({
-        ethereumAddress: window.ethereum._state.accounts[0],
-        walletConnected: true,
-      });
 
+      if(this.state.ethereumAddress === ""){
+        console.log("Account Changed Execution")
+        this.setState({
+          ethereumAddress: window.ethereum._state.accounts[0],
+          walletConnected: true,
+        });
+  
+        this.getWallet('ethereum', window.ethereum._state.accounts[0]);
+  
+        //Get the NFTs
+        this.getNFTs(window.ethereum._state.accounts[0], 1);
 
-      //Get the NFTs
-      this.getNFTs(window.ethereum._state.accounts[0], 1);
+        
+      }
+
 
     } else if (typeof window.ethereum._state.accounts[0] === 'undefined') {
       this.setState({ nfts: [], walletConnected: false, ethereumAddress: '' });
@@ -110,15 +120,27 @@ class MostViewedProducts extends Component {
     window.addEventListener('scroll', this.scrollNavigation, true);
 
     if (window.ethereum) {
+
       window.ethereum.on('accountsChanged', this.accountsChanged);
+
       if (
         window.ethereum._state.isConnected &&
         typeof window.ethereum._state.accounts[0] !== 'undefined'
       ) {
-        this.setState({
-          ethereumAddress: window.ethereum._state.accounts[0],
-          walletConnected: true,
-        });
+        if(this.state.ethereumAddress === ""){
+
+          this.setState({
+            ethereumAddress: window.ethereum._state.accounts[0],
+            walletConnected: true,
+          });
+    
+          this.getWallet('ethereum', window.ethereum._state.accounts[0]);
+    
+          //Get the NFTs
+          this.getNFTs(window.ethereum._state.accounts[0], 1);
+  
+          
+        }
 
         //Get the price
         this.getEthPrice(window.ethereum._state.accounts[0]);
@@ -128,6 +150,17 @@ class MostViewedProducts extends Component {
       }
     }
   }
+
+
+  getWallet = async (chain, address) => {
+    try {
+      const walletResp = await endpoint._get(getChain()['eth'].getWalletApiUrl + `/${chain}/${address}`);
+      console.info('wallet', walletResp.data.wallet);
+      this.setState({ wallet: walletResp.data.wallet });
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   //Add try/catch to this function
   getNFTs = async (ethereumAddress, ethusd) => {

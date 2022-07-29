@@ -14,6 +14,7 @@ const serverVars = {
          getWalletCollectionsApiUrl: process.env.REACT_APP_BASE_API_URL + '/collection',
          viewWalletCollectionApiUrl: process.env.REACT_APP_BASE_API_URL + '/collection/view',
          addWalletApiUrl: process.env.REACT_APP_BASE_API_URL + '/wallet',
+         getWalletApiUrl: process.env.REACT_APP_BASE_API_URL + '/wallet',
          viewWalletCollectionNftsApiUrl: process.env.REACT_APP_BASE_API_URL + '/wallet/collection',
         }
   },
@@ -35,6 +36,7 @@ const localVars = {
          getWalletCollectionsApiUrl: process.env.REACT_APP_BASE_API_URL + '/collection',
          viewWalletCollectionApiUrl: process.env.REACT_APP_BASE_API_URL + '/collection/view',
          addWalletApiUrl: process.env.REACT_APP_BASE_API_URL + '/wallet',
+         getWalletApiUrl: process.env.REACT_APP_BASE_API_URL + '/wallet',
          viewWalletCollectionNftsApiUrl: process.env.REACT_APP_BASE_API_URL + '/wallet/collection',
         }
   },

@@ -13,6 +13,8 @@ api\.serverless*
 /api/node_modules*
 /hardhat/node_modules*
 /frontend/node_modules*
+/abi/node_modules*
+abi\node_modules*
 # testing
 /coverage
 
@@ -29,8 +31,7 @@ api\.serverless*
 new_user_credentials (1).csv
 frontend_prod_credentials (1).csv
 frontend_credentials (1).csv
-api/.serverless/cloudformation-template-update-stack.json
-api/.serverless/cloudformation-template-update-stack.json
-api/.serverless/serverless-state.json
-api/.serverless/cloudformation-template-update-stack.json
-api/.serverless/serverless-state.json
+api/.serverless/*
+abi/node_modules/*
+
+abi\node_modules\*

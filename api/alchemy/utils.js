@@ -21,12 +21,12 @@ const settings = {
 const alchemy = alchemySDK.initializeAlchemy(settings);
 
 function expired(date) {
-    const today = new Date();
-    var Christmas = new Date(date);
-    var diffMs = (Christmas - today); // milliseconds between now & Christmas
-    var diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000);
-    console.log(diffMins);
-    return diffMins;
+  const today = new Date();
+  var Christmas = new Date(date);
+  var diffMs = (today - Christmas); // milliseconds between now & Christmas
+  var diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000);
+  console.log(diffMins);
+  return (diffMins < 3 ? false : true);
 }
 
 /**
@@ -64,7 +64,7 @@ module.exports.getCollections = async (chain, address) => {
         //console.log('API First Pull FULL',nfts);
         //Add the wallet
         var wallet = [...nfts.ownedNfts];
-        
+
         console.log("API First Pull", {
           length: wallet.length,
           key: nfts.pageKey,
@@ -204,14 +204,29 @@ module.exports.getCollectionsAndTokenIds = async (chain, address) => {
 */
 module.exports.getNFTs = async (chain, address) => {
     try {
+      //const results = await endpoint._get(`${baseURL}/getNFTs/?owner=${address}`);
+      const walletUtils = require("../wallet/utils");
 
-        //const results = await endpoint._get(`${baseURL}/getNFTs/?owner=${address}`);    
+      //Call the cache to check if we have NFTs
+      let results = await walletUtils._getAlchemyWalletCollectionFromCache(
+        chain,
+        address
+      );
 
+      if (typeof results !== "undefined") {
+
+        console.log('Alchemy Wallet NFT Cache: ', results);
+        results = results.nfts;
+
+      } else {
         // Print total NFT count returned in the response:
-        const results = await alchemySDK.getNftsForOwner(alchemy, address);
+        results = await alchemySDK.getNftsForOwner(alchemy, address);
 
-        return results;
+        //Add the NFTs to the cache
+        walletUtils._addAlchemyWalleNFTsToCache(chain, address, results);
+      }
 
+      return results;
     } catch (e) {
         console.error(e);
         throw e;
@@ -265,8 +280,22 @@ module.exports.getNFTsByPageKey = async (chain, address, pageKey) => {
 module.exports.getNFTsByContract = async (chain, address, contractAddresses) => {
     try {
 
-        //const results = await endpoint._get(`${baseURL}/getNFTs/?owner=${address}&contractAddresses=${contractAddresses}`);
+        //We need to call the cache to check if we have data, then filter out the NFTs
+        // const alchemy = alchemySDK.initializeAlchemy(settings);
+        //const alchemy = new Alchemy(settings);
+
+        // alchemy
+        //     .getNftsForOwner("0xC33881b8FD07d71098b440fA8A3797886D831061", {
+        //         contractAddresses: [
+        //             "0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85",
+        //             "0x76be3b62873462d2142405439777e971754e8e77",
+        //         ],
+        //     })
+        //     .then(console.log);
+        
+        console.log('getNFTsByContract',{contractAddresses})
         const results = await alchemySDK.getNftsForOwner(alchemy, address, {contractAddresses});
+
         return results;
 
     } catch (e) {

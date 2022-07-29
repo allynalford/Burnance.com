@@ -65,6 +65,7 @@ class Collection extends Component {
     this.getNFTs.bind(this);
     this.accountsChanged.bind(this);
     this.getEthPrice.bind(this);
+    this.getWallet.bind(this);
   }
 
   setCategory(category) {
@@ -95,6 +96,8 @@ class Collection extends Component {
           window.ethereum._state.accounts[0],
           this.props.match.params.address,
         );
+
+        this.getWallet('ethereum', window.ethereum._state.accounts[0]);
       }
     }
   }
@@ -118,10 +121,16 @@ class Collection extends Component {
       window.ethereum._state.isConnected &&
       typeof window.ethereum._state.accounts[0] !== 'undefined'
     ) {
-      this.setState({
-        ethereumAddress: window.ethereum._state.accounts[0],
-        walletConnected: true,
-      });
+
+      if (this.state.ethereumAddress === "") {
+
+        this.setState({
+          ethereumAddress: window.ethereum._state.accounts[0],
+          walletConnected: true,
+        });
+
+        this.getWallet('ethereum', window.ethereum._state.accounts[0]);
+      }
     } else if (typeof window.ethereum._state.accounts[0] === 'undefined') {
       this.setState({ nfts: [], walletConnected: false, ethereumAddress: '' });
     }
@@ -272,6 +281,16 @@ class Collection extends Component {
 
     this.setState({ethPrice});
   };
+
+
+  getWallet = async (chain, address) => {
+
+    const walletResp = await endpoint._get(getChain()['eth'].getWalletApiUrl + `/${chain}/${address}`);
+    console.log(walletResp);
+    
+    this.setState({wallet: walletResp.data});
+  };
+
   render() {
     return (
       <React.Fragment>

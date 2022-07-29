@@ -4,7 +4,8 @@
   "description": "Burnance API",
   "main": "index.js",
   "scripts": {
-    "test": "SET AWS_PROFILE=allyn-burnance | serverless offline",
+    "set": "SET AWS_PROFILE=allyn-burnance",
+    "test": "serverless offline",
     "deploy": "sls deploy --stage dev --aws-profile allyn-burnance",
     "deployprod": "sls deploy --stage prod --aws-profile allyn-burnance"
   },

@@ -399,7 +399,7 @@ module.exports.ViewCollection = async (event) => {
     // }
 
 
-    return responses.respond({ error: false, success: true, collection, nfts: updatedNfts }, 200);
+    return responses.respond({ error: false, success: true, collection }, 200);
   } catch (err) {
     console.error(err);
     const res = {

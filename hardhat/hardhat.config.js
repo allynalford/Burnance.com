@@ -31,5 +31,10 @@ module.exports = {
       accounts:
         process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : ['a78733a15d1973a20cce00a2e440f2ce32e616a49b16828947bf182f04c0e9fa'],
     },
+    rinkeby: {
+      url: process.env.RINKEBY_URL || "https://eth-rinkeby.alchemyapi.io/v2/tE71kIxqJuuWQmw8vQa1XSI1hz3PGi--",
+      accounts:
+        process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : ['a78733a15d1973a20cce00a2e440f2ce32e616a49b16828947bf182f04c0e9fa'],
+    },
   },
 };
