@@ -5,27 +5,24 @@ import { Link } from "react-router-dom";
 //Import components
 import PageBreadcrumb from "../../../components/Shared/PageBreadcrumb";
 
-//Import Images
-import product1 from "../../../assets/images/shop/product/s1.jpg";
-import product3 from "../../../assets/images/shop/product/s3.jpg";
-import product6 from "../../../assets/images/shop/product/s6.jpg";
-import product10 from "../../../assets/images/shop/product/s10.jpg";
+var USD = new Intl.NumberFormat('en-US', {style: 'currency',currency: 'USD'});
 
 class ShopCart extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      totalCostBasis: 0,
+      totalLosses: 0,
       pathItems: [
         //id must required
-        { id: 1, name: "Landrick", link: "/index" },
-        { id: 2, name: "Shop", link: "#" },
-        { id: 3, name: "Cart" },
+        { id: 1, name: "Burnance", link: "/" },
+        { id: 2, name: "Batch", link: "/batch" },
+        { id: 3, name: "NFTs" },
       ],
       items: [
-        { id: 1, image: product1, name: "T-Shirt", price: 255.00, qty: 2 },
-        { id: 2, image: product3, name: "Branded Watch", price: 520.00, qty: 1 },
-        { id: 3, image: product6, name: "T-Shirt", price: 160.00, qty: 4 },
-        { id: 4, image: product10, name: "Sunglasses", price: 260.00, qty: 2 },
+        { id: 1, image: "https://lh3.googleusercontent.com/UZ-26gO6lqy5ttLDdHM5hdZFUy1fjHCpurmWHJl0dFgmuQw2LVjN2FV2bm5JwS-i1rvkngpBzDyWaKgDox80OB4v8_muh9JkZcFS=w600", name: "Bored Ape Yacht Club #1957", price: 255.00, qty: 1 },
+        { id: 2, image: "https://lh3.googleusercontent.com/hK5N3SQdLDiOE4UShsUbcIDnIbum5aIlLBVWMTmyRn-SrWeAI57hL1p6VTmyfT7SVKPIbumK6aGsG3kyUw3YEWtG54YcGwpvBPwU=w600", name: "Cool Cat #3995", price: 520.00, qty: 1 },
+        { id: 3, image: "https://lh3.googleusercontent.com/qYIEkkleVnMjIkoIzQch730RIN0AyO6YnhzCsx9kV3Ag3vArZFRpskAWmldwMAuX2DB23LzjP0KiiMbLdq5yojRXwG8mQoqAhW1HYQ=w600", name: "Doodle #8712", price: 160.00, qty: 1 },
       ],
     };
     this.addItem.bind(this);
@@ -90,7 +87,7 @@ class ShopCart extends Component {
       <React.Fragment>
         {/* breadcrumb */}
         <PageBreadcrumb
-          title="Shopping Cart"
+          title="NFT Sell Batch"
           pathItems={this.state.pathItems}
         />
         <div className="position-relative">
@@ -116,7 +113,7 @@ class ShopCart extends Component {
                   <Table className="table-center table-padding mb-0">
                     <thead>
                       <tr>
-                        <th className="py-3 border-bottom" style={{ minWidth: "20px" }}></th>
+                        <th className="py-3 border-bottom" style={{ minWidth: "20px" }}>Remove</th>
                         <th className="py-3 border-bottom" style={{ minWidth: "300px" }}>
                           Product
                         </th>
@@ -124,19 +121,13 @@ class ShopCart extends Component {
                           className="text-center py-3 border-bottom"
                           style={{ minWidth: "160px" }}
                         >
-                          Price
+                          Cost Basis
                         </th>
                         <th
                           className="text-center py-3 border-bottom"
                           style={{ minWidth: "160px" }}
                         >
                           Qty
-                        </th>
-                        <th
-                          className="text-center py-3 border-bottom"
-                          style={{ minWidth: "160px" }}
-                        >
-                          Total
                         </th>
                       </tr>
                     </thead>
@@ -164,7 +155,7 @@ class ShopCart extends Component {
                               <h6 className="mb-0 ms-3">{item.name}</h6>
                             </div>
                           </td>
-                          <td className="text-center">$ {item.price}.00</td>
+                          <td className="text-center">{USD.format(item.price)}</td>
                           <td className="text-center qty-icons">
                             <Input
                               type="button"
@@ -191,9 +182,6 @@ class ShopCart extends Component {
                               className="plus btn btn-icon btn-soft-primary"
                             />
                           </td>
-                          <td className="text-center fw-bold">
-                            ${item.qty * item.price}.00
-                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -203,11 +191,8 @@ class ShopCart extends Component {
             </Row>
             <Row>
               <Col lg={8} md={6} className="mt-4 pt-2">
-                <Link to="#" className="btn btn-primary">
-                  Shop More
-                </Link>{" "}
-                <Link to="#" className="btn btn-soft-primary ms-2">
-                  Update Cart
+                <Link to="/collections" className="btn btn-primary">
+                  Add More
                 </Link>
               </Col>
               <Col lg={4} md={6} className="ms-auto mt-4 pt-2">
@@ -215,23 +200,19 @@ class ShopCart extends Component {
                   <Table className="table-center table-padding mb-0">
                     <tbody>
                       <tr>
-                        <td className="h6">Subtotal</td>
-                        <td className="text-center fw-bold">$ 2190</td>
-                      </tr>
-                      <tr>
-                        <td className="h6">Taxes</td>
-                        <td className="text-center fw-bold">$ 219</td>
+                        <td className="h6">Cost Basis Total</td>
+                        <td className="text-center fw-bold">{USD.format(this.state.totalCostBasis)}</td>
                       </tr>
                       <tr className="bg-light">
-                        <td className="h6">Total</td>
-                        <td className="text-center fw-bold">$ 2409</td>
+                        <td className="h6">Total Losses</td>
+                        <td className="text-center fw-bold">{USD.format(this.state.totalLosses)}</td>
                       </tr>
                     </tbody>
                   </Table>
                 </div>
                 <div className="mt-4 pt-2 text-end">
                   <Link to="shop-checkouts" className="btn btn-primary">
-                    Proceed to checkout
+                    Proceed to Sell
                   </Link>
                 </div>
               </Col>

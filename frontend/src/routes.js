@@ -19,7 +19,7 @@ const PageInvoice = React.lazy(() =>
 
 const Dashboard = React.lazy(() => import('./pages/Dashboard/index'));
 const Collection = React.lazy(() => import("./pages/Pages/CaseStudy/Collection"));
-
+const Batch = React.lazy(() => import("./pages/Pages/Batch/Cart"));
 const routes = [
   
 
@@ -40,6 +40,7 @@ const routes = [
   { path: "/collection/:address", component: Collection },
 
   { path: "/test", component: Test, isWithoutLayout: true, exact: false },
+  { path: "/batch", component: Batch, isTopbarDark: true },
 
   //Index Main
   { path: "/index", component: HomePage, isTopbarDark: true },
