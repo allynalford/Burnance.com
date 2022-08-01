@@ -1,14 +1,13 @@
 /*jshint esversion: 8 */
 /* jshint -W117 */
 /* jshint -W097 */
-/* global BigInt */
 import React, { Component } from "react";
 import {
   Container,
   Row,
   Col
 } from "reactstrap";
-import { Link } from "react-router-dom";
+//import { Link } from "react-router-dom";
 import logodark from "../../assets/images/burnance_logo.png";
 import {initGA, PageView, Event} from "../../common/gaUtils";
 import { getUser } from "../../common/config";

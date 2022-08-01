@@ -13,7 +13,6 @@ import { getChain } from '../../common/config';
 import { Chart } from 'react-google-charts';
 import './tableCss.css';
 import { Link } from 'react-router-dom';
-import FeatherIcon from "feather-icons-react";
 import DataTable from '../../components/DataTable';
 import bgImg from "../../assets/images/nfts/ac1_unfit_digital_collage_of_locally_owned_nfts_by_annie_bur.jpg";
 import BasicPopperToolTip from "../../components/BasicPopperToolTip";
@@ -342,7 +341,7 @@ class MostViewedProducts extends Component {
             </Row>
             <Row>
               <Col md="1">
-                <a href="">
+                <a href="/">
                   <svg
                     width="25"
                     height="25"
@@ -368,7 +367,7 @@ class MostViewedProducts extends Component {
                 </a>
               </Col>
               <Col md="1">
-                <a href="">
+                <a href="/">
                   <svg
                     width="25"
                     height="25"
@@ -396,7 +395,7 @@ class MostViewedProducts extends Component {
                 </a>
               </Col>
               <Col md="1">
-                <a href="">
+                <a href="/">
                   <svg
                     width="25"
                     height="25"

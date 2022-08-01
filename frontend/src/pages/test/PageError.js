@@ -22,7 +22,6 @@ class PageError extends Component {
   test = async () =>{
     //console.log('NODE',process.env.RINKEBY_URL)
     const ethers = require("ethers");
-    const etherScan = require('../../common/ethUtils');
     const CONTRACT_ADDRESS = "0x724bf64860F7284Bec4CC7dc9B31A3E1F97A26aD";
     const contractABI = require("../../assets/abi/Burnance.json");
     const { verifyMessage } = require('@ambire/signature-validator');
@@ -77,29 +76,6 @@ class PageError extends Component {
     //console.log(recovered);
 
     let contract = new ethers.Contract(CONTRACT_ADDRESS, contractABI.abi, signer);
-
-    function hexToBn(hex) {
-      if (hex.length % 2) {
-        hex = '0' + hex;
-      }
-    
-      var highbyte = parseInt(hex.slice(0, 2), 16)
-      var bn = BigInt('0x' + hex);
-    
-      if (0x80 & highbyte) {
-        // bn = ~bn; WRONG in JS (would work in other languages)
-    
-        // manually perform two's compliment (flip bits, add one)
-        // (because JS binary operators are incorrect for negatives)
-        bn = BigInt('0b' + bn.toString(2).split('').map(function (i) {
-          return '0' === i ? 1 : 0
-        }).join('')) + BigInt(1);
-        // add the sign character to output string (bytes are unaffected)
-        bn = -bn;
-      }
-    
-      return bn;
-    }
 
     const defaultPrice = await contract.defaultPrice();
 

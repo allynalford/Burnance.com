@@ -1,15 +1,5 @@
 import React, { Component } from "react";
 import MostViewedProducts from "./MostViewedProducts";
-import {
-  Container,
-  Row,
-  Col,
-  Card,
-  CardBody,
-} from "reactstrap";
-//Import Icons
-//Import Images
-import imgbg from "../../assets/images/account/bg.png";
 import {initGA, PageView} from "../../common/gaUtils";
 
 class Index extends Component {

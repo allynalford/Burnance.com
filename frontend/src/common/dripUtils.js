@@ -1,4 +1,4 @@
-'use strict';
+
 const responses = require('../common/responses.js');
 const dateformat = require('dateformat');
 const axios = require("axios");

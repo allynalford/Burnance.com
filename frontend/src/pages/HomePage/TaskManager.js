@@ -5,15 +5,9 @@ import {
   NavItem,
   NavLink,
   Row,
-  TabContent,
-  TabPane,
 } from "reactstrap";
 import classnames from "classnames";
-
 import apps from "../../assets/images/dalle/DALL·E 2022-07-26 15.40.09 - An unknown person sitting at a computer in the middle of the night selling digital art work for less than a penny. To Only realize i.png";
-import widgets2 from "../../assets/images/task/widgets2.png";
-import task from "../../assets/images/task/task.png";
-import file from "../../assets/images/task/file.png";
 
 export default class TaskManager extends Component {
   constructor(props) {

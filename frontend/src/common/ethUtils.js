@@ -1,9 +1,7 @@
 /*jshint esversion: 8 */
 /* jshint -W117 */
 /* jshint -W097 */
-"use strict";
 const ethers = require("ethers");
-
 
 module.exports._getProvider = async (node) => {
     try {
@@ -25,7 +23,6 @@ module.exports._getWeb3Provider = async (provider) => {
         console.error(e);
     }
 };
-
 module.exports._getContract = async (contractAddress, abi, wallet) => {
     try {
      let contract = new ethers.Contract(contractAddress, abi, wallet);
@@ -34,7 +31,6 @@ module.exports._getContract = async (contractAddress, abi, wallet) => {
         console.error(e);
     }
 };
-
 module.exports._createWallet = async (privatekey, provider) => {
     try {
         const wallet = new ethers.Wallet(privatekey, provider);

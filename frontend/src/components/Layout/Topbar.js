@@ -107,11 +107,11 @@ class Topbar extends Component {
 
       this.getEthPrice();
 
-      const interval = setInterval(()=>{
-        //console.log("Gwei:", gasPrice.gwei);
-        //alert(gasPrice.gwei);
-        this.getEthPrice();
-      }, 120000);
+      // const interval = setInterval(()=>{
+      //   //console.log("Gwei:", gasPrice.gwei);
+      //   //alert(gasPrice.gwei);
+      //   this.getEthPrice();
+      // }, 120000);
       //console.log('interval', interval);
  
     }
@@ -187,11 +187,14 @@ class Topbar extends Component {
       gasPrice = await endpoint._get(getChain()['eth'].getGasPriceApiUrl);
       gasPrice = gasPrice.data;
       gasPrice.dt = dt;
+      console.log(gasPrice);
 
       gasPrice.gwei = ethers.utils.formatUnits(BigInt(gasPrice.result).toString(), "gwei");
 
       sessionstorage.setItem("gasPrice", JSON.stringify(gasPrice));
     };
+
+    //console.log(gasPrice);
 
     this.setState({ ethPrice: ethPrice.ethusd, gasPrice:  gasPrice.gwei});
 
