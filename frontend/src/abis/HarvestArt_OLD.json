@@ -242,17 +242,16 @@
 			"type": "function"
 		},
 		{
-			"inputs": [
-				{
-					"internalType": "address",
-					"name": "_senderAddress",
-					"type": "address"
-				}
-			],
+			"inputs": [],
 			"name": "getGuarantees",
 			"outputs": [
 				{
 					"components": [
+						{
+							"internalType": "address",
+							"name": "senderAddress",
+							"type": "address"
+						},
 						{
 							"internalType": "address",
 							"name": "contractAddress",
@@ -329,7 +328,7 @@
 	  "4": {
 		"events": {},
 		"links": {},
-		"address": "0xa45e0AFae0bb25Dbc9EAb0A8e7bc60B4BFe59C4C",
+		"address": "0x22dAd90Ed748282668fAB428319a248C9DE86Ae8",
 		"transactionHash": "0x4f7992177e939805c65d3b812808ab4ce674258b115b68efd290e655ebf6300e"
 	  }
 	}

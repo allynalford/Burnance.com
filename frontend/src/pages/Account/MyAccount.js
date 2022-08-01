@@ -13,7 +13,7 @@ import {
 } from "reactstrap";
 import { Link } from "react-router-dom";
 import classnames from "classnames";
-
+import {initGA, PageView} from '../../common/gaUtils';
 //Import Icons
 import FeatherIcon from "feather-icons-react";
 
@@ -27,6 +27,9 @@ import PageBreadcrumb from "../../components/Shared/PageBreadcrumb";
 //Import Images
 import client from "../../assets/images/default-image.jpg";
 
+import Web3 from 'web3';
+import Burnance from '../../abis/HarvestArt.json';
+
 class MyAccount extends Component {
   constructor(props) {
     super(props);
@@ -37,8 +40,18 @@ class MyAccount extends Component {
         { id: 1, name: "Burnance", link: "/" },
         { id: 2, name: "My Account", link: "/account" },
       ],
+      burnanceAddr: "",
+      burnance: "",
+      ethereumAddress: '',
+      walletConnected: false,
+      account: '',
+      guarantees: []
     };
     this.toggleTab = this.toggleTab.bind(this);
+    this.loadBlockchainData.bind(this);
+    this.loadWeb3.bind(this);
+    this.getPromissoryList.bind(this);
+    this.accountsChanged.bind(this);
   }
   toggleTab(tab) {
     if (this.state.activeTab !== tab) {
@@ -48,10 +61,68 @@ class MyAccount extends Component {
     }
   }
 
+  async componentWillMount() {
+    await this.loadWeb3();
+    await this.loadBlockchainData();
+  }
+
+  componentDidMount() {
+
+
+    try{
+      document.body.classList = '';
+      document.getElementById('top-menu').classList.add('nav-light');
+      window.addEventListener('scroll', this.scrollNavigation, true);
+    }catch(e){
+      console.warn(e.message);
+    }
+
+    initGA();
+    PageView();
+
+    if (window.ethereum) {
+      window.ethereum.on('accountsChanged', this.accountsChanged);
+      if (
+        window.ethereum._state.isConnected &&
+        typeof window.ethereum._state.accounts[0] !== 'undefined'
+      ) {
+        this.setState({
+          ethereumAddress: window.ethereum._state.accounts[0],
+          walletConnected: true,
+        });
+
+
+        //this.getPromissoryList(window.ethereum._state.accounts[0]);
+
+      
+      }
+    }
+  }
+
   // Make sure to remove the DOM listener when the component is unmounted.
   componentWillUnmount() {
     window.removeEventListener("scroll", this.scrollNavigation, true);
   }
+
+  accountsChanged = () => {
+    if (
+      window.ethereum._state.isConnected &&
+      typeof window.ethereum._state.accounts[0] !== 'undefined'
+    ) {
+
+      if (this.state.ethereumAddress === "") {
+
+        this.setState({
+          ethereumAddress: window.ethereum._state.accounts[0],
+          walletConnected: true,
+        });
+
+        this.getPromissoryList(window.ethereum._state.accounts[0]);
+       }
+    } else if (typeof window.ethereum._state.accounts[0] === 'undefined') {
+      this.setState({ guarantees: [], walletConnected: false, ethereumAddress: '' });
+    }
+  };
 
   scrollNavigation = () => {
     var doc = document.documentElement;
@@ -62,6 +133,39 @@ class MyAccount extends Component {
       document.getElementById("topnav").classList.remove("nav-sticky");
     }
   };
+
+  async loadWeb3() {
+    if (window.ethereum) {
+        window.web3 = new Web3(window.ethereum);
+        await window.ethereum.request({method: 'eth_requestAccounts'});
+        //await window.ethereum.enable()
+    } else if (window.web3) {
+        window.web3 = new Web3(window.web3.currentProvider)
+    } else {
+        window.alert('Non-Ethereum browser detected. You should consider trying MetaMask!')
+    }
+}
+
+async loadBlockchainData() {
+    const web3 = window.web3
+    const accounts = await web3.eth.getAccounts()
+    this.setState({ account: accounts[0] })
+    const networkId = await web3.eth.net.getId()
+    const contractAddr = await Burnance.networks[networkId].address;
+    const burnance = new web3.eth.Contract(Burnance.abi, contractAddr)   
+    console.log(contractAddr)
+    this.setState({ burnance })
+    this.getPromissoryList(burnance, accounts[0]);
+    this.setState({ loading:false, burnanceAddr:contractAddr });
+
+}
+
+getPromissoryList = async(burnance, address) => {
+  const guarantees = await burnance.methods.getGuarantees(address).call();
+  
+  
+  this.setState({ guarantees, loading:false });
+}
 
   render() {
     return (
@@ -145,7 +249,6 @@ class MyAccount extends Component {
                       </div>
                     </NavLink>
                   </NavItem>
-
                   <NavItem className="mt-2">
                     <NavLink
                       className={classnames(
@@ -154,6 +257,25 @@ class MyAccount extends Component {
                       )}
                       onClick={() => {
                         this.toggleTab("3");
+                      }}
+                      to="#"
+                    >
+                      <div className="text-start py-1 px-3">
+                        <h6 className="mb-0">
+                          <i className="uil uil-list-ul h5 align-middle me-2 mb-0"></i>{" "}
+                          Guarantee Sells
+                        </h6>
+                      </div>
+                    </NavLink>
+                  </NavItem>
+                  <NavItem className="mt-2">
+                    <NavLink
+                      className={classnames(
+                        { active: this.state.activeTab === "4" },
+                        "rounded"
+                      )}
+                      onClick={() => {
+                        this.toggleTab("4");
                       }}
                       to="#"
                     >
@@ -206,7 +328,7 @@ class MyAccount extends Component {
                     </NavLink>
                   </NavItem>
 
-                  <NavItem className="mt-2">
+                  {/* <NavItem className="mt-2">
                     <Link className="nav-link rounded" to="/auth-login">
                       <div className="text-start py-1 px-3">
                         <h6 className="mb-0">
@@ -215,7 +337,7 @@ class MyAccount extends Component {
                         </h6>
                       </div>
                     </Link>
-                  </NavItem>
+                  </NavItem> */}
                 </ul>
               </Col>
 
@@ -316,10 +438,40 @@ class MyAccount extends Component {
                       </Table>
                     </div>
                   </TabPane>
-
                   <TabPane
                     className="show fade bg-white shadow rounded p-4"
                     tabId="3"
+                  >
+                    <div className="table-responsive bg-white shadow rounded">
+                      <Table className="mb-0 table-center table-nowrap">
+                        <thead>
+                          <tr>
+                            <th scope="col" className="border-bottom">Tx. Hash</th>
+                            <th scope="col" className="border-bottom">Collection</th>
+                            <th scope="col" className="border-bottom">TokenId</th>
+                            <th scope="col" className="border-bottom">Date</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {this.state.guarantees.map((tx) => {
+                            console.log(tx)
+                            return (<tr>
+                              <th scope="row"><a target={"_new"} href="/">7107</a></th>
+                              <td className="text-success">{"Collection Name"}</td>
+                              <td>
+                                {tx[1]}
+                              </td>
+                              <td>1st November 2020</td>
+                            </tr>)
+                          }
+                          )}
+                        </tbody>
+                      </Table>
+                    </div>
+                  </TabPane>
+                  <TabPane
+                    className="show fade bg-white shadow rounded p-4"
+                    tabId="4"
                   >
                     <div className="table-responsive bg-white shadow rounded">
                     <div className="table-responsive bg-white shadow rounded">

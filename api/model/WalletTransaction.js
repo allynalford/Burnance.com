@@ -17,9 +17,10 @@ const dynamo = require('../common/dynamo');
  * // new Automation(storeuuid, process, Automation.STATUS.SUCCEEDED);
  * @return {WalletTransaction} Solution Instance Object
  */
-function WalletTransaction(chain, address, transactionHash) { 
-    this.chainAddress  = chain + ":" + address  || null;
-    this.transactionHash = transactionHash || null;
+function WalletTransaction(chain, address, transactionHash, type) { 
+    this.chainAddress  = chain + ":" + address;
+    this.transactionHash = transactionHash;
+    this.type = type;
 }
 /**
  * get an Wallet Transaction from the database and build the object
@@ -141,31 +142,34 @@ function WalletTransaction(chain, address, transactionHash) {
  *
  * @author Allyn j. Alford <Allyn@tenablylabs.com>
  * @function setStatus
- * @param {String} status - the status of the solution
+ * @param {String} type - the type of transaction
  * @example <caption>Example usage of get.</caption>
  * // const automation = new Automation(storeuuid, process, Automation.STATUS.SUCCEEDED);
  * // await automation.get();
  * // automation.setStatus(Automation.STATUS.PENDING);
  */
- WalletTransaction.prototype.setStatus = function(status) {
-    this.status = status;
+ WalletTransaction.prototype.setType = function(type) {
+    this.type = type;
 };
 /**
- * get the status of Automation
+ * get the type of WalletTransaction
  *
  * @author Allyn j. Alford <Allyn@tenablylabs.com>
- * @function getStatus
+ * @function getType
  * @example <caption>Example usage of get.</caption>
- * // const automation = new Automation(storeuuid, process, Automation.STATUS.SUCCEEDED);
- * // await automation.get();
- * // automation.getStatus();
- * @return {String} Action status
+ * // const walletTransaction = new WalletTransaction(chain, address, transactionHash, WalletTransaction.type.SELL);
+ * // await walletTransaction.get();
+ * // walletTransaction.getType();
+ * @return {String} Wallet Transaction type
  */
- WalletTransaction.prototype.getStatus = function() {
-    return this.status;
+ WalletTransaction.prototype.getType = function() {
+    return this.type;
 };
 
-
+WalletTransaction.prototype.type = Object.freeze({
+    SELL : "sell",
+    GUARANTEE: "guarantee"
+});
 
 
 WalletTransaction.prototype.equals = function(otherSolution) {

@@ -86,6 +86,7 @@ class Collection extends Component {
     this.loadWeb3.bind(this);
     this.fireMsg.bind(this);
     this.isApprovedForAll.bind(this);
+    this.transfer.bind(this);
   }
 
   setCategory(category) {
@@ -174,7 +175,7 @@ async loadBlockchainData() {
     const networkId = await web3.eth.net.getId()
     const contractAddr = await Burnance.networks[networkId].address;
     const burnance = new web3.eth.Contract(Burnance.abi, contractAddr)   
-    
+    console.log(contractAddr)
     this.setState({ burnance })
     //this.getPromissoryList()
     this.setState({ loading:false, burnanceAddr:contractAddr });
@@ -509,16 +510,52 @@ guaranteeTransfer = async(tokenId) => {
           if(response.status){ 
               thisss.fireMsg("Guarantee NFT Transfer", "NFT transfer was successful", "INFO");
               
-              sessionstorage.removeItem(`${this.state.ethereumAddress}-${this.props.match.params.address}-nfts`);
-              sessionstorage.removeItem(`${this.state.ethereumAddress}-${this.props.match.params.address}`);
+              sessionstorage.removeItem(`${thisss.state.ethereumAddress}-${thisss.props.match.params.address}-nfts`);
+              sessionstorage.removeItem(`${thisss.state.ethereumAddress}-${thisss.props.match.params.address}`);
 
-              this.getEthPrice(
-                this.state.ethereumAddress,
-                this.props.match.params.address,
+              thisss.getEthPrice(
+                thisss.state.ethereumAddress,
+                thisss.props.match.params.address,
               );
             }else{
               //alert(response.msg);
               thisss.fireMsg("Guarantee nft Transfer",response.msg, "WARN");
+              thisss.setState({ transferring: false});
+          }
+      });
+  }).on('error', function(error, receipt) {
+      const title = error.message.split(':')[0];
+      const msg = error.message.split(':')[1]; 
+      thisss.fireMsg(title, msg, "WARN");
+      thisss.setState({ transferring: false});
+  });
+}
+
+transfer = async(tokenId) => {
+  //e.preventDefault();
+  const thisss = this;
+  this.setState({ transferring: true })
+
+  const address = this.props.match.params.address;
+  //const tokenId = e.target.tokenId.value
+
+
+  this.state.burnance.methods.batchTransfer([address], [tokenId], [1]).send({ from: this.state.ethereumAddress }).on('transactionHash', (transactionHash) => {
+    console.log('Transfer transactionHash',transactionHash)  
+    thisss.waitForReceipt(transactionHash, function (response) {
+          if(response.status){ 
+              thisss.fireMsg("NFT Transfer", "NFT transfer was successful", "INFO");
+              
+              sessionstorage.removeItem(`${thisss.state.ethereumAddress}-${thisss.props.match.params.address}-nfts`);
+              sessionstorage.removeItem(`${thisss.state.ethereumAddress}-${thisss.props.match.params.address}`);
+
+              thisss.getEthPrice(
+                thisss.state.ethereumAddress,
+                thisss.props.match.params.address,
+              );
+            }else{
+              //alert(response.msg);
+              thisss.fireMsg("NFT Transfer",response.msg, "WARN");
               thisss.setState({ transferring: false});
           }
       });
@@ -1324,9 +1361,14 @@ async waitForReceipt(hash, cb) {
                                           eventKey="1"
                                           onClick={(e) => {
                                             console.log(
-                                              'Burn',
+                                              'Sell (Burn)',
                                               cases.contract.address,
                                             );
+                                            console.log(
+                                              'Sell (Burn) Token',
+                                              BigInt(cases.tokenId).toString(),
+                                            );
+                                            this.transfer(BigInt(cases.tokenId).toString());
                                             Event(
                                               'Collection NFT',
                                               'Option',
