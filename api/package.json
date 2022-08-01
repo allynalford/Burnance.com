@@ -6,6 +6,7 @@
   "scripts": {
     "set": "SET AWS_PROFILE=allyn-burnance",
     "test": "serverless offline",
+    "test:rinkeby": "serverless offline --stage rinkeby",
     "deploy": "sls deploy --stage dev --aws-profile allyn-burnance",
     "deploy:goerli": "sls deploy --stage goerli --aws-profile allyn-burnance",
     "deploy:rinkeby": "sls deploy --stage rinkeby --aws-profile allyn-burnance",

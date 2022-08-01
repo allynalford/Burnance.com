@@ -678,7 +678,7 @@ module.exports._addAlchemyWalletCollectionToCache = async (chain, address, addre
 module.exports._getWalletCollectionFromCache = async (chain, address) => {
     try {
         const dynamo = require('../common/dynamo');
-        const results = await dynamo.qetFromDB({
+       const results = await dynamo.qetFromDB({
             TableName: process.env.DYNAMODB_TABLE_WALLET_COLLECTION_CACHE,
             Key: {
               chain,

@@ -191,57 +191,116 @@ module.exports.GetCollection = async (event) => {
         //Check if the collection exists
         let collection = await collectionUtils._getCollection(chain, addr.address);
 
+        console.log('collection', collection);
+
         //If the collection doesn't already exists in the wallet
-        if(typeof collection === "undefined"){
-
-          //Grab the wallets information
-          const metaData = await alchemyUtils.getContractMetadata(chain, addr.address);
-
-          collection = metaData.contractMetadata;
-          collection.chain = chain;
-          collection.address = metaData.address;
+        if(typeof collection === "undefined" || collection.statusCode === 400){
 
 
           try {
-            statistics = await nftPortUtils._getCollectionStats(chain, addr.address);
-          } catch (s) {
-            console.log(s.message);
-            statistics = {};
 
-            //We need to look up the data elsewhere
-          }
+            //Grab the wallets information
+            const metaData = await alchemyUtils.getContractMetadata(chain, addr.address);
+
+            console.log('metaData', metaData);
+
+            collection = metaData.contractMetadata;
+            collection.chain = chain;
+            collection.address = metaData.address;
+
+            try {
+              statistics = await nftPortUtils._getCollectionStats(chain, addr.address);
+            } catch (s) {
+              console.log(s.message);
+              statistics = {};
+
+              //We need to look up the data elsewhere
+            }
 
 
-          if (typeof statistics.statistics !== "undefined") {
+            if (typeof statistics.statistics !== "undefined") {
 
-            console.log('Loaded Stats for new Collection', statistics.statistics);
+              console.log('Loaded Stats for new Collection', statistics.statistics);
 
-            collection.statistics = statistics.statistics;
+              collection.statistics = statistics.statistics;
+
+              //Add the collection
+              await collectionUtils._addCollectionWithStats(
+                chain,
+                metaData.address,
+                metaData.contractMetadata.name,
+                metaData.contractMetadata.symbol,
+                metaData.contractMetadata.totalSupply,
+                metaData.contractMetadata.tokenType,
+                collection.statistics
+              );
+
+
+            } else {
+              //Add the collection
+              await collectionUtils._addCollection(
+                chain,
+                metaData.address,
+                metaData.contractMetadata.name,
+                metaData.contractMetadata.symbol,
+                metaData.contractMetadata.totalSupply,
+                metaData.contractMetadata.tokenType
+              );
+
+            }
+
+          } catch (e) {
+              console.log(e.message);
+
+            collection = {
+              name: "Unknown Test Net Asset",
+              symbol: "UNKN",
+              totalSupply: "0",
+              tokenType: "erc721",
+            };
+            collection.chain = chain;
+            collection.address = addr.address;
+
+            collection.statistics = {
+              "one_day_volume": 0,
+              "one_day_change": 0,
+              "one_day_sales": 0,
+              "one_day_average_price": 0,
+              "seven_day_volume": 0,
+              "seven_day_change": 0,
+              "seven_day_sales": 0,
+              "seven_day_average_price": 0,
+              "thirty_day_volume": 0,
+              "thirty_day_change": 0,
+              "thirty_day_sales": 0,
+              "thirty_day_average_price": 0,
+              "total_volume": 0,
+              "total_sales": 0,
+              "total_supply": 0,
+              "total_minted": 0,
+              "num_owners": 0,
+              "average_price": 0,
+              "market_cap": 0,
+              "floor_price": 0,
+              "floor_price_historic_one_day": 0,
+              "floor_price_historic_seven_day": 0,
+              "floor_price_historic_thirty_day": 0,
+              "updated_date": "2022-02-02T02:22:22.222222"
+            };
 
             //Add the collection
-            await collectionUtils._addCollectionWithStats(
+            await collectionUtils._addTestNetCollectionWithStats(
               chain,
-              metaData.address,
-              metaData.contractMetadata.name,
-              metaData.contractMetadata.symbol,
-              metaData.contractMetadata.totalSupply,
-              metaData.contractMetadata.tokenType,
+              addr.address,
+              "Unknown Test Net Asset",
+              "UNKN",
+              0,
+              "erc721",
               collection.statistics
             );
 
-
-          } else {
-            //Add the collection
-            await collectionUtils._addCollection(
-              chain,
-              metaData.address,
-              metaData.contractMetadata.name,
-              metaData.contractMetadata.symbol,
-              metaData.contractMetadata.totalSupply,
-              metaData.contractMetadata.tokenType
-            );
-
           }
+
 
  
         } else {

@@ -308,6 +308,41 @@ module.exports._addCollectionWithStats = async (chain, contractAddress, name, sy
 };
 
 /**
+* Add NFT Collection that is on test network
+*
+* @author Allyn j. Alford <Allyn@tenablylabs.com>
+* @async
+* @function _addTestNetCollectionWithStats
+* @param {String} chain - blockchain of address
+* @param {String} contractAddress - NFT Collection contract address
+* @return {Promise<Array>} Response Array for next step to process.
+*/
+module.exports._addTestNetCollectionWithStats = async (chain, contractAddress, name, symbol, totalSupply, tokenType, statistics) => {
+  try {
+      const dynamo = require('../common/dynamo');
+      const dateformat = require("dateformat");
+      return await dynamo.saveItemInDB({
+          TableName: process.env.DYNAMODB_TABLE_NFT_COLLECTION,
+          Item: {
+              chain,
+              contractAddress,
+              name, 
+              symbol, 
+              totalSupply, 
+              tokenType,
+              statistics,
+              testNet: true,
+              dt: dateformat(new Date(), "isoUtcDateTime"),
+              timestamp: new Date().getTime(),
+          },
+      });
+  } catch (e) {
+      console.error(e);
+      throw e;
+  }
+};
+
+/**
 * delete a wallet
 *
 * @author Allyn j. Alford <Allyn@tenablylabs.com>

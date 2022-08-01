@@ -20,7 +20,11 @@ provider:
     QUICK_NODE_WSS: ${file(config.${self:provider.stage}.json):QUICK_NODE_WSS}
     ETHERSCAN_API_URL: ${file(config.${self:provider.stage}.json):ETHERSCAN_API_URL}
     NFT_PORT_API_KEY: ${file(config.${self:provider.stage}.json):NFT_PORT_API_KEY}
+    ETH_NETWORK: ${file(config.${self:provider.stage}.json):ETH_NETWORK}
     ALCHEMY_API_KEY: ${file(config.${self:provider.stage}.json):ALCHEMY_API_KEY}
+    ALCHEMY_BASE_URL: ${file(config.${self:provider.stage}.json):ALCHEMY_BASE_URL}
+    ALCHEMY_HTTP: ${file(config.${self:provider.stage}.json):ALCHEMY_HTTP}
+    ALCHEMY_WSS: ${file(config.${self:provider.stage}.json):ALCHEMY_WSS}
     API_KEY_TOKEN: ${file(config.${self:provider.stage}.json):API_KEY_TOKEN}
     PRO_API_KEY: ${file(config.${self:provider.stage}.json):PRO_API_KEY}
     ETHERSCAN_ABI_PARAMS: ${file(config.${self:provider.stage}.json):ETHERSCAN_ABI_PARAMS}

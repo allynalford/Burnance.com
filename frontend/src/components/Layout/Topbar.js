@@ -127,7 +127,6 @@ class Topbar extends Component {
         .request({ method: 'eth_requestAccounts' })
         .then((ethereumAddress) => {
           this.setState({ ethereumAddress, walletConnected: true });
-          this.getEthBalance(ethereumAddress);
           Event('connectWallet', 'Connection Made', 'connected');
         });
     } else {

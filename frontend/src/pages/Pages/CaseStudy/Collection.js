@@ -9,7 +9,7 @@ import { getChain } from '../../../common/config';
 import ImageGrid from '../../../components/ImageGrid';
 import {initGA, PageView, Event} from '../../../common/gaUtils';
 import RingLoader from "react-spinners/RingLoader";
-
+import { ERC721, ERC1155 } from "../../../common/contractUtils";
 //Import Images
 import bgImg from "../../../assets/images/nfts/ac1_unfit_digital_collage_of_locally_owned_nfts_by_annie_bur.jpg";
 
@@ -66,6 +66,7 @@ class Collection extends Component {
     this.accountsChanged.bind(this);
     this.getEthPrice.bind(this);
     this.getWallet.bind(this);
+    this.approveForAll.bind(this);
   }
 
   setCategory(category) {
@@ -158,7 +159,7 @@ class Collection extends Component {
         const floorPrice = (typeof collection.statistics !== "undefined" ? formatter.format(parseFloat(Number(collection.statistics.floor_price) * Number(ethusd))) : formatter.format(0.00));
         const marketCap = (typeof collection.statistics !== "undefined" ? formatter.format(parseFloat(Number(collection.statistics.market_cap) * Number(ethusd))) : formatter.format(0.00));
         const avgPrice = (typeof collection.statistics !== "undefined" ? formatter.format(parseFloat(Number(collection.statistics.average_price) * Number(ethusd))) : formatter.format(0.00))
-        const holdingValue = (typeof collection.statistics !== "undefined" ? formatter.format(parseFloat(Number((existsNFTS.nfts.length * collection.statistics.average_price)) * Number(ethusd))) : formatter.format(0.00))
+        //const holdingValue = (typeof collection.statistics !== "undefined" ? formatter.format(parseFloat(Number((existsNFTS.nfts.length * collection.statistics.average_price)) * Number(ethusd))) : formatter.format(0.00))
         const thirtyDayVolume = (typeof collection.statistics !== "undefined" ? formatter.format(parseFloat(Number(collection.statistics.thirty_day_volume) * Number(ethusd))) : formatter.format(0.00));
         
         console.log('Setting State');
@@ -171,7 +172,7 @@ class Collection extends Component {
           floorPrice,
           marketCap,
           avgPrice,
-          holdingValue,
+          //holdingValue,
           thirtyDayVolume,
           totalSupply: (typeof collection.statistics !== "undefined" ? collection.statistics.total_supply : '-'),
           owners: (typeof collection.statistics !== "undefined" ? collection.statistics.num_owners : '-'),
@@ -290,6 +291,51 @@ class Collection extends Component {
     
     this.setState({wallet: walletResp.data});
   };
+
+  approveForAll = async(e) => {
+    e.preventDefault();
+    const web3 = window.web3
+    const thisss = this;
+    this.setState({ loading: true })
+
+    const type = e.target.type.value
+    const address = e.target.address.value
+    
+    if(type == "ERC721"){
+        ERC721(address).methods.setApprovalForAll(this.state.marketingAddr, true).send({ from: this.state.account }).on('transactionHash', (transactionHash) => {
+            thisss.waitForReceipt(transactionHash, function (response) {
+                if(response.status){ 
+                    alert("Set Approve for all Successfully");
+                    thisss.setState({ loading: false});
+                }else{
+                    alert(response.msg);
+                    thisss.setState({ loading: false});
+                }
+            });
+        }).on('error', function(error, receipt) {
+            alert(error.message);
+            thisss.setState({ loading: false});
+        });
+
+    }else if(type == "ERC1155"){
+        ERC1155(address).methods.setApprovalForAll(this.state.marketingAddr, true).send({ from: this.state.account }).on('transactionHash', (transactionHash) => {
+            thisss.waitForReceipt(transactionHash, function (response) {
+                if(response.status){ 
+                    alert("Set Approve for all Successfully");
+                    thisss.setState({ loading: false});
+                }else{
+                    alert(response.msg);
+                    thisss.setState({ loading: false});
+                }
+            });
+        }).on('error', function(error, receipt) {
+            alert(error.message);
+            thisss.setState({ loading: false});
+        });
+    }
+
+
+}
 
   render() {
     return (
@@ -835,7 +881,7 @@ class Collection extends Component {
                         <Card className="blog border-0 work-container work-classic shadow rounded-md overflow-hidden">
                           <img
                             src={
-                              typeof cases.media === 'undefined'
+                              typeof cases.media === 'undefined' | typeof cases.media[0] === 'undefined'
                                 ? `${process.env.REACT_APP_BASE_CDN_URL}/default-image.jpg`
                                 : cases.media[0].gateway
                             }

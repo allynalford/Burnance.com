@@ -7,14 +7,14 @@ const endpoint = require('../common/endpoint');
 const alchemySDK = require('@alch/alchemy-sdk');
 
 // replace with your Alchemy api key
-const baseURL = `https://eth-mainnet.alchemyapi.io/nft/v2/${process.env.ALCHEMY_API_KEY}`;
-
+const baseURL = `${process.env.ALCHEMY_BASE_URL}/nft/v2/${process.env.ALCHEMY_API_KEY}`;
+//const baseURL = process.env.ALCHEMY_HTTP;
 
 
 // Optional Config object, but defaults to demo api-key and eth-mainnet.
 const settings = {
   apiKey: process.env.ALCHEMY_API_KEY, // Replace with your Alchemy API Key.
-  network: alchemySDK.Network.ETH_MAINNET, // Replace with your network.
+  network: (process.env.ETH_NETWORK === "rinkeby" ? alchemySDK.Network.ETH_RINKEBY : (process.env.ETH_NETWORK === "goerli" ? alchemySDK.Network.ETH_GOERLI : Network.ETH_MAINNET)), // Replace with your network.
   maxRetries: 10,
 };
 
@@ -62,7 +62,7 @@ module.exports.getCollections = async (chain, address) => {
         //Lets process the wallet list
         // Print total NFT count returned in the response:
         const nfts = await this.getNFTs(chain, address);
-        //console.log('API First Pull FULL',nfts);
+        console.log('API First Pull FULL', nfts);
         //Add the wallet
         var wallet = [...nfts.ownedNfts];
 
@@ -214,6 +214,7 @@ module.exports.getNFTs = async (chain, address) => {
         address
       );
 
+    
       if (typeof results !== "undefined") {
 
         console.log('Alchemy Wallet NFT Cache: ', results);
@@ -222,7 +223,7 @@ module.exports.getNFTs = async (chain, address) => {
       } else {
         // Print total NFT count returned in the response:
         results = await alchemySDK.getNftsForOwner(alchemy, address);
-
+       
         //Add the NFTs to the cache
         walletUtils._addAlchemyWalleNFTsToCache(chain, address, results);
       }
@@ -348,7 +349,7 @@ module.exports.getNFTMetadata = async (chain, contractAddress, tokenId, tokenTyp
 */
 module.exports.getContractMetadata = async (chain, contractAddress) => {
     try {
-
+       console.log('URL', `${baseURL}/getContractMetadata/?contractAddress=${contractAddress}`)
         const results = await endpoint._get(`${baseURL}/getContractMetadata/?contractAddress=${contractAddress}`);
 
         // {
@@ -364,7 +365,7 @@ module.exports.getContractMetadata = async (chain, contractAddress) => {
         return results.data;
 
     } catch (e) {
-        console.error(e);
+        console.error(e.message);
         throw e;
     }
 };
