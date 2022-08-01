@@ -87,6 +87,7 @@ class Collection extends Component {
     this.fireMsg.bind(this);
     this.isApprovedForAll.bind(this);
     this.transfer.bind(this);
+    this.refresh.bind(this);
   }
 
   setCategory(category) {
@@ -151,7 +152,7 @@ class Collection extends Component {
       hideClass: {
         popup: 'animate__animated animate__fadeOutUp'
       },
-      timer: 3000,
+      timer: 5000,
       timerProgressBar: true,
     })
   }
@@ -175,7 +176,7 @@ async loadBlockchainData() {
     const networkId = await web3.eth.net.getId()
     const contractAddr = await Burnance.networks[networkId].address;
     const burnance = new web3.eth.Contract(Burnance.abi, contractAddr)   
-    console.log(contractAddr)
+    //console.log(contractAddr)
     this.setState({ burnance })
     //this.getPromissoryList()
     this.setState({ loading:false, burnanceAddr:contractAddr });
@@ -220,7 +221,7 @@ async loadBlockchainData() {
   getNFTs = async (ethereumAddress, contractAddress, ethusd) => {
     //console.log('Loading Page:',pageNumber);
     try {
-      this.setState({ loading: true, loadingCollection: true });
+      this.setState({ loading: true, loadingCollection: true, approving: true });
       const exists = JSON.parse(
         sessionstorage.getItem(ethereumAddress + '-' + contractAddress),
       );
@@ -248,6 +249,7 @@ async loadBlockchainData() {
           nfts: existsNFTS.nfts,
           loadingCollection: false,
           loading: false,
+          approving: false,
           description: existsNFTS.nfts[0].description,
           floorPrice,
           marketCap,
@@ -323,7 +325,7 @@ async loadBlockchainData() {
         }
 
 
-        console.log('Called NFT Service', NFTS);
+        //console.log('Called NFT Service', NFTS);
 
         const holdingValue = (typeof collection.statistics !== "undefined" ? formatter.format(parseFloat(Number((NFTS.data.nfts.length * collection.statistics.average_price)) * Number(ethusd))) : formatter.format(0.00))
 
@@ -331,6 +333,7 @@ async loadBlockchainData() {
         this.setState({
           nfts: NFTS.data.nfts,
           loading: false,
+          approving: false,
           holdingValue,
           description: NFTS.data.nfts[0].description,
           held: NFTS.data.nfts.length,
@@ -362,6 +365,11 @@ async loadBlockchainData() {
 
     this.setState({ethPrice});
   };
+
+  refresh = async () =>{
+    sessionstorage.removeItem(this.state.ethereumAddress + "-" + this.props.match.params.address);
+    this.getEthPrice(this.state.ethereumAddress, this.props.match.params.address);
+  }
 
 
   getWallet = async (chain, address) => {
@@ -989,7 +997,7 @@ async waitForReceipt(hash, cb) {
               </Col>
               <Col md="12">
                 <p className="text mb-0" style={{ marginTop: '25px' }}>
-                  Approval the collection to burn an NFT from the collection
+                  Approval the collection to burn an NFT from the collection. Refresh the collection to view updates.
                 </p>
                 <Link
                   to="#"
@@ -1012,10 +1020,26 @@ async waitForReceipt(hash, cb) {
                     ? 'Approved'
                     : 'Approve Collection'}
                 </Link>
+                <Link
+                  to="#"
+                  className="btn mouse-down"
+                  style={{
+                    marginRight: '10px',
+                    backgroundColor:'blue',
+                    color: 'white',
+                  }}
+                  disabled={(this.state.loading === true | this.state.approving === true ? true : false)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    this.refresh();
+                  }}
+                >
+                  {(this.state.loading === true ? "Loading Collection..." : "Refresh Collection")}
+                </Link>
               </Col>
             </Row>
 
-            <Row
+            {/* <Row
               className="justify-content-center"
               style={{ marginTop: '25px' }}
             >
@@ -1106,7 +1130,7 @@ async waitForReceipt(hash, cb) {
                   </ul>
                 </div>
               </div>
-            </Row>
+            </Row> */}
             {this.state.loading === true ? (
               <Row className="projects-wrapper">
                 <ImageGrid />

@@ -84,11 +84,12 @@ function WalletTransaction(chain, address, transactionHash, type) {
     log.options.tags = ['log', '<<level>>']; 
     try {
         const dt = new Date();
+        const uuid = require('uuid');
         this.isodate = dateFormat(dt, "isoDate"),
         this.week = dateFormat(dt, "W"),
         this.createdatetime = dateFormat(dt, "isoUtcDateTime"),
         this.updatedat = dateFormat(dt, "isoUtcDateTime")
-
+        this.txUUID = uuid.v4();
         //Make sure the instance doesn't already exists
 
         return await dynamo.saveItemInDB({

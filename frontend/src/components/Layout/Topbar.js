@@ -184,6 +184,11 @@ class Topbar extends Component {
       ethPrice.dt = dt;
       sessionstorage.setItem('ethPrice', JSON.stringify(ethPrice));
 
+    };
+
+    if ((typeof gasPrice === 'undefined') | (gasPrice === null)) {
+      const dt = dateFormat(new Date(), 'isoUtcDateTime');
+
       gasPrice = await endpoint._get(getChain()['eth'].getGasPriceApiUrl);
       gasPrice = gasPrice.data;
       gasPrice.dt = dt;

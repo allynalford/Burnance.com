@@ -72,6 +72,7 @@ class MostViewedProducts extends Component {
     this.openModal.bind(this);
     this.getEthPrice.bind(this);
     this.getWallet.bind(this);
+    this.refresh.bind(this);
 
     _openModal = this.openModal;
   }
@@ -154,7 +155,6 @@ class MostViewedProducts extends Component {
   getWallet = async (chain, address) => {
     try {
       const walletResp = await endpoint._get(getChain()['eth'].getWalletApiUrl + `/${chain}/${address}`);
-      console.info('wallet', walletResp.data.wallet);
       this.setState({ wallet: walletResp.data.wallet });
     } catch (e) {
       console.error(e);
@@ -165,6 +165,9 @@ class MostViewedProducts extends Component {
   getNFTs = async (ethereumAddress, ethusd) => {
     //console.log('Loading Page:',pageNumber);
     try {
+
+      this.setState({ loading: true});
+
       let Collections = JSON.parse(sessionstorage.getItem(ethereumAddress));
       if ((typeof Collections === 'undefined') | (Collections === null)) {
         Collections = await endpoint._get(
@@ -258,6 +261,11 @@ class MostViewedProducts extends Component {
 
     this.setState({ethPrice});
   };
+
+  refresh = async () =>{
+    sessionstorage.removeItem(this.state.ethereumAddress);
+    this.getEthPrice();
+  }
 
   AddToBatch = (contractAddress, tokenId, name) => {
     var nft = _.find(this.state.batch, { contractAddress, tokenId });
@@ -577,6 +585,15 @@ class MostViewedProducts extends Component {
               <h2 className="mb-0">
                 You have {(this.state.collections.length === 0 ? "-" : this.state.collections.length)} Collections in your Portfolio
               </h2>
+                <Button name="refresh"
+                  className='btn btn-info rounded'
+                  style={{ marginBottom: '15px' }}
+                  onClick={e =>{
+                    e.preventDefault();
+                    this.refresh();
+                  }}>
+                  {(this.state.loading === true ? "Loading Collections..." : "Refresh Collections")}
+                </Button>
             </Col>
           </Row>)}
           
