@@ -39,6 +39,52 @@ const agents = [
 }
 
 
+module.exports.getGasData = async (hash) => {
+    var browser = await this.getBrowser();
+
+    //Create a page
+    //const page = await browser.newPage();
+    const page = (await browser.pages())[0];
+
+    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36');
+
+
+    await page.setExtraHTTPHeaders({
+        //'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36',
+        'sec-fetch-mode': 'navigate',
+        'sec-fetch-site': 'none',
+        'sec-fetch-user': '?1',
+        'upgrade-insecure-requests': '1',
+        'cache-control': 'max-age=0',
+        'accept-encoding': 'gzip, deflate, br',
+        'accept-language': 'en-US,en;q=0.9',
+        'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+    })
+
+    await page.setRequestInterception(true);
+
+    //if the page makes a  request to a resource type of image then abort that request
+    page.on('request', request => {
+        if (request.resourceType() === 'image')
+            request.abort();
+        else
+            request.continue();
+    });
+ 
+    const gasData = await this.getTxTransactionFee(`${process.env.ETHERSCAN_BASE_URL}tx/${hash}`, page);
+
+    //Start cleaning up the browser session
+    page.removeAllListeners();
+
+    //Close the page
+    await page.close();
+
+    //Close the browser
+    await browser.close();
+
+    return gasData;
+}
+
 module.exports.getTxTransactionFee = async (url, page) => {
     let dt, txFee, closingPrice, gasPrice, value = "";
     try {
@@ -109,7 +155,8 @@ module.exports.getTxTransactionFee = async (url, page) => {
 
         if(typeof txFee !== "undefined"){
          //Clean Up the fee
-         txFee = txFee.replace(' Ether', '');
+         //txFee = txFee.replace(' Ether', '');
+         txFee = txFee.split('Ether')[0].trim();
          //txFee = txFee.replace('0.', '');
         }
 

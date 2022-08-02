@@ -47,7 +47,7 @@ module.exports._getCollection = async (chain, contractAddress) => {
             TableName: process.env.DYNAMODB_TABLE_NFT_COLLECTION,
             Key: {
               chain,
-                contractAddress
+              contractAddress
             }
         });
         return assets;

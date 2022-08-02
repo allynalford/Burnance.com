@@ -827,7 +827,7 @@ module.exports._ViewWalletNFT = async (chain, address, contractAddress, tokenId)
             const tx = await etherUtils.getNFTtx(chain, address, contractAddress, tokenId);
             console.log('txs', tx);
 
-            const url = `https://etherscan.io/tx/${tx.hash}`;
+            const url = `${process.env.ETHERSCAN_BASE_URL}tx/${tx.hash}`;
 
             let gasData = {retry: true};
 
@@ -841,8 +841,8 @@ module.exports._ViewWalletNFT = async (chain, address, contractAddress, tokenId)
 
                     if(typeof gasData === "undefined"){
 
-                        gasData = await pupUtils.getTxTransactionFee(url, page);
-
+                        //gasData = await pupUtils.getTxTransactionFee(url, page);
+                         gasData = await etherUtils._eth_getTransactionReceipt(tx.hash);
                     }else{
                         gasData = gasData.result;
 
@@ -863,38 +863,42 @@ module.exports._ViewWalletNFT = async (chain, address, contractAddress, tokenId)
 
                         etherUtils._addNftTxHash(chain, address, tx.hash, gasData);
 
+                        const gasUsed = gasData.result.gasUsed;
+
+                        gasData = {};
+
                         gasData.mintTokenIds = tx.mintTokenIds;
                         gasData.transactionDate = tx.transactionDate;
 
-                        let fields = [{name: 'status', value: 'loaded'},{name: 'gasData', value:  gasData}]
+                        let fields = [{name: 'status', value: 'loaded'}]
                        
                         //Update the NFT in the wallet
-                        //gasData.gasETH = web3.utils.fromWei(gasData.txFee.toString(), 'ether');
-                        gasData.gasETH = gasData.txFee;
+                        gasData.gasETH = web3.utils.fromWei(BigInt(gasUsed).toString(), 'ether');
+                        //gasData.gasETH = gasData.txFee;
                         gasData.gasUSD = parseFloat((gasData.gasETH + 0) * gasData.closingPrice);
 
                         fields.push({ name: 'gasUSD', value:  gasData.gasUSD});
                         fields.push({name: 'gasETH', value:  gasData.gasETH});
-
+                        fields.push({name: 'gasData', value:  gasData})
                         
-                        console.log('gasETH: ',gasData.gasETH);
-                        console.log('gasUSD: ',gasData.gasUSD);
+                        console.log('gasETH: ', gasData.gasETH);
+                        console.log('gasUSD: ', gasData.gasUSD);
 
                         
 
                         //Calculate the cost
-                        gasData.costETH = (gasData.gasETH + gasData.value);
-                        gasData.costUSD = parseFloat(gasData.costETH * gasData.closingPrice);
-                        gasData.valueUSD = parseFloat(gasData.value * gasData.closingPrice);
+                        //gasData.costETH = (gasData.gasETH + gasData.value);
+                        //gasData.costUSD = parseFloat(gasData.costETH * gasData.closingPrice);
+                        //gasData.valueUSD = parseFloat(gasData.value * gasData.closingPrice);
 
-                        fields.push({name: 'valueETH', value:  gasData.value});
-                        fields.push({name: 'valueUSD', value:  gasData.valueUSD});
+                        //fields.push({name: 'valueETH', value:  gasData.value});
+                        //fields.push({name: 'valueUSD', value:  gasData.valueUSD});
 
-                        console.log('costETH: ',gasData.costETH);
-                        console.log('costUSD: ',gasData.costUSD);
+                        //console.log('costETH: ',gasData.costETH);
+                        //console.log('costUSD: ',gasData.costUSD);
 
-                        fields.push({name: 'costETH', value:  gasData.costETH});
-                        fields.push({name: 'costUSD', value:  gasData.costUSD});
+                        //fields.push({name: 'costETH', value:  gasData.costETH});
+                        //fields.push({name: 'costUSD', value:  gasData.costUSD});
 
                         const update = await walletUtils._updateWalletNFTFields(chain, contractAddress + tokenId, fields);
                         console.log('Update',update);

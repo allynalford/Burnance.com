@@ -18,7 +18,9 @@ provider:
     NFT_IMAGE_CDN_BUCKET: ${file(config.${self:provider.stage}.json):NFT_IMAGE_CDN_BUCKET}
     QUICK_NODE_HTTP: ${file(config.${self:provider.stage}.json):QUICK_NODE_HTTP}
     QUICK_NODE_WSS: ${file(config.${self:provider.stage}.json):QUICK_NODE_WSS}
+    ETHERSCAN_PRICE_API_URL: ${file(config.${self:provider.stage}.json):ETHERSCAN_API_URL}
     ETHERSCAN_API_URL: ${file(config.${self:provider.stage}.json):ETHERSCAN_API_URL}
+    ETHERSCAN_BASE_URL: ${file(config.${self:provider.stage}.json):ETHERSCAN_BASE_URL}
     NFT_PORT_API_KEY: ${file(config.${self:provider.stage}.json):NFT_PORT_API_KEY}
     ETH_NETWORK: ${file(config.${self:provider.stage}.json):ETH_NETWORK}
     ALCHEMY_API_KEY: ${file(config.${self:provider.stage}.json):ALCHEMY_API_KEY}

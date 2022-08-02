@@ -26,9 +26,9 @@ import PageBreadcrumb from "../../components/Shared/PageBreadcrumb";
 
 //Import Images
 import client from "../../assets/images/default-image.jpg";
-
-import Web3 from 'web3';
-import Burnance from '../../abis/HarvestArt.json';
+import { getChain } from "../../common/config";
+import dateFormat from "dateformat";
+const endpoint = require('../../common/endpoint');
 
 class MyAccount extends Component {
   constructor(props) {
@@ -48,8 +48,6 @@ class MyAccount extends Component {
       guarantees: []
     };
     this.toggleTab = this.toggleTab.bind(this);
-    this.loadBlockchainData.bind(this);
-    this.loadWeb3.bind(this);
     this.getPromissoryList.bind(this);
     this.accountsChanged.bind(this);
   }
@@ -61,14 +59,8 @@ class MyAccount extends Component {
     }
   }
 
-  async componentWillMount() {
-    await this.loadWeb3();
-    await this.loadBlockchainData();
-  }
 
   componentDidMount() {
-
-
     try{
       document.body.classList = '';
       document.getElementById('top-menu').classList.add('nav-light');
@@ -91,10 +83,7 @@ class MyAccount extends Component {
           walletConnected: true,
         });
 
-
-        //this.getPromissoryList(window.ethereum._state.accounts[0]);
-
-      
+        this.getPromissoryList(window.ethereum._state.accounts[0]);
       }
     }
   }
@@ -134,37 +123,11 @@ class MyAccount extends Component {
     }
   };
 
-  async loadWeb3() {
-    if (window.ethereum) {
-        window.web3 = new Web3(window.ethereum);
-        await window.ethereum.request({method: 'eth_requestAccounts'});
-        //await window.ethereum.enable()
-    } else if (window.web3) {
-        window.web3 = new Web3(window.web3.currentProvider)
-    } else {
-        window.alert('Non-Ethereum browser detected. You should consider trying MetaMask!')
-    }
-}
 
-async loadBlockchainData() {
-    const web3 = window.web3
-    const accounts = await web3.eth.getAccounts()
-    this.setState({ account: accounts[0] })
-    const networkId = await web3.eth.net.getId()
-    const contractAddr = await Burnance.networks[networkId].address;
-    const burnance = new web3.eth.Contract(Burnance.abi, contractAddr)   
-    console.log(contractAddr)
-    this.setState({ burnance })
-    this.getPromissoryList(burnance, accounts[0]);
-    this.setState({ loading:false, burnanceAddr:contractAddr });
-
-}
-
-getPromissoryList = async(burnance, address) => {
-  const guarantees = await burnance.methods.getGuarantees(address).call();
-  
-  
-  this.setState({ guarantees, loading:false });
+getPromissoryList = async(address) => {
+  this.setState({ loading:true });
+  const guarantees = await endpoint._get(getChain()['eth'].viewWalletGuarenteeSellTxApiUrl + `/ethereum/${address}`)
+  this.setState({ guarantees: guarantees.data.transactions, loading:false });
 }
 
   render() {
@@ -449,19 +412,22 @@ getPromissoryList = async(burnance, address) => {
                             <th scope="col" className="border-bottom">Tx. Hash</th>
                             <th scope="col" className="border-bottom">Collection</th>
                             <th scope="col" className="border-bottom">TokenId</th>
+                            <th scope="col" className="border-bottom">Cost</th>
+                            <th scope="col" className="border-bottom">Tx. Fee</th>
                             <th scope="col" className="border-bottom">Date</th>
                           </tr>
                         </thead>
                         <tbody>
                           {this.state.guarantees.map((tx) => {
+                           
                             console.log(tx)
                             return (<tr>
-                              <th scope="row"><a target={"_new"} href="/">7107</a></th>
-                              <td className="text-success">{"Collection Name"}</td>
-                              <td>
-                                {tx[1]}
-                              </td>
-                              <td>1st November 2020</td>
+                              <th scope="row"><a target={"_new"} href={`${process.env.REACT_APP_ETHERSCAN_BASE_URL}/tx/${tx.transactionHash}`}>Explorer</a></th>
+                              <td className="text-success">{tx.title}</td>
+                              <td>{tx.tokenID}</td>
+                              <td>{tx.transferValueETH}</td>
+                              <td>{tx.transferGasETH}</td>
+                              <td>{dateFormat(new Date(tx.timeStamp * 1000), "mm/dd/yyyy")}</td>
                             </tr>)
                           }
                           )}

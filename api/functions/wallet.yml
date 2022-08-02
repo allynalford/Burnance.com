@@ -74,3 +74,23 @@
           method: get
           authorizer: aws_iam
           cors: true
+  walletAddTx:
+    handler: wallet/transactions.addTx
+    memorySize: 128 # optional, in MB, default is 1024
+    timeout: 30 # optional, in seconds, default is 6
+    events:
+      - http:
+          path: wallet/tx
+          method: post
+          authorizer: aws_iam
+          cors: true
+  walletGetTxs:
+    handler: wallet/transactions.getGuaranteesTxs
+    memorySize: 128 # optional, in MB, default is 1024
+    timeout: 30 # optional, in seconds, default is 6
+    events:
+      - http:
+          path: wallet/txs/guarantees/{chain}/{address}
+          method: get
+          authorizer: aws_iam
+          cors: true

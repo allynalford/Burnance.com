@@ -2,7 +2,7 @@
 const dateFormat = require('dateformat');
 const log = require('lambda-log');
 const dynamo = require('../common/dynamo');
-
+const etherscan = require('../etherscan/ethUtils');
 /**
  * constructor for WalletTransaction Object
  *
@@ -13,15 +13,79 @@ const dynamo = require('../common/dynamo');
  * @param {String} transactionHash - blockchain transaction hash
  * @param {Automation.STATUS} status - status of action
  * @example <caption>Example usage of Action Object.</caption>
- * // new Automation();
- * // new Automation(storeuuid, process, Automation.STATUS.SUCCEEDED);
+ * // new WalletTransaction(chain, address, transactionHash, type, contractaddress, tokenId);
  * @return {WalletTransaction} Solution Instance Object
  */
-function WalletTransaction(chain, address, transactionHash, type) { 
+function WalletTransaction(chain, address, transactionHash, type, contractaddress, tokenID) { 
     this.chainAddress  = chain + ":" + address;
-    this.transactionHash = transactionHash;
+    this.address  = address;
+    this.transactionHash = transactionHash || null;
     this.type = type;
+    this.contractaddress = contractaddress;
+    this.tokenID = tokenID;
 }
+
+/**
+ * load the transaction from EtherScan
+ *
+ * @author Allyn j. Alford <Allyn@tenablylabs.com>
+ * @async
+ * @function loadTX
+ * @requires module:./dynamo.js
+ * @requires module:lambda-log
+ * @requires module:dateformat
+ * @example <caption>Example usage of get.</caption>
+ * // const tx = new WalletTransaction(chain, address, transactionHash, type);
+ * // await tx.loadTX();
+ */
+ WalletTransaction.prototype.loadTX = async function() {
+    log.options.tags = ['log', '<<level>>'];
+    try {
+        const _ = require('lodash');
+        const transactions = await etherscan._tokenNftTx(this.contractaddress, this.address);
+        const tx = _.find(transactions.result, {hash:this.transactionHash});
+        //const transaction = await etherscan._eth_getTransactionByHash(tx.hash);
+
+        this.to = tx.to;
+        this.timeStamp = tx.timeStamp;
+        this.tokenName = tx.tokenName;
+        this.tokenSymbol = tx.tokenSymbol;
+;
+    } catch (e) {
+        console.error(e);
+        log.error(e);
+        throw e;
+    };
+}
+
+/**
+ * load the transaction gas data from EtherScan using puppeteer
+ *
+ * @author Allyn j. Alford <Allyn@tenablylabs.com>
+ * @async
+ * @function loadGasData
+ * @requires module:./dynamo.js
+ * @requires module:lambda-log
+ * @requires module:dateformat
+ * @example <caption>Example usage of get.</caption>
+ * // const tx = new WalletTransaction(chain, address, transactionHash, type);
+ * // await tx.loadTX();
+ */
+ WalletTransaction.prototype.loadGasData = async function() {
+    log.options.tags = ['log', '<<level>>'];
+    try {
+        const pupUtils = require('../pup/utils');
+        const gasData = await pupUtils.getGasData(this.transactionHash);
+
+        this.transferGasETH = gasData.txFee;
+        this.transferValueETH = gasData.value;
+    } catch (e) {
+        console.error(e);
+        log.error(e);
+        throw e;
+    };
+}
+
 /**
  * get an Wallet Transaction from the database and build the object
  *
@@ -58,13 +122,100 @@ function WalletTransaction(chain, address, transactionHash, type) {
         this.costETH = tx.costETH;
         this.ethTransPriceUSD = tx.ethTransPriceUSD;
         this.txUUID = tx.txUUID;
+        this.transferGasETH = tx.txFee;
+        this.transferValueETH = tx.value;
+
+        this.isoDate = tx.isodate;
+        this.week = tx.week;
+        this.created = tx.createdatetime;
+        this.updatedAt = tx.updatedat;
 
     } catch (e) {
         console.error(e);
         log.error(e);
         throw e;
     };
-}
+};
+
+/**
+ * get an Wallet Transaction from the database by TokenId and build the object
+ *
+ * @author Allyn j. Alford <Allyn@tenablylabs.com>
+ * @async
+ * @function getByTokenId
+ * @requires module:./dynamo.js
+ * @requires module:lambda-log
+ * @requires module:dateformat
+ * @example <caption>Example usage of get.</caption>
+ * // const tx = new WalletTransaction(storeuuid, process, Automation.STATUS.SUCCEEDED);
+ * // await tx.getByTokenId();
+ * //@return {Promise<WalletTransaction>} WalletTransaction Object
+ */
+ WalletTransaction.prototype.getByTokenId = async function() {
+    log.options.tags = ['log', '<<level>>'];
+    try {
+
+        const tx =  await dynamo.queryDB({
+            TableName: process.env.DYNAMODB_TABLE_WALLET_SELL_TX,
+            KeyConditionExpression: "#chainAddress = :chainAddress",
+            FilterExpression: "#tokenID = :tokenID",
+            ExpressionAttributeNames: {
+                "#chainAddress": "chainAddress",
+                "#tokenID": "tokenID"
+            },
+            ExpressionAttributeValues: {
+                ":chainAddress": this.chainAddress,
+                ":tokenID": this.tokenID
+            },
+        });
+
+        if(typeof tx !== "undefined" && tx.length !== 0){
+            this.transactionHash = tx[0].transactionHash;
+            this.timeStamp = tx[0].timeStamp;
+            this.contractAddress = tx[0].contractAddress;
+            this.to = tx[0].to;
+            this.valueUSD = tx[0].valueUSD;
+            this.costUSD = tx[0].costUSD;
+            this.valueETH = tx[0].valueETH;
+            this.costETH = tx[0].costETH;
+            this.ethTransPriceUSD = tx[0].ethTransPriceUSD;
+            this.txUUID = tx[0].txUUID;
+            this.transferGasETH = tx[0].transferGasETH;
+            this.transferValueETH = tx[0].transferValueETH;
+    
+            this.isoDate = tx[0].isodate;
+            this.week = tx[0].week;
+            this.created = tx[0].createdatetime;
+            this.updatedAt = tx[0].updatedat;
+        }else{
+            this.transactionHash = "0x000000";
+            this.timeStamp = 1659336634;
+            this.contractAddress = "0x000000000";
+            this.to = "0x000000000";
+            this.valueUSD = 0;
+            this.costUSD = 0;
+            this.valueETH = 0;
+            this.costETH = 0;
+            this.ethTransPriceUSD = 0;
+            this.txUUID = "123456789";
+            this.transferGasETH = 0;
+            this.transferValueETH = 0;
+    
+
+            this.isodate = dateFormat(new Date(), "isoDate"),
+            this.week = dateFormat(new Date(), "W"),
+            this.createdatetime = dateFormat(new Date(), "isoUtcDateTime"),
+            this.updatedat = dateFormat(new Date(), "isoUtcDateTime")
+        }
+
+        return this;
+    } catch (e) {
+        console.error(e);
+        log.error(e);
+        throw e;
+    };
+};
+
 /**
  * save Automation to the database
  *
@@ -83,7 +234,7 @@ function WalletTransaction(chain, address, transactionHash, type) {
  WalletTransaction.prototype.save = async function() {
     log.options.tags = ['log', '<<level>>']; 
     try {
-        const dt = new Date();
+        const dt = this.dt;
         const uuid = require('uuid');
         this.isodate = dateFormat(dt, "isoDate"),
         this.week = dateFormat(dt, "W"),
@@ -107,11 +258,13 @@ function WalletTransaction(chain, address, transactionHash, type) {
                 valueETH: this.valueETH,
                 costETH: this.costETH,
                 ethTransPriceUSD: this.ethTransPriceUSD,
+                transferGasETH : this.transferGasETH,
+                transferValueETH : this.transferValueETH,
                 txUUID: this.txUUID,
                 isoDate: this.isodate,
                 week: this.week,
                 created: this.createdatetime,
-                updatedAt: this.updatedat,
+                updatedAt: this.updatedat
             }
         });
     } catch (e) {

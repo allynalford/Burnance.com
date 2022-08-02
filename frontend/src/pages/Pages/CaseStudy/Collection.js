@@ -10,8 +10,6 @@ import { getChain } from '../../../common/config';
 import ImageGrid from '../../../components/ImageGrid';
 import {initGA, PageView, Event} from '../../../common/gaUtils';
 import RingLoader from "react-spinners/RingLoader";
-
-
 import { ERC721, ERC1155 } from "../../../common/contractUtils";
 import Web3 from 'web3';
 import Burnance from '../../../abis/HarvestArt.json';
@@ -20,7 +18,7 @@ import Burnance from '../../../abis/HarvestArt.json';
 //Import Images
 import bgImg from "../../../assets/images/nfts/ac1_unfit_digital_collage_of_locally_owned_nfts_by_annie_bur.jpg";
 const Swal = require('sweetalert2');
-
+const Batch = require('../../../model/Batch');
 var sessionstorage = require('sessionstorage');
 var endpoint = require('../../../common/endpoint');
 // Create our number formatter.
@@ -48,8 +46,10 @@ class Collection extends Component {
     this.state = {
       type: "ERC721",
       collection: { name: '' },
+      batchSize: 0,
       ethereumAddress: '',
       account: '',
+      batch: '',
       walletConnected: false,
       collectionApproved: false,
       loading: false,
@@ -88,6 +88,7 @@ class Collection extends Component {
     this.isApprovedForAll.bind(this);
     this.transfer.bind(this);
     this.refresh.bind(this);
+    this.recordTx.bind(this);
   }
 
   setCategory(category) {
@@ -121,9 +122,16 @@ class Collection extends Component {
         window.ethereum._state.isConnected &&
         typeof window.ethereum._state.accounts[0] !== 'undefined'
       ) {
+
+        let batch = new Batch(window.ethereum._state.accounts[0]);
+
+        const batchSize = batch.length(window.ethereum._state.accounts[0]);
+         this.setState({batchSize});
+     
         this.setState({
           ethereumAddress: window.ethereum._state.accounts[0],
           walletConnected: true,
+          batch
         });
         this.getEthPrice(
           window.ethereum._state.accounts[0],
@@ -132,6 +140,8 @@ class Collection extends Component {
 
         this.getWallet('ethereum', window.ethereum._state.accounts[0]);
 
+        
+
         //this.isApprovedForAll(window.ethereum._state.accounts[0], "0x22dAd90Ed748282668fAB428319a248C9DE86Ae8");
 
       }
@@ -139,6 +149,7 @@ class Collection extends Component {
   }
 
   fireMsg(title, text, icon){
+    icon = icon.toLowerCase();
     Swal.fire({
       title,
       text,
@@ -206,9 +217,13 @@ async loadBlockchainData() {
 
       if (this.state.ethereumAddress === "") {
 
+        let batch = new Batch(window.ethereum._state.accounts[0])
+
+
         this.setState({
           ethereumAddress: window.ethereum._state.accounts[0],
           walletConnected: true,
+          batch
         });
 
         this.getWallet('ethereum', window.ethereum._state.accounts[0]);
@@ -234,7 +249,7 @@ async loadBlockchainData() {
 
 
       //Check if the records exists in storage
-      if (typeof exists !== 'undefined' && exists !== null) {
+      if (typeof exists !== 'undefined' && exists !== null && existsNFTS !== null) {
 
         const collection = exists.collection;
         const floorPrice = (typeof collection.statistics !== "undefined" ? formatter.format(parseFloat(Number(collection.statistics.floor_price) * Number(ethusd))) : formatter.format(0.00));
@@ -269,6 +284,7 @@ async loadBlockchainData() {
         let Collection;
 
         try{
+          console.log('Called Collection Service');
           Collection = await endpoint._get(
             getChain()['eth'].viewWalletCollectionApiUrl +
               `/ethereum/${ethereumAddress}/${contractAddress}`,
@@ -312,6 +328,7 @@ async loadBlockchainData() {
 
         let NFTS;
         try{
+          console.log('Calling NFT Service');
           NFTS = await endpoint._get(
             getChain()['eth'].viewWalletCollectionNftsApiUrl +
               `/ethereum/${ethereumAddress}/${contractAddress}`,
@@ -324,9 +341,8 @@ async loadBlockchainData() {
           );
         }
 
-
-        //console.log('Called NFT Service', NFTS);
-
+        try{
+          
         const holdingValue = (typeof collection.statistics !== "undefined" ? formatter.format(parseFloat(Number((NFTS.data.nfts.length * collection.statistics.average_price)) * Number(ethusd))) : formatter.format(0.00))
 
 
@@ -343,6 +359,22 @@ async loadBlockchainData() {
             ethereumAddress + '-' + contractAddress + '-nfts',
             JSON.stringify(NFTS.data),
           );
+        }catch(e){
+          console.error(e);
+          this.setState({
+            loading: false,
+            approving: false,
+            loadingCollection: false,
+            holdingValue: 0,
+            description: "",
+            held: NFTS.data.nfts.length,
+             });
+  
+             sessionstorage.setItem(
+              ethereumAddress + '-' + contractAddress + '-nfts',
+              JSON.stringify(NFTS.data),
+            );
+        }
 
       }
     } catch (e) {
@@ -525,6 +557,9 @@ guaranteeTransfer = async(tokenId) => {
                 thisss.state.ethereumAddress,
                 thisss.props.match.params.address,
               );
+
+              
+
             }else{
               //alert(response.msg);
               thisss.fireMsg("Guarantee nft Transfer",response.msg, "WARN");
@@ -537,6 +572,12 @@ guaranteeTransfer = async(tokenId) => {
       thisss.fireMsg(title, msg, "WARN");
       thisss.setState({ transferring: false});
   });
+}
+
+recordTx = async(tokenId, transactionHash) =>{
+  const _ = require('lodash');
+  const nft = _.find(this.state.nfts, {tokenId:tokenId});
+  console.log({tokenId, nft, transactionHash});
 }
 
 transfer = async(tokenId) => {
@@ -557,10 +598,16 @@ transfer = async(tokenId) => {
               sessionstorage.removeItem(`${thisss.state.ethereumAddress}-${thisss.props.match.params.address}-nfts`);
               sessionstorage.removeItem(`${thisss.state.ethereumAddress}-${thisss.props.match.params.address}`);
 
+             
+            thisss.recordTx(tokenId, transactionHash).then(function (result) { // (**)
+
               thisss.getEthPrice(
                 thisss.state.ethereumAddress,
                 thisss.props.match.params.address,
               );
+
+            }).catch(err => alert(err))
+
             }else{
               //alert(response.msg);
               thisss.fireMsg("NFT Transfer",response.msg, "WARN");
@@ -677,7 +724,7 @@ async waitForReceipt(hash, cb) {
                     {this.state.loading === true ? (
                       <RingLoader
                         color={"#ff914d"}
-                        loading={this.state.loading}
+                        loading={this.state.loadingCollection}
                         cssOverride={override}
                         size={50}
                       />
@@ -707,7 +754,7 @@ async waitForReceipt(hash, cb) {
                     {this.state.loading === true ? (
                       <RingLoader
                         color={"#ff914d"}
-                        loading={this.state.loading}
+                        loading={this.state.loadingCollection}
                         cssOverride={override}
                         size={50}
                       />
@@ -737,7 +784,7 @@ async waitForReceipt(hash, cb) {
                     {this.state.loading === true ? (
                       <RingLoader
                         color={"#ff914d"}
-                        loading={this.state.loading}
+                        loading={this.state.loadingCollection}
                         cssOverride={override}
                         size={50}
                       />
@@ -770,7 +817,7 @@ async waitForReceipt(hash, cb) {
                     {this.state.loading === true ? (
                       <RingLoader
                         color={"#ff914d"}
-                        loading={this.state.loading}
+                        loading={this.state.loadingCollection}
                         cssOverride={override}
                         size={50}
                       />
@@ -803,7 +850,7 @@ async waitForReceipt(hash, cb) {
                     {this.state.loading === true ? (
                       <RingLoader
                         color={"#ff914d"}
-                        loading={this.state.loading}
+                        loading={this.state.loadingCollection}
                         cssOverride={override}
                         size={50}
                       />
@@ -835,7 +882,7 @@ async waitForReceipt(hash, cb) {
                     {this.state.loading === true ? (
                       <RingLoader
                         color={"#ff914d"}
-                        loading={this.state.loading}
+                        loading={this.state.loadingCollection}
                         cssOverride={override}
                         size={50}
                       />
@@ -864,7 +911,7 @@ async waitForReceipt(hash, cb) {
                     {this.state.loading === true ? (
                       <RingLoader
                         color={"#ff914d"}
-                        loading={this.state.loading}
+                        loading={this.state.loadingCollection}
                         cssOverride={override}
                         size={50}
                       />
@@ -893,7 +940,7 @@ async waitForReceipt(hash, cb) {
                     {this.state.loading === true ? (
                       <RingLoader
                         color={"#ff914d"}
-                        loading={this.state.loading}
+                        loading={this.state.loadingCollection}
                         cssOverride={override}
                         size={50}
                       />
@@ -919,7 +966,7 @@ async waitForReceipt(hash, cb) {
                     {this.state.loading === true ? (
                       <RingLoader
                         color={"#ff914d"}
-                        loading={this.state.loading}
+                        loading={this.state.loadingCollection}
                         cssOverride={override}
                         size={50}
                       />
@@ -947,7 +994,7 @@ async waitForReceipt(hash, cb) {
                     {this.state.loading === true ? (
                       <RingLoader
                         color={"#ff914d"}
-                        loading={this.state.loading}
+                        loading={this.state.loadingCollection}
                         cssOverride={override}
                         size={50}
                       />
@@ -978,7 +1025,7 @@ async waitForReceipt(hash, cb) {
                     {this.state.loading === true ? (
                       <RingLoader
                         color={"#ff914d"}
-                        loading={this.state.loading}
+                        loading={this.state.loadingCollection}
                         cssOverride={override}
                         size={50}
                       />
@@ -1035,6 +1082,15 @@ async waitForReceipt(hash, cb) {
                   }}
                 >
                   {(this.state.loading === true ? "Loading Collection..." : "Refresh Collection")}
+                </Link>
+                <Link
+                  to="/batch"
+                  className="btn mouse-down"
+                  style={{
+                    backgroundColor:'#939393',
+                    color: 'white',
+                  }}>
+                  Batch: {this.state.batchSize}<i className="mdi mdi-cart-variant h6" style={{ color: '#F22613' }}> </i>
                 </Link>
               </Col>
             </Row>
@@ -1149,6 +1205,9 @@ async waitForReceipt(hash, cb) {
                       currentCost = parseFloat(cases.costETH * this.state.ethPrice.ethusd)
                       diff = (currentCost - cases.costUSD);
                     }
+                   
+                    const exists = this.state.batch.existsInBatch(this.state.batch.address, cases.contract.address, cases.tokenId)
+                    const title = (cases.title === "" ? `Test Net Asset ${BigInt(cases.tokenId).toString()}` : cases.title);
                     return (
                       <Col
                         key={key}
@@ -1172,12 +1231,12 @@ async waitForReceipt(hash, cb) {
 
                             <CardBody>
                               <div className="content">
-                                {cases.isBusiness && (
+                                {exists === true && (
                                   <Link
                                     to="#"
-                                    className="badge badge-link bg-primary"
+                                    className="badge badge-link bg-success"
                                   >
-                                    Business
+                                    In Batch
                                   </Link>
                                 )}
                                 {cases.isMarketing && (
@@ -1250,7 +1309,7 @@ async waitForReceipt(hash, cb) {
                                     to="page-case-detail"
                                     className="text-dark title"
                                   >
-                                    {(cases.title === "" ? `Test Net Asset ${BigInt(cases.tokenId).toString()}` : cases.title)}
+                                    {title}
                                   </Link>
                                 </h5>
                                 <Row>
@@ -1429,10 +1488,30 @@ async waitForReceipt(hash, cb) {
                                           className="btn-info"
                                           eventKey="2"
                                           onClick={(e) => {
-                                            console.log(
-                                              'Add',
-                                              cases.contract.address,
-                                            );
+
+                                            const exists = this.state.batch.existsInBatch(this.state.batch.address, cases.contract.address, cases.tokenId)
+                                            //console.log('Cost',cases.costUSD)
+                                            const costUSD = (typeof cases.costUSD !== "undefined" ? cases.costUSD : 0);
+                                            const tokenType = (typeof cases.tokenType !== "undefined" ? cases.tokenType : "ERC721");
+
+                                            const imgSrc = (typeof cases.media === 'undefined') |
+                                            (typeof cases.media[0] === 'undefined')
+                                              ? `${process.env.REACT_APP_BASE_CDN_URL}/default-image.jpg`
+                                              : cases.media[0].gateway
+
+                                            if (exists === false) {
+                                              const add = this.state.batch.addToBatch(this.state.batch.address, title, cases.contract.address, cases.tokenId, tokenType, 1, imgSrc, costUSD);
+                                              if (add === true) {
+                                                const batchSize = new Batch().length(this.state.ethereumAddress);
+                                                this.setState({batchSize});
+                                                this.fireMsg("NFT Sell Batch", "NFT added to batch.", "INFO");
+                                              } else {
+                                                this.fireMsg("NFT Sell Batch", "NFT already exists in batch.", "INFO")
+                                              }
+                                            } else {
+                                              this.fireMsg("NFT Sell Batch", "NFT already exists in batch.", "INFO")
+                                            }
+
                                             Event(
                                               'Collection NFT',
                                               'Option',

@@ -98,12 +98,16 @@ module.exports.getNFTtx = async (chain, address, contractaddress, tokenId) => {
         //add provider to it
         var web3 = new Web3(process.env.QUICK_NODE_HTTP);
 
-        etherScanTxUrl = `https://etherscan.io/tx/${hash}`;
+        etherScanTxUrl = `${process.env.ETHERSCAN_BASE_URL}tx/${hash}`;
 
         //Grab all the transactions based on the hash
         const txs = await this._txListInternal(hash);
+        //Grab the single result
+
+        //
+        const txFromHash = await this._eth_getTransactionByHash(hash);
   
-        //console.log(txs);
+        console.log('txFromHash',txFromHash);
   
         //Loop thru the transactions and add up the values
         valueETH = 0.0, gasETH = 0.0;
@@ -118,17 +122,26 @@ module.exports.getNFTtx = async (chain, address, contractaddress, tokenId) => {
           gasETH = (Number(gasETH) + Number(gasToEth));//First the value
         };
 
-        gasUSD = parseFloat((Number(gasETH) + 0) * price.result[0].value);
+       
 
         costETH = (Number(valueETH) + Number(gasETH));//Then the transaction cost in gas
 
-        //Convert ETH to USD based on the price of ETH on that date
-        costUSD = parseFloat(costETH * price.result[0].value);
-        costUSD = (Number(gasUSD.toFixed(2)) + Number(costUSD.toFixed(2)));
 
+        let ethTransPriceUSD = 0;
+        if(price.message === "OK"){
+            valueUSD = parseFloat(valueETH * price.result[0].value);
 
+            costUSD = parseFloat(costETH * price.result[0].value);
+            costUSD = (Number(gasUSD.toFixed(2)) + Number(costUSD.toFixed(2)));
+            gasUSD = parseFloat((Number(gasETH) + 0) * price.result[0].value);
+            ethTransPriceUSD = price.result[0].value;
+        }else{
+            valueUSD = 0;
+            costUSD = 0;
+            gasUSD = 0;
+            ethTransPriceUSD = 0;
+        }
 
-        valueUSD = parseFloat(valueETH * price.result[0].value);
 
         const saveNFT = await this._addWalletNFT(
           chain,
@@ -138,7 +151,7 @@ module.exports.getNFTtx = async (chain, address, contractaddress, tokenId) => {
           costETH,
           valueUSD,
           valueETH,
-          price.result[0].value,
+          ethTransPriceUSD,
           tokenNftTx.hash,
           mintTokenIds,
           date
@@ -177,6 +190,24 @@ module.exports._addressTokenNFTBalance = async (address, page, offset) => {
 module.exports._addressTokenNFTInventory = async (address, contractaddress, page, offset) => {
     try {
         const response = await endpoint._get(`${process.env.ETHERSCAN_API_URL}?module=account&action=addresstokennftinventory&address=${address}&contractaddress=${contractaddress}&page=1&offset=100apikey=${process.env.API_KEY_TOKEN}`);
+        return response.data;
+    } catch (e) {
+        console.error(e);
+    }
+};
+
+module.exports._eth_getTransactionByHash = async (txhash) => {
+    try {
+        const response = await endpoint._get(`${process.env.ETHERSCAN_API_URL}?module=proxy&action=eth_getTransactionByHash&txhash=${txhash}&apikey=${process.env.API_KEY_TOKEN}`);
+        return response.data;
+    } catch (e) {
+        console.error(e);
+    }
+};
+
+module.exports._eth_getTransactionReceipt = async (txhash) => {
+    try {
+        const response = await endpoint._get(`${process.env.ETHERSCAN_API_URL}?module=proxy&action=eth_getTransactionReceipt&txhash=${txhash}&apikey=${process.env.API_KEY_TOKEN}`);
         return response.data;
     } catch (e) {
         console.error(e);
@@ -268,7 +299,7 @@ module.exports._addressTokenNFTInventory = async (address, contractaddress, page
  */
 module.exports._ethDailyPrice = async (startdate, enddate) => {
     try {
-         const response = await endpoint._get(`${process.env.ETHERSCAN_API_URL}?module=stats&action=ethdailyprice&startdate=${startdate}&enddate=${enddate}&sort=asc&apikey=${process.env.API_KEY_TOKEN}`);
+         const response = await endpoint._get(`${process.env.ETHERSCAN_PRICE_API_URL}?module=stats&action=ethdailyprice&startdate=${startdate}&enddate=${enddate}&sort=asc&apikey=${process.env.API_KEY_TOKEN}`);
         return response.data;
     } catch (e) {
         console.error(e);

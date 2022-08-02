@@ -192,7 +192,7 @@ class Topbar extends Component {
       gasPrice = await endpoint._get(getChain()['eth'].getGasPriceApiUrl);
       gasPrice = gasPrice.data;
       gasPrice.dt = dt;
-      console.log(gasPrice);
+      //console.log(gasPrice);
 
       gasPrice.gwei = ethers.utils.formatUnits(BigInt(gasPrice.result).toString(), "gwei");
 
