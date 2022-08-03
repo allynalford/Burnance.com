@@ -21,7 +21,7 @@ var sessionstorage = require('sessionstorage');
 var _ = require('lodash');
 var endpoint = require('../../common/endpoint');
 const Swal = require('sweetalert2');
-
+const exportUtils = require('../../common/exportUtils');
 // Create our number formatter.
 var formatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
@@ -32,8 +32,8 @@ var formatter = new Intl.NumberFormat('en-US', {
   //maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
 });
 
-var _collections = [],
-  _openModal;
+var _collections = [];
+
   const override: CSSProperties = {
     display: "block",
     margin: "0 auto",
@@ -73,8 +73,8 @@ class MostViewedProducts extends Component {
     this.getEthPrice.bind(this);
     this.getWallet.bind(this);
     this.refresh.bind(this);
-
-    _openModal = this.openModal;
+    this.downloadCSV.bind(this);
+    this.handleRowSelect.bind(this);
   }
 
   handleRowSelect = ({ selectedRows }) => {
@@ -82,6 +82,23 @@ class MostViewedProducts extends Component {
     console.log('Selected Rows: ', selectedRows);
   };
 
+  downloadCSV = (array) => {
+    	const link = document.createElement('a');
+    	let csv = exportUtils.convertArrayOfObjectsToCSV(array);
+    	if (csv == null) return;
+    
+    	const filename = 'export.csv';
+    
+    	if (!csv.match(/^data:text\/csv/i)) {
+    		csv = `data:text/csv;charset=utf-8,${csv}`;
+    	}
+    
+    	link.setAttribute('href', encodeURI(csv));
+    	link.setAttribute('download', filename);
+    	link.click();
+    }
+
+    
   fireMsg(title, text, icon) {
     Swal.fire({
       title,
@@ -193,66 +210,11 @@ class MostViewedProducts extends Component {
         sessionstorage.setItem(ethereumAddress, JSON.stringify(Collections));
       }
 
-      //console.log(Collections);
-
-      // let collections = [
-      //   [
-      //     'Collection',
-      //     'Held',
-      //     'Floor',
-      //     'Avg Price',
-      //     'Holding Value',
-      //     'Cost Basis',
-      //     'PnL',
-      //     'Liquidity (1D)',
-      //     'Liquidity (7D)',
-      //     'Liquidity (30D)',
-      //   ],
-      // ];
 
       let EstHoldingValue = 0, SevenDaySales = 0, NumOwners = 0, totalSupply = 0;
-      // for (const collection of Collections.collections) {
-
-      //   const floorPrice = (collection.FloorPrice !== "N/F" ? formatter.format(parseFloat(Number(collection.FloorPrice) * Number(ethusd))) : formatter.format(0.00));
-      //   const avgPrice = (typeof collection.statistics !== "undefined" ? formatter.format(parseFloat(Number(collection.statistics.average_price) * Number(ethusd))) : formatter.format(0.00))
-      //   const holdingValue = (collection.HoldingValue !== "N/F" ? formatter.format(parseFloat(Number(collection.HoldingValue) * Number(ethusd))) : formatter.format(0.00))
-      //   collections.push([
-      //     collection.name,
-      //     collection.count,
-      //     floorPrice,
-      //     avgPrice,
-      //     holdingValue,
-      //     '--',
-      //     '--',
-      //     (typeof collection.statistics !== "undefined" ? (collection.statistics.one_day_sales / (collection.statistics.total_supply - collection.statistics.num_owners)) * 100 : 0.0),
-      //     (typeof collection.statistics !== "undefined" ? (collection.statistics.seven_day_sales / (collection.statistics.total_supply - collection.statistics.num_owners)) * 100 : 0.0),
-      //     (typeof collection.statistics !== "undefined" ? (collection.statistics.thirty_day_sales / (collection.statistics.total_supply - collection.statistics.num_owners)) * 100 : 0.0),
-      //   ]);
-
-
-      //   _collections.push({
-      //     name: collection.name,
-      //     contractAddress: (typeof collection.address !== "undefined" ? collection.address : collection.contractAddress),
-      //   });
-
-      //   if(typeof collection.HoldingValue === "number"){
-      //     EstHoldingValue = (Number(EstHoldingValue) + Number(collection.HoldingValue));
-      //     //parseFloat(costETH * price.result[0].value)
-      //   };
-
-      //   if(typeof collection.statistics !== "undefined"){
-      //     SevenDaySales = (Number(SevenDaySales) + Number(collection.statistics.seven_day_sales));
-      //     NumOwners = (Number(NumOwners) + Number(collection.statistics.num_owners));
-      //     totalSupply = (Number(totalSupply) + Number(collection.statistics.total_supply));
-      //   };
-
-
-
-
-      // }
+ 
 
       EstHoldingValue = parseFloat(Number(EstHoldingValue) * Number(ethusd));
-      console.log(Collections);
       
       //console.log(collections)
       //Liquidity = Sales / The number of NFTs * 100%
@@ -318,12 +280,14 @@ class MostViewedProducts extends Component {
       	headRow: {
       		style: {
       			border: 'none',
+
       		},
       	},
       	headCells: {
       		style: {
       			color: '#202124',
-      			fontSize: '14px',
+            fontWeight: 'bold',
+            fontSize: '16px'
       		},
       	},
       	rows: {
@@ -341,7 +305,7 @@ class MostViewedProducts extends Component {
       	},
       };
 
-
+     
     return (
       <React.Fragment>
         <Modal
@@ -702,7 +666,7 @@ class MostViewedProducts extends Component {
                         grow: 2,
                         style: {
                           color: '#202124',
-                          fontSize: '14px',
+                          fontSize: '16px',
                           fontWeight: 600,
                         },
                       },
@@ -710,12 +674,20 @@ class MostViewedProducts extends Component {
                         name: 'Held',
                         selector: (row) => row.count,
                         sortable: true,
+                        style: {
+                          fontSize: '14px',
+                          fontWeight: 600,
+                        },
                       },
                       {
                         name: 'Floor Price',
                         selector: (row) => row.FloorPrice,
                         sortable: true,
                         format: (row) => formatter.format(row.FloorPrice),
+                        style: {
+                          fontSize: '14px',
+                          fontWeight: 600,
+                        },
                         when: (row) => row.FloorPrice < row.AmountInvested,
                         style: {
                           backgroundColor: '#8B0000',
@@ -730,18 +702,30 @@ class MostViewedProducts extends Component {
                         selector: (row) => row.HoldingValue,
                         sortable: true,
                         format: (row) => formatter.format(row.HoldingValue),
+                        style: {
+                          fontSize: '14px',
+                          fontWeight: 600,
+                        },
                       },
                       {
                         name: 'Cost Basis',
                         selector: (row) => row.AmountInvested,
                         sortable: true,
                         format: (row) => formatter.format(row.AmountInvested),
+                        style: {
+                          fontSize: '14px',
+                          fontWeight: 600,
+                        },
                       },
                       {
                         name: 'PnL',
                         selector: (row) => row.pnl,
                         sortable: true,
                         format: (row) => formatter.format(row.pnl),
+                        style: {
+                          fontSize: '14px',
+                          fontWeight: 600,
+                        },
                         when: (row) => row.pnl < 0,
                         style: {
                           backgroundColor: '#8B0000',
@@ -763,7 +747,12 @@ class MostViewedProducts extends Component {
                         name: 'Liquidity (1D)',
                         selector: (row) => row.Liquidity7D,
                         sortable: true,
+                        grow: 2,
                         format: (row) => `${row.Liquidity7D}%`,
+                        style: {
+                          fontSize: '14px',
+                          fontWeight: 600,
+                        },
                       },
                     ]}
                     data={this.state.collections}

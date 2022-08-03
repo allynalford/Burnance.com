@@ -1090,7 +1090,7 @@ async waitForReceipt(hash, cb) {
                     backgroundColor:'#939393',
                     color: 'white',
                   }}>
-                  Batch: {this.state.batchSize}<i className="mdi mdi-cart-variant h6" style={{ color: '#F22613' }}> </i>
+                  View Batch: {this.state.batchSize}<i className="mdi mdi-cart-variant h6" style={{ color: '#F22613' }}> </i>
                 </Link>
               </Col>
             </Row>

@@ -3,6 +3,8 @@ import { Container, Row, Col, Table, Input } from "reactstrap";
 import { Link } from "react-router-dom";
 import PageBreadcrumb from "../../../components/Shared/PageBreadcrumb";
 import {initGA, PageView} from '../../../common/gaUtils';
+import DataTable from 'react-data-table-component';
+import DataTableLoader from '../../../components/DataTable';
 const Batch = require('../../../model/Batch');
 var USD = new Intl.NumberFormat('en-US', {style: 'currency',currency: 'USD'});
 
@@ -138,6 +140,36 @@ class ShopCart extends Component {
   };
 
   render() {
+
+    const customStyles = {
+      headRow: {
+        style: {
+          border: 'none',
+
+        },
+      },
+      headCells: {
+        style: {
+          color: '#202124',
+          fontWeight: 'bold',
+          fontSize: '16px'
+        },
+      },
+      rows: {
+        highlightOnHoverStyle: {
+          backgroundColor: 'rgb(230, 244, 244)',
+          borderBottomColor: '#FFFFFF',
+          borderRadius: '25px',
+          outline: '1px solid #FFFFFF',
+        },
+      },
+      pagination: {
+        style: {
+          border: 'none',
+        },
+      },
+    };
+
     return (
       <React.Fragment>
         {/* breadcrumb */}
@@ -164,7 +196,115 @@ class ShopCart extends Component {
           <Container>
             <Row>
               <Col xs={12}>
-                <div className="table-responsive bg-white shadow">
+              <DataTable
+                    title={'Sell Batch'}
+                    customStyles={customStyles}
+                    highlightOnHover
+                    pointerOnHover
+                    progressPending={this.state.loading}
+                    progressComponent={<DataTableLoader width={'100%'} />}
+                    onSelectedRowsChange={this.handleRowSelect}
+                    columns={[
+                      {
+                        cell: (row) => (
+                          <Link
+                              to="#"
+                              onClick={() => this.removeCartItem(row.address, row.tokenId)}
+                              className="text-danger"
+                              alt={`Remove ${row.title} from batch`}
+                            >
+                              X
+                          </Link>
+                        ),
+                        width: '56px', // custom width for icon button
+                        style: {
+                          borderBottom: '1px solid #FFFFFF',
+                          marginBottom: '-1px',
+                        },
+                      },
+                      {
+                        name: 'Asset',
+                        selector: (row) =>  row.name,
+                        format: row => (<div>
+                          <img
+                          src={row.imgSrc}
+                          className="img-fluid avatar avatar-small rounded shadow"
+                          style={{ height: "auto", marginRight: '15px', marginBottom: '5px', marginTop: '5px' }}
+                          alt={`${row.title} ${row.tokenType} token`}
+                        />&nbsp;{row.name}
+                        </div>),
+                        sortable: true,
+                        grow: 3,
+                        style: {
+                          color: '#202124',
+                          fontSize: '16px',
+                          fontWeight: 600,
+                        },
+                      },
+                      {
+                        name: 'Cost Basis',
+                        selector: (row) => row.AmountInvested,
+                        sortable: true,
+                        format: (row) => USD.format(row.AmountInvested),
+                        style: {
+                          fontSize: '14px',
+                          fontWeight: 600,
+                        },
+                      },
+                      {
+                        name: 'Token Type',
+                        selector: (row) => row.AmountInvested,
+                        sortable: true,
+                        format: (row) => row.tokenType,
+                        style: {
+                          fontSize: '14px',
+                          fontWeight: 600,
+                        },
+                      },
+                      {
+                        name: 'Quantity',
+                        selector: (row) => (<div className="text-center qty-icons">
+                        <Input
+                          type="button"
+                          value="-"
+                          aria-label="reduce quantity"
+                          onClick={() => this.removeItem(row.address, row.tokenId)}
+                          className="minus btn btn-icon btn-soft-primary"
+                          disabled={(row.tokenType === "ERC721" ? true : false)}
+                          readOnly
+                        />{" "}
+                        <Input
+                          type="text"
+                          step="1"
+                          min="1"
+                          name="quantity"
+                          value={row.qty}
+                          title="Qty"
+                          disabled={(row.tokenType === "ERC721" ? true : false)}
+                          readOnly
+                          className="btn btn-icon btn-soft-primary qty-btn quantity"
+                        />{" "}
+                        <Input
+                          type="button"
+                          value="+"
+                          aria-label="Increase quantity"
+                          onClick={() => this.addItem(row.address, row.tokenId)}
+                          disabled={(row.tokenType === "ERC721" ? true : false)}
+                          readOnly
+                          className="plus btn btn-icon btn-soft-primary"
+                        />
+                      </div>),
+                        sortable: true,
+                        style: {
+                          fontSize: '14px',
+                          fontWeight: 600,
+                        },
+                      }
+                    ]}
+                    data={this.state.batch}
+                    pagination
+                  />
+                {/* <div className="table-responsive bg-white shadow">
                   <Table className="table-center table-padding mb-0">
                     <thead>
                       <tr>
@@ -246,7 +386,7 @@ class ShopCart extends Component {
                       ))}
                     </tbody>
                   </Table>
-                </div>
+                </div> */}
               </Col>
             </Row>
             <Row>
