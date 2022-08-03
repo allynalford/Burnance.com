@@ -76,6 +76,11 @@ Batch.prototype.removeFromBatch = (wallet, address, tokenId) => {;
      localStorage.setItem('batch:'+wallet, JSON.stringify(batch));
 }
 
+Batch.prototype.delete = (wallet) => {;
+    //delete the batch
+    localStorage.removeItem('batch:'+wallet);
+}
+
 Batch.prototype.existsInBatch = (wallet, address, tokenId) => {
    //Grab the batch
     const batch = JSON.parse(localStorage.getItem('batch:'+wallet));

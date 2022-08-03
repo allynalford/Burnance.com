@@ -1,11 +1,14 @@
 import React, { Component } from "react";
-import { Container, Row, Col, Table, Input } from "reactstrap";
+import { Container, Row, Col, Table, Input, Button } from "reactstrap";
 import { Link } from "react-router-dom";
 import PageBreadcrumb from "../../../components/Shared/PageBreadcrumb";
 import {initGA, PageView} from '../../../common/gaUtils';
 import DataTable from 'react-data-table-component';
 import DataTableLoader from '../../../components/DataTable';
+import Web3 from 'web3';
+import Burnance from '../../../abis/Burnance.json';
 const Batch = require('../../../model/Batch');
+const Swal = require('sweetalert2');
 var USD = new Intl.NumberFormat('en-US', {style: 'currency',currency: 'USD'});
 
 class ShopCart extends Component {
@@ -28,7 +31,152 @@ class ShopCart extends Component {
     this.removeItem.bind(this);
     this.removeCartItem.bind(this);
     this.accountsChanged.bind(this);
+    this.waitForReceipt.bind(this);
+    this.loadBlockchainData.bind(this);
+    this.loadWeb3.bind(this);
+    this.fireMsg.bind(this);
+    this.transfer.bind(this);
+    this.recordTx.bind(this);
+  };
+
+  async componentWillMount() {
+    await this.loadWeb3();
+    await this.loadBlockchainData();
   }
+
+  fireMsg(title, text, icon){
+    icon = icon.toLowerCase();
+    Swal.fire({
+      title,
+      text,
+      icon,
+      confirmButtonText: 'Ok',
+      confirmButtonAriaLabel:'Ok',
+      focusConfirm: true,
+      showClass: {
+        popup: 'animate__animated animate__fadeInDown'
+      },
+      hideClass: {
+        popup: 'animate__animated animate__fadeOutUp'
+      },
+      timer: 5000,
+      timerProgressBar: true,
+    })
+  };
+
+  
+  async loadWeb3() {
+    if (window.ethereum) {
+        window.web3 = new Web3(window.ethereum);
+        await window.ethereum.request({method: 'eth_requestAccounts'});
+        //await window.ethereum.enable()
+    } else if (window.web3) {
+        window.web3 = new Web3(window.web3.currentProvider)
+    } else {
+        window.alert('Non-Ethereum browser detected. You should consider trying MetaMask!')
+    }
+}
+
+async loadBlockchainData() {
+    const web3 = window.web3
+    const accounts = await web3.eth.getAccounts()
+    this.setState({ account: accounts[0] })
+    const networkId = await web3.eth.net.getId()
+    const contractAddr = await Burnance.networks[networkId].address;
+    const burnance = new web3.eth.Contract(Burnance.abi, contractAddr)   
+    //console.log(contractAddr)
+    this.setState({ burnance })
+    //this.getPromissoryList()
+    this.setState({ loading:false, burnanceAddr:contractAddr });
+
+};
+
+recordTx = async(batch, transactionHash) =>{
+  console.log({transactionHash, batch});
+
+  //Loop the batch and record each NFT
+     //Record the batch transaction
+     //Record the batch item
+    //remove batch item from the database wallet nft table
+}
+
+transfer = async() => {
+  //e.preventDefault();
+  const thisss = this;
+  this.setState({ transferring: true });
+
+  //Init the object
+  const batchObj = new Batch(this.state.ethereumAddress);
+
+  //Grab the batch
+  const batch = batchObj.getBatch(batchObj.address);
+
+  //const tokenId = e.target.tokenId.value
+  let addresses = [], tokenIds = [], counts = [];
+
+  //Loop the batch
+  for(const token of batch){
+    addresses.push(token.address);
+    tokenIds.push(token.tokenId);
+    counts.push(token.qty);
+  };
+
+  this.state.burnance.methods.batchTransfer(addresses, tokenIds, counts).send({ from: this.state.ethereumAddress }).on('transactionHash', (transactionHash) => {
+    console.log('Transfer transactionHash',transactionHash)  
+    thisss.waitForReceipt(transactionHash, function (response) {
+          if(response.status){ 
+              thisss.fireMsg("NFT Transfer", "NFT transfer was successful", "INFO");
+              
+              const batchObj = new Batch(thisss.state.ethereumAddress);
+              batchObj.delete(batchObj.address);
+
+             
+            thisss.recordTx(batch, transactionHash).then(function (result) { // (**)
+
+              thisss.getEthPrice(
+                thisss.state.ethereumAddress,
+                thisss.props.match.params.address,
+              );
+
+            }).catch(err => alert(err))
+
+            }else{
+              //alert(response.msg);
+              thisss.fireMsg("NFT Transfer",response.msg, "warn");
+              thisss.setState({ transferring: false});
+          }
+      });
+  }).on('error', function(error, receipt) {
+      const title = error.message.split(':')[0];
+      const msg = error.message.split(':')[1]; 
+      thisss.fireMsg(title, msg, "warn");
+      thisss.setState({ transferring: false});
+  });
+}
+
+async waitForReceipt(hash, cb) {
+  const web3 = window.web3;
+  const thiss = this;
+  web3.eth.getTransactionReceipt(hash, function (err, receipt) {
+      if (err) {
+        console.log(err);
+      }  
+  
+      if (receipt !== null) {
+        if (cb) {
+            if(receipt.status === '0x0') {
+                cb({status:false, msg: "The contract execution was not successful, check your transaction !"});
+            } else {
+                cb({status:true, msg:"Execution worked fine!"});
+            }
+        }
+      } else {
+        window.setTimeout(function () {
+          thiss.waitForReceipt(hash, cb);
+        }, 1000);
+      }
+  });
+}
 
   removeCartItem = (address, tokenId) => {
     const batchObj = new Batch(this.state.ethereumAddress);
@@ -88,7 +236,7 @@ class ShopCart extends Component {
         const batchObj = new Batch(window.ethereum._state.accounts[0]);
 
         const batch = batchObj.getBatch(batchObj.address);
-        console.log(batch)
+        console.log(batch);
      
         this.setState({
           ethereumAddress: window.ethereum._state.accounts[0],
@@ -304,94 +452,11 @@ class ShopCart extends Component {
                     data={this.state.batch}
                     pagination
                   />
-                {/* <div className="table-responsive bg-white shadow">
-                  <Table className="table-center table-padding mb-0">
-                    <thead>
-                      <tr>
-                        <th className="py-3 border-bottom" style={{ minWidth: "20px" }}>Remove</th>
-                        <th className="py-3 border-bottom" style={{ minWidth: "300px" }}>
-                          Asset
-                        </th>
-                        <th
-                          className="text-center py-3 border-bottom"
-                          style={{ minWidth: "160px" }}
-                        >
-                          Cost Basis
-                        </th>
-                        <th
-                          className="text-center py-3 border-bottom"
-                          style={{ minWidth: "160px" }}
-                        >
-                          Qty
-                        </th>
-                      </tr>
-                    </thead>
-
-                    <tbody>
-                      {this.state.batch.map((item, key) => (
-                        <tr key={key} className="shop-list">
-                          <td className="h6">
-                            <Link
-                              to="#"
-                              onClick={() => this.removeCartItem(item.address, item.tokenId)}
-                              className="text-danger"
-                            >
-                              X
-                            </Link>
-                          </td>
-                          <td>
-                            <div className="d-flex align-items-center">
-                              <img
-                                src={item.imgSrc}
-                                className="img-fluid avatar avatar-small rounded shadow"
-                                style={{ height: "auto" }}
-                                alt=""
-                              />
-                              <h6 className="mb-0 ms-3">{item.name}</h6>
-                            </div>
-                          </td>
-                          <td className="text-center">{USD.format(item.costUSD)}</td>
-                          <td className="text-center qty-icons">
-                            <Input
-                              type="button"
-                              value="-"
-                              aria-label="reduce quantity"
-                              onClick={() => this.removeItem(item.address, item.tokenId)}
-                              className="minus btn btn-icon btn-soft-primary"
-                              disabled={(item.tokenType === "ERC721" ? true : false)}
-                              readOnly
-                            />{" "}
-                            <Input
-                              type="text"
-                              step="1"
-                              min="1"
-                              name="quantity"
-                              value={item.qty}
-                              title="Qty"
-                              disabled={(item.tokenType === "ERC721" ? true : false)}
-                              readOnly
-                              className="btn btn-icon btn-soft-primary qty-btn quantity"
-                            />{" "}
-                            <Input
-                              type="button"
-                              value="+"
-                              aria-label="Increase quantity"
-                              onClick={() => this.addItem(item.address, item.tokenId)}
-                              disabled={(item.tokenType === "ERC721" ? true : false)}
-                              readOnly
-                              className="plus btn btn-icon btn-soft-primary"
-                            />
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </Table>
-                </div> */}
               </Col>
             </Row>
             <Row>
               <Col lg={8} md={6} className="mt-4 pt-2">
-                <Link to="/collections" className="btn btn-primary">
+                <Link to="/collections" className="btn btn-primary" >
                   Add More
                 </Link>
               </Col>
@@ -411,9 +476,15 @@ class ShopCart extends Component {
                   </Table>
                 </div>
                 <div className="mt-4 pt-2 text-end">
-                  <Link to="shop-checkouts" className="btn btn-primary">
+                  <Button disabled={this.state.transferring} 
+                    to="shop-checkouts" 
+                    className="btn btn-primary"
+                    onClick={ e =>{
+                      e.preventDefault();
+                      this.transfer();
+                    }}>
                     Proceed to Sell
-                  </Link>
+                  </Button>
                 </div>
               </Col>
             </Row>

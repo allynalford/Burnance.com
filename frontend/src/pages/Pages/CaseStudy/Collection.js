@@ -12,7 +12,7 @@ import {initGA, PageView, Event} from '../../../common/gaUtils';
 import RingLoader from "react-spinners/RingLoader";
 import { ERC721, ERC1155 } from "../../../common/contractUtils";
 import Web3 from 'web3';
-import Burnance from '../../../abis/Burnance.json';
+import Burnance from '../../../abis/Burnance.v2.json';
 
 
 //Import Images
@@ -187,7 +187,7 @@ async loadBlockchainData() {
     const networkId = await web3.eth.net.getId()
     const contractAddr = await Burnance.networks[networkId].address;
     const burnance = new web3.eth.Contract(Burnance.abi, contractAddr)   
-    //console.log(contractAddr)
+    console.log('contractAddr', contractAddr)
     this.setState({ burnance })
     //this.getPromissoryList()
     this.setState({ loading:false, burnanceAddr:contractAddr });
@@ -343,6 +343,9 @@ async loadBlockchainData() {
 
         try{
           
+
+          console.log('NFTS', NFTS)
+
         const holdingValue = (typeof collection.statistics !== "undefined" ? formatter.format(parseFloat(Number((NFTS.data.nfts.length * collection.statistics.average_price)) * Number(ethusd))) : formatter.format(0.00))
 
 
