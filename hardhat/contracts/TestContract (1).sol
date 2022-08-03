@@ -1,11 +1,22 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.9;
 
+// ⠀⡠⡤⢤⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+// ⠀⠀⠀⢿⡢⣁⢄⢫⡲⢤⡀⠀⠀⠀⠀⢀⠄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+// ⠀⠀⠀⠘⣧⡁⢔⢑⢄⠙⣬⠳⢄⠀⠀⣾⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+// ⠀⠀⠀⠀⠘⢎⣤⠑⣤⠛⢄⠝⠃⡙⢦⣸⣧⡀⠀⢠⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+// ⠀⠀⠀⠀⠀⠈⢧⡿⣀⠷⣁⠱⢎⠉⣦⡛⢿⣷⣤⣯⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+// ⠀⠀⠈⠉⠛⠻⢶⣵⣎⣢⡜⠣⣠⠛⢄⣜⣳⣿⣿⣿⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀
+// ⠀⠀⠀⠀⠀⠀⠀⠈⠻⢿⣿⣾⣿⣾⣿⣿⣿⣿⣿⣿⣷⣄⠀⠀⠀⠀⠀⠀⠀⠀
+// ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⡀⠀⠀⠀⠀⠀⠀
+// ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣰⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⠀⠀⠀⠀⠀⠀
+// ⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⣿⠟⠛⠛⠛⢿⣿⣿⣿⣿⣿⣿⣿⣿⡇⠀⠀⠀⠀⠀
+// ⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⠋⠀⠀⠀⠀⠀⠙⠿⣿⣿⣿⣿⣿⣿⣿⠂⠀⠀⠀⠀
+// ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠻⠿⠋⠁
 
 import "@openzeppelin/contracts/access/Ownable.sol"; 
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "hardhat/console.sol";
 
 interface ERCBase {
     function supportsInterface(bytes4 interfaceId) external view returns (bool);
@@ -20,26 +31,31 @@ interface ERC1155Partial is ERCBase {
     function safeTransferFrom(address from, address to, uint256 id, uint256 amount, bytes calldata) external;
 }
 
-contract Burnance is ReentrancyGuard, Pausable, Ownable {
+contract HarvestArt is ReentrancyGuard, Pausable, Ownable {
 
     bytes4 _ERC721 = 0x80ac58cd;
     bytes4 _ERC1155 = 0xd9b67a26;
 
-    address public furnace = address(0);
+    address public barn = address(0);
     uint256 public defaultPrice = 1 gwei;
     uint256 public guaranteeFee = 1 gwei;
     uint256 public maxTokensPerTx = 100;
 
+    uint256 public gauranteeTransferId = 0;
+
     struct GauranteeIntent {
+        address senderAddress;
         address contractAddress;
         uint256 tokenId;
     }
 
+    GauranteeIntent[] private _gauranteeTransfer;
+
     mapping (address => uint256) private _contractPrices;
-    mapping (address => GauranteeIntent[]) private _gauranteeTransfer;
+    // mapping (uint256 => GauranteeIntent) private _gauranteeTransfer;
 
     function setFurnace(address _furnance) onlyOwner public {
-        furnace = _furnance;
+        barn = _furnance;
     }
 
     function setDefaultPrice(uint256 _defaultPrice) onlyOwner public {
@@ -74,7 +90,7 @@ contract Burnance is ReentrancyGuard, Pausable, Ownable {
     }
 
     function batchTransfer(address[] calldata tokenContracts, uint256[] calldata tokenIds, uint256[] calldata counts) external whenNotPaused {
-        require(furnace != address(0), "furnace cannot be the 0x0 address");
+        require(barn != address(0), "Barn cannot be the 0x0 address");
         require(tokenContracts.length > 0, "Must have 1 or more token contracts");
         require(tokenContracts.length == tokenIds.length && tokenIds.length == counts.length, "All params must have equal length");
 
@@ -104,10 +120,10 @@ contract Burnance is ReentrancyGuard, Pausable, Ownable {
             require(tokenContract.isApprovedForAll(msg.sender, address(this)), "Token not yet approved for all transfers");
 
             if (tokenContract.supportsInterface(_ERC721)) {
-                ERC721Partial(tokenContracts[i]).transferFrom(msg.sender, furnace, tokenIds[i]);
+                ERC721Partial(tokenContracts[i]).transferFrom(msg.sender, barn, tokenIds[i]);
             }
             else {
-                ERC1155Partial(tokenContracts[i]).safeTransferFrom(msg.sender, furnace, tokenIds[i], counts[i], "");
+                ERC1155Partial(tokenContracts[i]).safeTransferFrom(msg.sender, barn, tokenIds[i], counts[i], "");
             }
         }
 
@@ -116,7 +132,7 @@ contract Burnance is ReentrancyGuard, Pausable, Ownable {
     }
 
     function gauranteeTransfer(address _tokenContract, uint256 _tokenId) public payable whenNotPaused{
-        require(furnace != address(0), "furnace cannot be the 0x0 address");
+        require(barn != address(0), "Barn cannot be the 0x0 address");
         require(msg.value >= defaultPrice, "Not enough ether in contract.");
         
         ERCBase tokenContract;
@@ -124,16 +140,17 @@ contract Burnance is ReentrancyGuard, Pausable, Ownable {
         require(tokenContract.isApprovedForAll(msg.sender, address(this)), "Token not yet approved for all transfers");
         
         if (tokenContract.supportsInterface(_ERC721)) {
-            ERC721Partial(_tokenContract).transferFrom(msg.sender, furnace, _tokenId);
+            ERC721Partial(_tokenContract).transferFrom(msg.sender, barn, _tokenId);
         } else {
-            ERC1155Partial(_tokenContract).safeTransferFrom(msg.sender, furnace, _tokenId, 1, "");
+            ERC1155Partial(_tokenContract).safeTransferFrom(msg.sender, barn, _tokenId, 1, "");
         }
 
-        GauranteeIntent memory currentEntry;
-        currentEntry.contractAddress = _tokenContract;
-        currentEntry.tokenId = _tokenId;
+        _gauranteeTransfer.push(GauranteeIntent({contractAddress:_tokenContract, senderAddress:msg.sender, tokenId:_tokenId}));
 
-        _gauranteeTransfer[msg.sender].push(currentEntry);
+    }
+
+    function getGuarantees() public view returns(GauranteeIntent[] memory lists){
+        return _gauranteeTransfer;
     }
 
     receive () external payable { }

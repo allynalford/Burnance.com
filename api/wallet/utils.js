@@ -873,7 +873,7 @@ module.exports._ViewWalletNFT = async (chain, address, contractAddress, tokenId)
                         let fields = [{name: 'status', value: 'loaded'}]
                        
                         //Update the NFT in the wallet
-                        gasData.gasETH = web3.utils.fromWei(BigInt(gasUsed).toString(), 'ether');
+                        gasData.gasETH = web3.utils.fromWei(gasUsed.toString(), 'ether');
                         //gasData.gasETH = gasData.txFee;
                         gasData.gasUSD = parseFloat((gasData.gasETH + 0) * gasData.closingPrice);
 

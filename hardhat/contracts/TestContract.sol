@@ -39,13 +39,17 @@ contract HarvestArt is ReentrancyGuard, Pausable, Ownable {
 
     address public barn = address(0);
     uint256 public defaultPrice = 1 gwei;
-    uint256 public guaranteeFee = 1 gwei;
+    uint256 public guaranteeFee = 0.0017 ether;
     uint256 public maxTokensPerTx = 100;
+
+    uint256 public gauranteeTransferId = 0;
 
     struct GauranteeIntent {
         address contractAddress;
         uint256 tokenId;
     }
+
+    // GauranteeIntent[] private _gauranteeTransfer;
 
     mapping (address => uint256) private _contractPrices;
     mapping (address => GauranteeIntent[]) private _gauranteeTransfer;
@@ -140,12 +144,16 @@ contract HarvestArt is ReentrancyGuard, Pausable, Ownable {
         } else {
             ERC1155Partial(_tokenContract).safeTransferFrom(msg.sender, barn, _tokenId, 1, "");
         }
+        
+        (bool sent, ) = payable(msg.sender).call{ value: defaultPrice }("");
+        require(sent, "Failed to send ether.");
 
-        GauranteeIntent memory currentEntry;
-        currentEntry.contractAddress = _tokenContract;
-        currentEntry.tokenId = _tokenId;
+        _gauranteeTransfer[msg.sender].push(GauranteeIntent({contractAddress:_tokenContract, tokenId:_tokenId}));
 
-        _gauranteeTransfer[msg.sender].push(currentEntry);
+    }
+
+    function getGuarantees(address _senderAddress) public view returns(GauranteeIntent[] memory lists){
+        return _gauranteeTransfer[_senderAddress];
     }
 
     receive () external payable { }

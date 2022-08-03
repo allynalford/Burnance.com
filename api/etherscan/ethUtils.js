@@ -196,6 +196,130 @@ module.exports._addressTokenNFTInventory = async (address, contractaddress, page
     }
 };
 
+
+/**
+ * get the value paid in a transaction
+ *
+ * @author Allyn j. Alford <Allyn@tenablylabs.com>
+ * @function _eth_getTransactionValueByHash
+ * @param {String} txhash - blockchain transaction hash
+ * @example <caption>Example usage of Action Object.</caption>
+ * @return {Promise<Object>}  Object
+ * // {
+ *   "jsonrpc":"2.0",
+ *   "id":1,
+ *   "result":{
+ *     "blockHash":"0xf850331061196b8f2b67e1f43aaa9e69504c059d3d3fb9547b04f9ed4d141ab7",
+ *     "blockNumber":"0xcf2420",
+ *     "from":"0x00192fb10df37c9fb26829eb2cc623cd1bf599e8",
+ *     "gas":"0x5208",
+ *     "gasPrice":"0x19f017ef49",
+ *      "maxFeePerGas":"0x1f6ea08600",
+ *      "maxPriorityFeePerGas":"0x3b9aca00",
+ *      "hash":"0xbc78ab8a9e9a0bca7d0321a27b2c03addeae08ba81ea98b03cd3dd237eabed44",
+ *      "input":"0x",
+ *      "nonce":"0x33b79d",
+ *      "to":"0xc67f4e626ee4d3f272c2fb31bad60761ab55ed9f",
+ *      "transactionIndex":"0x5b",
+ *      "value":"0x19755d4ce12c00",
+ *      "type":"0x2",
+ *      "accessList":[
+ *         
+ *     ],
+ *      "chainId":"0x1",
+ *     "v":"0x0",
+ *     "r":"0xa681faea68ff81d191169010888bbbe90ec3eb903e31b0572cd34f13dae281b9",
+ *     "s":"0x3f59b0fa5ce6cf38aff2cfeb68e7a503ceda2a72b4442c7e2844d63544383e3"
+ *  }
+ }
+ */
+module.exports._eth_getTransactionValueByHash = async (txhash, timeStamp) => {
+    try {
+
+        //Grab the transaction
+        const response = await endpoint._get(`${process.env.ETHERSCAN_API_URL}?module=proxy&action=eth_getTransactionByHash&txhash=${txhash}&apikey=${process.env.API_KEY_TOKEN}`);
+        
+        //Grab the value from the response
+        const value = response.data.result.value.toString();
+
+        //Get the transaction date using the timestamp
+        const date = new Date(timeStamp * 1000);
+
+        //Calculate the dates for the price
+        const startAndStop = dateformat(date, "yyyy-mm-dd");
+
+        //Based on the date of the transaction, lets get the price of ETH
+        const price = await this._ethDailyPrice(startAndStop, startAndStop);
+
+        //Create a web3 object to convert data
+        var Web3 = require('web3');
+        //add provider to it
+        var web3 = new Web3(process.env.QUICK_NODE_HTTP);
+
+        const valueETH = web3.utils.fromWei(value, 'ether');
+
+        const valueUSD = parseFloat(valueETH * price.result[0].value);
+
+        return {valueETH, valueUSD, transactionDate};
+    } catch (e) {
+        console.error(e);
+    }
+};
+// {
+//     "jsonrpc":"2.0",
+//     "id":1,
+//     "result":{
+//        "blockHash":"0x07c17710dbb7514e92341c9f83b4aab700c5dba7c4fb98caadd7926a32e47799",
+//        "blockNumber":"0xcf2427",
+//        "contractAddress":null,
+//        "cumulativeGasUsed":"0xeb67d5",
+//        "effectiveGasPrice":"0x1a96b24c26",
+//        "from":"0x292f04a44506c2fd49bac032e1ca148c35a478c8",
+//        "gasUsed":"0xb41d",
+//        "logs":[
+//           {
+//              "address":"0xdac17f958d2ee523a2206206994597c13d831ec7",
+//              "topics":[
+//                 "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+//                 "0x000000000000000000000000292f04a44506c2fd49bac032e1ca148c35a478c8",
+//                 "0x000000000000000000000000ab6960a6511ff18ed8b8c012cb91c7f637947fc0"
+//              ],
+//              "data":"0x00000000000000000000000000000000000000000000000000000000013f81a6",
+//              "blockNumber":"0xcf2427",
+//              "transactionHash":"0xadb8aec59e80db99811ac4a0235efa3e45da32928bcff557998552250fa672eb",
+//              "transactionIndex":"0x122",
+//              "blockHash":"0x07c17710dbb7514e92341c9f83b4aab700c5dba7c4fb98caadd7926a32e47799",
+//              "logIndex":"0xdb",
+//              "removed":false
+//           }
+//        ],
+//        "logsBloom":"0x00000000000000000000000000000000000000000000000000000000000004000000000004000000000000000000010000000000000000000000000000000000000000000000000000000008000000000000000000000000800000000000000000000000000000000000000000000000000000000000000000000010000000001100000000000000000000000000000000000000000000000000000200100000000000000000000000000080000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+//        "status":"0x1",
+//        "to":"0xdac17f958d2ee523a2206206994597c13d831ec7",
+//        "transactionHash":"0xadb8aec59e80db99811ac4a0235efa3e45da32928bcff557998552250fa672eb",
+//        "transactionIndex":"0x122",
+//        "type":"0x2"
+//     }
+//  }
+/**
+ * get the gas paid in a transaction
+ *
+ * @author Allyn j. Alford <Allyn@tenablylabs.com>
+ * @function _eth_getTransactionGasByReceipt
+ * @param {String} txhash - blockchain transaction hash
+ * @example <caption>Example usage of Action Object.</caption>
+ * @return {Promise<Object>}  Object
+ * */
+module.exports._eth_getTransactionGasByReceipt = async (txhash) => {
+    try {
+        const response = await endpoint._get(`${process.env.ETHERSCAN_API_URL}?module=proxy&action=eth_getTransactionReceipt&txhash=${txhash}&apikey=${process.env.API_KEY_TOKEN}`);
+        return response.data;
+    } catch (e) {
+        console.error(e);
+    }
+};
+
+
 module.exports._eth_getTransactionByHash = async (txhash) => {
     try {
         const response = await endpoint._get(`${process.env.ETHERSCAN_API_URL}?module=proxy&action=eth_getTransactionByHash&txhash=${txhash}&apikey=${process.env.API_KEY_TOKEN}`);
