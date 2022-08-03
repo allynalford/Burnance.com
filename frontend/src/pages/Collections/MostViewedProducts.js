@@ -10,13 +10,13 @@ import {
   Button,
 } from 'reactstrap';
 import { getChain } from '../../common/config';
-import { Chart } from 'react-google-charts';
-import './tableCss.css';
+import Icon from '@material-ui/icons/Apps';
 import { Link } from 'react-router-dom';
-import DataTable from '../../components/DataTable';
+import DataTableLoader from '../../components/DataTable';
 import bgImg from "../../assets/images/nfts/ac1_unfit_digital_collage_of_locally_owned_nfts_by_annie_bur.jpg";
 import BasicPopperToolTip from "../../components/BasicPopperToolTip";
 import RingLoader from "react-spinners/RingLoader";
+import DataTable from 'react-data-table-component';
 var sessionstorage = require('sessionstorage');
 var _ = require('lodash');
 var endpoint = require('../../common/endpoint');
@@ -76,6 +76,11 @@ class MostViewedProducts extends Component {
 
     _openModal = this.openModal;
   }
+
+  handleRowSelect = ({ selectedRows }) => {
+    // You can set state or dispatch with something like Redux so we can use the retrieved data
+    console.log('Selected Rows: ', selectedRows);
+  };
 
   fireMsg(title, text, icon) {
     Swal.fire({
@@ -169,78 +174,95 @@ class MostViewedProducts extends Component {
       this.setState({ loading: true});
 
       let Collections = JSON.parse(sessionstorage.getItem(ethereumAddress));
+
       if ((typeof Collections === 'undefined') | (Collections === null)) {
         Collections = await endpoint._get(
           getChain()['eth'].getWalletCollectionsApiUrl +
             `/ethereum/${ethereumAddress}`,
         );
-        Collections = Collections.data;
+        
+
+        //Loop the collections and add a id column
+        let id = 1, collections = [];
+        for(const collection of Collections.data.collections){
+          collection.id = id;
+          collections.push(collection);
+          id++;
+        }
+        Collections = collections;
         sessionstorage.setItem(ethereumAddress, JSON.stringify(Collections));
       }
 
       //console.log(Collections);
 
-      let collections = [
-        [
-          'Collection',
-          'Held',
-          'Floor',
-          'Avg Price',
-          'Holding Value',
-          'Cost Basis',
-          'PnL',
-          'Liquidity (1D)',
-          'Liquidity (7D)',
-          'Liquidity (30D)',
-        ],
-      ];
+      // let collections = [
+      //   [
+      //     'Collection',
+      //     'Held',
+      //     'Floor',
+      //     'Avg Price',
+      //     'Holding Value',
+      //     'Cost Basis',
+      //     'PnL',
+      //     'Liquidity (1D)',
+      //     'Liquidity (7D)',
+      //     'Liquidity (30D)',
+      //   ],
+      // ];
 
       let EstHoldingValue = 0, SevenDaySales = 0, NumOwners = 0, totalSupply = 0;
-      for (const collection of Collections.collections) {
+      // for (const collection of Collections.collections) {
 
-        const floorPrice = (collection.FloorPrice !== "N/F" ? formatter.format(parseFloat(Number(collection.FloorPrice) * Number(ethusd))) : formatter.format(0.00));
-        const avgPrice = (typeof collection.statistics !== "undefined" ? formatter.format(parseFloat(Number(collection.statistics.average_price) * Number(ethusd))) : formatter.format(0.00))
-        const holdingValue = (collection.HoldingValue !== "N/F" ? formatter.format(parseFloat(Number(collection.HoldingValue) * Number(ethusd))) : formatter.format(0.00))
-        collections.push([
-          collection.name,
-          collection.count,
-          floorPrice,
-          avgPrice,
-          holdingValue,
-          '--',
-          '--',
-          (typeof collection.statistics !== "undefined" ? (collection.statistics.one_day_sales / (collection.statistics.total_supply - collection.statistics.num_owners)) * 100 : 0.0),
-          (typeof collection.statistics !== "undefined" ? (collection.statistics.seven_day_sales / (collection.statistics.total_supply - collection.statistics.num_owners)) * 100 : 0.0),
-          (typeof collection.statistics !== "undefined" ? (collection.statistics.thirty_day_sales / (collection.statistics.total_supply - collection.statistics.num_owners)) * 100 : 0.0),
-        ]);
-
-
-        _collections.push({
-          name: collection.name,
-          contractAddress: (typeof collection.address !== "undefined" ? collection.address : collection.contractAddress),
-        });
-
-        if(typeof collection.HoldingValue === "number"){
-          EstHoldingValue = (Number(EstHoldingValue) + Number(collection.HoldingValue));
-          //parseFloat(costETH * price.result[0].value)
-        };
-
-        if(typeof collection.statistics !== "undefined"){
-          SevenDaySales = (Number(SevenDaySales) + Number(collection.statistics.seven_day_sales));
-          NumOwners = (Number(NumOwners) + Number(collection.statistics.num_owners));
-          totalSupply = (Number(totalSupply) + Number(collection.statistics.total_supply));
-        };
+      //   const floorPrice = (collection.FloorPrice !== "N/F" ? formatter.format(parseFloat(Number(collection.FloorPrice) * Number(ethusd))) : formatter.format(0.00));
+      //   const avgPrice = (typeof collection.statistics !== "undefined" ? formatter.format(parseFloat(Number(collection.statistics.average_price) * Number(ethusd))) : formatter.format(0.00))
+      //   const holdingValue = (collection.HoldingValue !== "N/F" ? formatter.format(parseFloat(Number(collection.HoldingValue) * Number(ethusd))) : formatter.format(0.00))
+      //   collections.push([
+      //     collection.name,
+      //     collection.count,
+      //     floorPrice,
+      //     avgPrice,
+      //     holdingValue,
+      //     '--',
+      //     '--',
+      //     (typeof collection.statistics !== "undefined" ? (collection.statistics.one_day_sales / (collection.statistics.total_supply - collection.statistics.num_owners)) * 100 : 0.0),
+      //     (typeof collection.statistics !== "undefined" ? (collection.statistics.seven_day_sales / (collection.statistics.total_supply - collection.statistics.num_owners)) * 100 : 0.0),
+      //     (typeof collection.statistics !== "undefined" ? (collection.statistics.thirty_day_sales / (collection.statistics.total_supply - collection.statistics.num_owners)) * 100 : 0.0),
+      //   ]);
 
 
+      //   _collections.push({
+      //     name: collection.name,
+      //     contractAddress: (typeof collection.address !== "undefined" ? collection.address : collection.contractAddress),
+      //   });
+
+      //   if(typeof collection.HoldingValue === "number"){
+      //     EstHoldingValue = (Number(EstHoldingValue) + Number(collection.HoldingValue));
+      //     //parseFloat(costETH * price.result[0].value)
+      //   };
+
+      //   if(typeof collection.statistics !== "undefined"){
+      //     SevenDaySales = (Number(SevenDaySales) + Number(collection.statistics.seven_day_sales));
+      //     NumOwners = (Number(NumOwners) + Number(collection.statistics.num_owners));
+      //     totalSupply = (Number(totalSupply) + Number(collection.statistics.total_supply));
+      //   };
 
 
-      }
+
+
+      // }
 
       EstHoldingValue = parseFloat(Number(EstHoldingValue) * Number(ethusd));
-
+      console.log(Collections);
+      
+      //console.log(collections)
       //Liquidity = Sales / The number of NFTs * 100%
       const Liquidity7D = (SevenDaySales / (totalSupply - NumOwners)) * 100;
-      this.setState({ collections, loading: false, EstHoldingValue: EstHoldingValue.toFixed(4), Liquidity7D: Liquidity7D.toFixed(2) });
+      this.setState({
+        collections: Collections,
+        loading: false,
+        EstHoldingValue: EstHoldingValue.toFixed(4),
+        Liquidity7D: Liquidity7D.toFixed(2),
+      });
     } catch (e) {
       console.error(e);
       this.setState({ loading: false });
@@ -292,40 +314,33 @@ class MostViewedProducts extends Component {
   };
 
   render() {
-    const chartEvents = [
-      {
-        eventName: 'select',
-        callback({ chartWrapper }) {
-          //console.log("Selected ", chartWrapper.getChart().getSelection());
-          const item = chartWrapper.getChart().getSelection()[0];
-          const name = chartWrapper.getDataTable().cache[item.row][0].Me;
-          _openModal(name);
-        },
-      },
-      {
-        eventName: 'ready',
-        callback({ chartWrapper }) {
-          // console.log("ready ", chartWrapper.getChart());
-        },
-      },
-      {
-        eventName: 'error',
-        callback({ chartWrapper }) {
-          console.log('error ', chartWrapper.getChart());
-        },
-      },
-    ];
+    const customStyles = {
+      	headRow: {
+      		style: {
+      			border: 'none',
+      		},
+      	},
+      	headCells: {
+      		style: {
+      			color: '#202124',
+      			fontSize: '14px',
+      		},
+      	},
+      	rows: {
+      		highlightOnHoverStyle: {
+      			backgroundColor: 'rgb(230, 244, 244)',
+      			borderBottomColor: '#FFFFFF',
+      			borderRadius: '25px',
+      			outline: '1px solid #FFFFFF',
+      		},
+      	},
+      	pagination: {
+      		style: {
+      			border: 'none',
+      		},
+      	},
+      };
 
-    var cssClassNames = {
-      headerRow: 'cssHeaderRow',
-      tableRow: 'cssTableRow',
-      oddTableRow: 'cssOddTableRow',
-      selectedTableRow: 'cssSelectedTableRow',
-      hoverTableRow: 'cssHoverTableRow',
-      headerCell: 'cssHeaderCell',
-      tableCell: 'cssTableCell',
-      rowNumberCell: 'cssRowNumberCell',
-    };
 
     return (
       <React.Fragment>
@@ -337,7 +352,9 @@ class MostViewedProducts extends Component {
           style={{ maxWidth: '500px', width: '500px' }}
         >
           <ModalHeader toggle={this.openModal}>
-            {(typeof this.state.currentCollection !== "undefined" ? this.state.currentCollection.name : "")}
+            {typeof this.state.currentCollection !== 'undefined'
+              ? this.state.currentCollection.name
+              : ''}
           </ModalHeader>
           <ModalBody>
             <Row>
@@ -423,7 +440,11 @@ class MostViewedProducts extends Component {
           <ModalFooter>
             <Link
               className="btn mouse-down"
-              to={`/collection/${(typeof this.state.currentCollection !== "undefined" ? this.state.currentCollection.contractAddress : "")}`}
+              to={`/collection/${
+                typeof this.state.currentCollection !== 'undefined'
+                  ? this.state.currentCollection.contractAddress
+                  : ''
+              }`}
             >
               View NFTs
             </Link>
@@ -442,7 +463,7 @@ class MostViewedProducts extends Component {
               <div className="col-lg-12 text-center">
                 <div className="page-next-level">
                   <h1 className="title text-white title-dark">
-                   Wallet NFT Collections
+                    Wallet NFT Collections
                   </h1>
                   <div className="page-next">
                     <nav aria-label="breadcrumb" className="d-inline-block">
@@ -476,9 +497,8 @@ class MostViewedProducts extends Component {
           </div>
         </div>
         <section className="section">
-
-        <Container>
-        <Row className="justify-content-center">
+          <Container>
+            <Row className="justify-content-center">
               <Col md="4">
                 <div
                   key={1}
@@ -490,17 +510,24 @@ class MostViewedProducts extends Component {
                   alt=""
                 /> */}
                   <div className="flex-1 content ms-3">
-                    <BasicPopperToolTip title={"Est Holding Value"} text={"Holding value is calculated as: number of NFTs held * avg sale price of NFT's in the collection"} />
-                    
+                    <BasicPopperToolTip
+                      title={'Est Holding Value'}
+                      text={
+                        "Holding value is calculated as: number of NFTs held * avg sale price of NFT's in the collection"
+                      }
+                    />
+
                     {this.state.loading === true ? (
                       <RingLoader
-                        color={"#ff914d"}
+                        color={'#ff914d'}
                         loading={this.state.loading}
                         cssOverride={override}
                         size={50}
                       />
                     ) : (
-                      <p className="text h3 mb-0">{formatter.format(this.state.EstHoldingValue)}</p>
+                      <p className="text h3 mb-0">
+                        {formatter.format(this.state.EstHoldingValue)}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -516,7 +543,10 @@ class MostViewedProducts extends Component {
                   alt=""
                 /> */}
                   <div className="flex-1 content ms-3">
-                    <BasicPopperToolTip title={"Est Holding Cost"} text={"Est Holding Cost data not yet available."} />
+                    <BasicPopperToolTip
+                      title={'Est Holding Cost'}
+                      text={'Est Holding Cost data not yet available.'}
+                    />
                     <p className="text h3 mb-0">--</p>
                   </div>
                 </div>
@@ -532,17 +562,22 @@ class MostViewedProducts extends Component {
                   alt=""
                 /> */}
                   <div className="flex-1 content ms-3">
-                    <BasicPopperToolTip title={"Liquidity (7D)"} text={"Liquidity is calculated as: 7 day sales / The number of NFT holders * 100%"} />
-                    
+                    <BasicPopperToolTip
+                      title={'Liquidity (7D)'}
+                      text={
+                        'Liquidity is calculated as: 7 day sales / The number of NFT holders * 100%'
+                      }
+                    />
+
                     {this.state.loading === true ? (
                       <RingLoader
-                        color={"#ff914d"}
+                        color={'#ff914d'}
                         loading={this.state.loading}
                         cssOverride={override}
                         size={50}
                       />
                     ) : (
-                      <p className="text h3 mb-0" >{this.state.Liquidity7D}%</p>
+                      <p className="text h3 mb-0">{this.state.Liquidity7D}%</p>
                     )}
                   </div>
                 </div>
@@ -558,8 +593,15 @@ class MostViewedProducts extends Component {
                   alt=""
                 /> */}
                   <div className="flex-1 content ms-3">
-                    <BasicPopperToolTip title={"PnL"} text={"PnL calculated based on NFTs held. This data is not yet available."} />
-                    <p className="text h3 mb-0">{formatter.format(this.state.PNL)}</p>
+                    <BasicPopperToolTip
+                      title={'PnL'}
+                      text={
+                        'PnL calculated based on NFTs held. This data is not yet available.'
+                      }
+                    />
+                    <p className="text h3 mb-0">
+                      {formatter.format(this.state.PNL)}
+                    </p>
                   </div>
                 </div>
               </Col>
@@ -574,121 +616,170 @@ class MostViewedProducts extends Component {
                   alt=""
                 /> */}
                   <div className="flex-1 content ms-3">
-                    <BasicPopperToolTip title="Realized PnL" text={"PnL calculated based on NFTs sold. This data is not yet available."} />
-                    <p className="text h3 mb-0">{formatter.format(this.state.realizedPNL)}</p>
+                    <BasicPopperToolTip
+                      title="Realized PnL"
+                      text={
+                        'PnL calculated based on NFTs sold. This data is not yet available.'
+                      }
+                    />
+                    <p className="text h3 mb-0">
+                      {formatter.format(this.state.realizedPNL)}
+                    </p>
                   </div>
                 </div>
               </Col>
             </Row>
-            {(this.state.walletConnected === false ? "" : <Row>
-            <Col xs={12} style={{marginTop: "25px"}}>
-              <h2 className="mb-0">
-                You have {(this.state.collections.length === 0 ? "-" : this.state.collections.length)} Collections in your Portfolio
-              </h2>
-                <Button name="refresh"
-                  className='btn btn-info rounded'
-                  style={{ marginBottom: '15px' }}
-                  onClick={e =>{
-                    e.preventDefault();
-                    this.refresh();
-                  }}>
-                  {(this.state.loading === true ? "Loading Collections..." : "Refresh Collections")}
-                </Button>
-            </Col>
-          </Row>)}
-          
-          <Row>
-              {(this.state.walletConnected === false ? <Col md="12">
-                <div className="row justify-content-center">
-                  <div className="col-lg-12 text-center">
-                    <h3 className="mb-0" style={{marginTop: '45px'}}>Connect your Wallet</h3>
-                  </div>
-                </div>
-              </Col> :  <Col md="12">
-              {this.state.loading === true ? (
-                <DataTable width={'100%'} />
-              ) : (
-                <div className="table-responsive bg-white shadow rounded">
-                  <Chart
-                    chartType="Table"
-                    width="100%"
-                    data={this.state.collections}
-                    options={{
-                      allowHtml: true,
-                      showRowNumber: false,
-                      width: '100%',
-                      height: '100%',
-                      pageSize: 25,
-                      cssClassNames: cssClassNames,
+            {this.state.walletConnected === false ? (
+              ''
+            ) : (
+              <Row>
+                <Col xs={12} style={{ marginTop: '25px' }}>
+                  <Button
+                    name="refresh"
+                    className="btn btn-info rounded"
+                    style={{ marginBottom: '15px' }}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      this.refresh();
                     }}
-                    formatters={[
+                  >
+                    {this.state.loading === true
+                      ? 'Loading Collections...'
+                      : 'Refresh Collections'}
+                  </Button>
+                </Col>
+              </Row>
+            )}
+
+            <Row>
+              {this.state.walletConnected === false ? (
+                <Col md="12">
+                  <div className="row justify-content-center">
+                    <div className="col-lg-12 text-center">
+                      <h3 className="mb-0" style={{ marginTop: '45px' }}>
+                        Connect your Wallet
+                      </h3>
+                    </div>
+                  </div>
+                </Col>
+              ) : (
+                <Col md="12">
+                  <DataTable
+                    title={
+                      (this.state.collections.length === 0
+                        ? '-'
+                        : this.state.collections.length) +
+                      ' Collection(s) in your Portfolio'
+                    }
+                    customStyles={customStyles}
+                    highlightOnHover
+                    pointerOnHover
+                    progressPending={this.state.loading}
+                    progressComponent={<DataTableLoader width={'100%'} />}
+                    onSelectedRowsChange={this.handleRowSelect}
+                    columns={[
                       {
-                        type: 'NumberFormat',
-                        column: 9,
-                        options: {
-                          suffix: '%',
-                          negativeColor: 'red',
-                          negativeParens: true,
-                          fractionDigits: 2,
-                        },
-                      },{
-                        type: 'NumberFormat',
-                        column: 8,
-                        options: {
-                          suffix: '%',
-                          negativeColor: 'red',
-                          negativeParens: true,
-                          fractionDigits: 2,
+                        cell: (row) => (
+                          <Link to={`/collection/${row.address}`}>
+                            <Icon style={{ fill: '#43a047' }} />
+                          </Link>
+                        ),
+                        width: '56px', // custom width for icon button
+                        style: {
+                          borderBottom: '1px solid #FFFFFF',
+                          marginBottom: '-1px',
                         },
                       },
                       {
-                        type: 'NumberFormat',
-                        column: 7,
-                        options: {
-                          suffix: '%',
-                          negativeColor: 'red',
-                          negativeParens: true,
-                          fractionDigits: 2,
+                        name: 'Collection',
+                        selector: (row) => (
+                          <Link to={`/collection/${row.address}`}>
+                            {row.name}
+                          </Link>
+                        ),
+                        sortable: true,
+                        width: '20%',
+                        grow: 2,
+                        style: {
+                          color: '#202124',
+                          fontSize: '14px',
+                          fontWeight: 600,
                         },
                       },
                       {
-                        type: 'NumberFormat',
-                        column: 5,
-                        options: {
-                          prefix: '$',
-                          negativeColor: 'red',
-                          negativeParens: true,
+                        name: 'Held',
+                        selector: (row) => row.count,
+                        sortable: true,
+                      },
+                      {
+                        name: 'Floor Price',
+                        selector: (row) => row.FloorPrice,
+                        sortable: true,
+                        format: (row) => formatter.format(row.FloorPrice),
+                        when: (row) => row.FloorPrice < row.AmountInvested,
+                        style: {
+                          backgroundColor: '#8B0000',
+                          color: 'white',
+                          '&:hover': {
+                            cursor: 'pointer',
+                          },
                         },
                       },
                       {
-                        type: 'NumberFormat',
-                        column: 4,
-                        options: {
-                          fractionDigits: 6,
+                        name: 'Est. Value',
+                        selector: (row) => row.HoldingValue,
+                        sortable: true,
+                        format: (row) => formatter.format(row.HoldingValue),
+                      },
+                      {
+                        name: 'Cost Basis',
+                        selector: (row) => row.AmountInvested,
+                        sortable: true,
+                        format: (row) => formatter.format(row.AmountInvested),
+                      },
+                      {
+                        name: 'PnL',
+                        selector: (row) => row.pnl,
+                        sortable: true,
+                        format: (row) => formatter.format(row.pnl),
+                        when: (row) => row.pnl < 0,
+                        style: {
+                          backgroundColor: '#8B0000',
+                          color: 'white',
+                          '&:hover': {
+                            cursor: 'pointer',
+                          },
+                        },
+                        when: (row) => (row.pnl = 0),
+                        style: {
+                          backgroundColor: '#D43900',
+                          color: 'white',
+                          '&:hover': {
+                            cursor: 'pointer',
+                          },
                         },
                       },
                       {
-                        type: 'NumberFormat',
-                        column: 3,
-                        options: {
-                          fractionDigits: 6,
-                        },
+                        name: 'Liquidity (1D)',
+                        selector: (row) => row.Liquidity7D,
+                        sortable: true,
+                        format: (row) => `${row.Liquidity7D}%`,
                       },
                     ]}
-                    chartEvents={chartEvents}
+                    data={this.state.collections}
+                    pagination
                   />
-                </div>
+                </Col>
               )}
-            </Col>)}
-          </Row>
-          {/* <Row>
+            </Row>
+            {/* <Row>
               {this.state.nfts.map((nft, key) => (
                 <Col key={key} lg={3} md={6} xs={12} className="mt-4 pt-2">
                   <Asset AddToBatch={this.AddToBatch} ethereumAddress={this.state.ethereumAddress} nft={nft} />
                 </Col>
               ))}
             </Row> */}
-        </Container>
+          </Container>
         </section>
       </React.Fragment>
     );

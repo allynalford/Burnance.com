@@ -670,7 +670,7 @@ async waitForReceipt(hash, cb) {
                           <Link to="/">Burnance</Link>
                         </li>
                         <li className="breadcrumb-item">
-                          <Link to="/collections">Collection</Link>
+                          <Link to="/collections">Collections</Link>
                         </li>
                         <li
                           className="breadcrumb-item active"
