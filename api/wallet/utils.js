@@ -785,145 +785,132 @@ module.exports._ViewWalletNFT = async (chain, address, contractAddress, tokenId)
 
     try{
 
-        const MAX_TRYS = 10, TRY_TIMEOUT = 800;
-        function toTry() {
-            return new Promise((ok, fail) => {
-                setTimeout(() => Math.random() < 0.05 ? ok("OK!") : fail("Error"), TRY_TIMEOUT);
-            });
-        }
-        async function tryNTimes(toTry, count = MAX_TRYS) {
-            if (count > 0) {
-                const result = await toTry().catch(e => e);
-                if (result === "Error") { return await tryNTimes(toTry, count - 1) }
-                return result
-            }
-            return `Tried ${MAX_TRYS} times and failed`;
-        }
+      
 
-        var browser = await pupUtils.getBrowser();
-
-        //Create a page
-        //const page = await browser.newPage();
-        const page = (await browser.pages())[0];
-
-        await page.setUserAgent(pupUtils.getRandomAgent());
-
-        await page.setRequestInterception(true);
-
-        //if the page makes a  request to a resource type of image then abort that request
-        page.on('request', request => {
-            if (request.resourceType() === 'image')
-                request.abort();
-            else
-                request.continue();
-        });
-
-
-
-        console.info('Browser Tabs: ', (await browser.pages()).length);
-
-            const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
             const tx = await etherUtils.getNFTtx(chain, address, contractAddress, tokenId);
             console.log('txs', tx);
 
-            const url = `${process.env.ETHERSCAN_BASE_URL}tx/${tx.hash}`;
+            
 
             let gasData = {retry: true};
 
 
-            if(typeof tx.gasData === "undefined"){
-                while(typeof gasData.retry !== "undefined"){
+        if (typeof tx.gasData === "undefined") {
 
-                    gasData = await etherUtils._getNftTxHash(chain, address, tx.hash);
+            var browser = await pupUtils.getBrowser();
 
-                    //console.log('gasData Exists',gasData);
+            //Create a page
+            //const page = await browser.newPage();
+            const page = (await browser.pages())[0];
 
-                    if(typeof gasData === "undefined"){
+            await page.setUserAgent(pupUtils.getRandomAgent());
 
-                        //gasData = await pupUtils.getTxTransactionFee(url, page);
-                         gasData = await etherUtils._eth_getTransactionReceipt(tx.hash);
-                    }else{
-                        gasData = gasData.result;
+            await page.setRequestInterception(true);
 
-                        delete gasData.retry;
-                    }
+            //if the page makes a  request to a resource type of image then abort that request
+            page.on('request', request => {
+                if (request.resourceType() === 'image')
+                    request.abort();
+                else
+                    request.continue();
+            });
 
-                             
-                    if(typeof gasData.retry !== "undefined"){
-                        console.log("Delaying 12000");
+            const url = `${process.env.ETHERSCAN_BASE_URL}tx/${tx.hash}`;
 
-                        //delay next call
-                        await delay(12000);
+            console.info('Browser Tabs: ', (await browser.pages()).length);
 
-                        //change the user agent
-                        await page.setUserAgent(pupUtils.getRandomAgent());
+            const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-                    }else{
 
-                        etherUtils._addNftTxHash(chain, address, tx.hash, gasData);
+            while (typeof gasData.retry !== "undefined") {
 
-                        const gasUsed = gasData.result.gasUsed;
+                gasData = await etherUtils._getNftTxHash(chain, address, tx.hash);
 
-                        gasData = {};
+                //console.log('gasData Exists',gasData);
 
-                        gasData.mintTokenIds = tx.mintTokenIds;
-                        gasData.transactionDate = tx.transactionDate;
+                if (typeof gasData === "undefined") {
 
-                        let fields = [{name: 'status', value: 'loaded'}]
-                       
-                        //Update the NFT in the wallet
-                        gasData.gasETH = web3.utils.fromWei(gasUsed.toString(), 'ether');
-                        //gasData.gasETH = gasData.txFee;
-                        gasData.gasUSD = parseFloat((gasData.gasETH + 0) * gasData.closingPrice);
+                    //gasData = await pupUtils.getTxTransactionFee(url, page);
+                    gasData = await etherUtils._eth_getTransactionReceipt(tx.hash);
+                } else {
+                    gasData = gasData.result;
 
-                        fields.push({ name: 'gasUSD', value:  gasData.gasUSD});
-                        fields.push({name: 'gasETH', value:  gasData.gasETH});
-                        fields.push({name: 'gasData', value:  gasData})
-                        
-                        console.log('gasETH: ', gasData.gasETH);
-                        console.log('gasUSD: ', gasData.gasUSD);
-
-                        
-
-                        //Calculate the cost
-                        //gasData.costETH = (gasData.gasETH + gasData.value);
-                        //gasData.costUSD = parseFloat(gasData.costETH * gasData.closingPrice);
-                        //gasData.valueUSD = parseFloat(gasData.value * gasData.closingPrice);
-
-                        //fields.push({name: 'valueETH', value:  gasData.value});
-                        //fields.push({name: 'valueUSD', value:  gasData.valueUSD});
-
-                        //console.log('costETH: ',gasData.costETH);
-                        //console.log('costUSD: ',gasData.costUSD);
-
-                        //fields.push({name: 'costETH', value:  gasData.costETH});
-                        //fields.push({name: 'costUSD', value:  gasData.costUSD});
-
-                        const update = await walletUtils._updateWalletNFTFields(chain, contractAddress + tokenId, fields);
-                        console.log('Update',update);
-                    }
-    
-                    
+                    delete gasData.retry;
                 }
-                loaded = true;
-            }else{
-                console.log("NFT already loaded");
-                loaded = false;
+
+
+                if (typeof gasData.retry !== "undefined") {
+                    console.log("Delaying 12000");
+
+                    //delay next call
+                    await delay(12000);
+
+                    //change the user agent
+                    await page.setUserAgent(pupUtils.getRandomAgent());
+
+                } else {
+
+                    etherUtils._addNftTxHash(chain, address, tx.hash, gasData);
+
+                    const gasUsed = gasData.result.gasUsed;
+
+                    gasData = {};
+
+                    gasData.mintTokenIds = tx.mintTokenIds;
+                    gasData.transactionDate = tx.transactionDate;
+
+                    let fields = [{ name: 'status', value: 'loaded' }]
+
+                    //Update the NFT in the wallet
+                    gasData.gasETH = web3.utils.fromWei(gasUsed.toString(), 'ether');
+                    //gasData.gasETH = gasData.txFee;
+                    gasData.gasUSD = parseFloat((gasData.gasETH + 0) * gasData.closingPrice);
+
+                    fields.push({ name: 'gasUSD', value: gasData.gasUSD });
+                    fields.push({ name: 'gasETH', value: gasData.gasETH });
+                    fields.push({ name: 'gasData', value: gasData })
+
+                    console.log('gasETH: ', gasData.gasETH);
+                    console.log('gasUSD: ', gasData.gasUSD);
+
+
+
+                    //Calculate the cost
+                    //gasData.costETH = (gasData.gasETH + gasData.value);
+                    //gasData.costUSD = parseFloat(gasData.costETH * gasData.closingPrice);
+                    //gasData.valueUSD = parseFloat(gasData.value * gasData.closingPrice);
+
+                    //fields.push({name: 'valueETH', value:  gasData.value});
+                    //fields.push({name: 'valueUSD', value:  gasData.valueUSD});
+
+                    //console.log('costETH: ',gasData.costETH);
+                    //console.log('costUSD: ',gasData.costUSD);
+
+                    //fields.push({name: 'costETH', value:  gasData.costETH});
+                    //fields.push({name: 'costUSD', value:  gasData.costUSD});
+
+                    const update = await walletUtils._updateWalletNFTFields(chain, contractAddress + tokenId, fields);
+                    console.log('Update', update);
+                }
+
+
             }
+            loaded = true;
 
+            //Start cleaning up the browser session
+            page.removeAllListeners();
 
- 
+            //Close the page
+            await page.close();
 
-        //Start cleaning up the browser session
-        page.removeAllListeners();
+            //Close the browser
+            await browser.close();
+        } else {
+            console.log("NFT already loaded");
+            loaded = false;
+        }
 
-        //Close the page
-        await page.close();
-
-        //Close the browser
-        await browser.close();
-        
        
         const resp = {
             loaded,
@@ -937,6 +924,13 @@ module.exports._ViewWalletNFT = async (chain, address, contractAddress, tokenId)
     }catch(e){
         console.error(e);
         return e;
+    }finally{
+        if(typeof page !== "undefined"){
+            await page.close();
+        };
+        if(typeof browser !== "undefined"){
+            await browser.close();
+        };
     }
 
 };

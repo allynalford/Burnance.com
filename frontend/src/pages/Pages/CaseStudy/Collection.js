@@ -12,7 +12,7 @@ import {initGA, PageView, Event} from '../../../common/gaUtils';
 import RingLoader from "react-spinners/RingLoader";
 import { ERC721, ERC1155 } from "../../../common/contractUtils";
 import Web3 from 'web3';
-import Burnance from '../../../abis/HarvestArt.json';
+import Burnance from '../../../abis/Burnance.json';
 
 
 //Import Images

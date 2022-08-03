@@ -75,7 +75,7 @@ module.exports.getNFTtx = async (chain, address, contractaddress, tokenId) => {
         
         
 
-        hash = tokenNftTx.hash
+        //hash = tokenNftTx.hash
 
 
         //Save the transactions
@@ -91,59 +91,83 @@ module.exports.getNFTtx = async (chain, address, contractaddress, tokenId) => {
   
         //Based on the date of the transaction, lets get the price of ETH
         price = await this._ethDailyPrice(startAndStop, startAndStop);
+
+        const ethTransPriceUSD = price.result[0].value;
+
+
         //console.log('Price',price);
-  
-        //Create a web3 object to convert data
-        var Web3 = require('web3');
-        //add provider to it
-        var web3 = new Web3(process.env.QUICK_NODE_HTTP);
 
-        etherScanTxUrl = `${process.env.ETHERSCAN_BASE_URL}tx/${hash}`;
+        //Get the prices
 
-        //Grab all the transactions based on the hash
-        const txs = await this._txListInternal(hash);
-        //Grab the single result
+        { valueETH, valueUSD } await this._eth_getTransactionValueByHash(tokenNftTx.hash, ethTransPriceUSD);
 
-        //
-        const txFromHash = await this._eth_getTransactionByHash(hash);
+        const gasData =  await this._eth_getTransactionGasByHash(tokenNftTx.hash, ethTransPriceUSD);
+
+        { gasETH, gasUSD } gasData;
+
+         gasData.closingPrice = ethTransPriceUSD;
+
+         gasData.costETH = (valueETH + gasETH);
+         gasData.costUSD = (valueUSD + gasUSD);
+
+         gasData.valueETH = valueETH;
+         gasData.valueUSD = valueUSD;
+
+         console.log('Gas Data', gasData);
+
+        
   
-        console.log('txFromHash',txFromHash);
+        // //Create a web3 object to convert data
+        // var Web3 = require('web3');
+        // //add provider to it
+        // var web3 = new Web3(process.env.QUICK_NODE_HTTP);
+
+        // etherScanTxUrl = `${process.env.ETHERSCAN_BASE_URL}tx/${hash}`;
+
+        // //Grab all the transactions based on the hash
+        // const txs = await this._txListInternal(hash);
+        // //Grab the single result
+
+        // //
+        // const txFromHash = await this._eth_getTransactionByHash(hash);
   
-        //Loop thru the transactions and add up the values
-        valueETH = 0.0, gasETH = 0.0;
-        for (const tx of txs.result) {
+        // console.log('txFromHash',txFromHash);
   
-          const valueToEth = web3.utils.fromWei(tx.value.toString(), 'ether');
+        // //Loop thru the transactions and add up the values
+        // valueETH = 0.0, gasETH = 0.0;
+        // for (const tx of txs.result) {
   
-          const gasToEth = web3.utils.fromWei(tx.gas.toString(), 'ether');
+        //   const valueToEth = web3.utils.fromWei(tx.value.toString(), 'ether');
+  
+        //   const gasToEth = web3.utils.fromWei(tx.gas.toString(), 'ether');
   
   
-          valueETH = (Number(valueETH) + Number(valueToEth));//First the value
-          gasETH = (Number(gasETH) + Number(gasToEth));//First the value
-        };
+        //   valueETH = (Number(valueETH) + Number(valueToEth));//First the value
+        //   gasETH = (Number(gasETH) + Number(gasToEth));//First the value
+        // };
 
        
 
-        costETH = (Number(valueETH) + Number(gasETH));//Then the transaction cost in gas
+        // costETH = (Number(valueETH) + Number(gasETH));//Then the transaction cost in gas
 
 
-        let ethTransPriceUSD = 0;
-        if(price.message === "OK"){
-            valueUSD = parseFloat(valueETH * price.result[0].value);
+        // let ethTransPriceUSD = 0;
+        // if(price.message === "OK"){
+        //     valueUSD = parseFloat(valueETH * price.result[0].value);
 
-            costUSD = parseFloat(costETH * price.result[0].value);
-            costUSD = (Number(gasUSD.toFixed(2)) + Number(costUSD.toFixed(2)));
-            gasUSD = parseFloat((Number(gasETH) + 0) * price.result[0].value);
-            ethTransPriceUSD = price.result[0].value;
-        }else{
-            valueUSD = 0;
-            costUSD = 0;
-            gasUSD = 0;
-            ethTransPriceUSD = 0;
-        }
+        //     costUSD = parseFloat(costETH * price.result[0].value);
+        //     costUSD = (Number(gasUSD.toFixed(2)) + Number(costUSD.toFixed(2)));
+        //     gasUSD = parseFloat((Number(gasETH) + 0) * price.result[0].value);
+        //     ethTransPriceUSD = price.result[0].value;
+        // }else{
+        //     valueUSD = 0;
+        //     costUSD = 0;
+        //     gasUSD = 0;
+        //     ethTransPriceUSD = 0;
+        // }
 
 
-        const saveNFT = await this._addWalletNFT(
+        const saveNFT = await this._addWalletNFTWithData(
           chain,
           address,
           contractaddress + tokenId,
@@ -154,9 +178,10 @@ module.exports.getNFTtx = async (chain, address, contractaddress, tokenId) => {
           ethTransPriceUSD,
           tokenNftTx.hash,
           mintTokenIds,
-          date
+          date,
+          gasData
         );
-        console.log("saveNFT", saveNFT);
+        console.log("save the NFT result:", saveNFT);
        
 
         //Return the data
@@ -167,9 +192,10 @@ module.exports.getNFTtx = async (chain, address, contractaddress, tokenId) => {
             valueUSD,
             ethTransPriceUSD: price.result[0].value,
             etherScanTxUrl,
-            hash,
+            hash: tokenNftTx.hash,
             mintTokenIds,
-            transactionDate: date
+            transactionDate: date,
+            gasData
         }
     } catch (err) {
         console.error(err.message);
@@ -203,7 +229,8 @@ module.exports._addressTokenNFTInventory = async (address, contractaddress, page
  * @author Allyn j. Alford <Allyn@tenablylabs.com>
  * @function _eth_getTransactionValueByHash
  * @param {String} txhash - blockchain transaction hash
- * @example <caption>Example usage of Action Object.</caption>
+ * @param {Number} price - price of ETH on date of transaction
+ * @example <caption>Example .</caption>
  * @return {Promise<Object>}  Object
  * // {
  *   "jsonrpc":"2.0",
@@ -233,7 +260,7 @@ module.exports._addressTokenNFTInventory = async (address, contractaddress, page
  *  }
  }
  */
-module.exports._eth_getTransactionValueByHash = async (txhash, timeStamp) => {
+module.exports._eth_getTransactionValueByHash = async (txhash, price) => {
     try {
 
         //Grab the transaction
@@ -242,27 +269,17 @@ module.exports._eth_getTransactionValueByHash = async (txhash, timeStamp) => {
         //Grab the value from the response
         const value = response.data.result.value.toString();
 
-        //Get the transaction date using the timestamp
-        const date = new Date(timeStamp * 1000);
+        //Convert to ETH from BigInt
+        const valueETH = ethers.utils.formatEther(value);
 
-        //Calculate the dates for the price
-        const startAndStop = dateformat(date, "yyyy-mm-dd");
+        //Convert from ETH to USD based on the market rate of ETH
+        const valueUSD = parseFloat(valueETH * price);
 
-        //Based on the date of the transaction, lets get the price of ETH
-        const price = await this._ethDailyPrice(startAndStop, startAndStop);
-
-        //Create a web3 object to convert data
-        var Web3 = require('web3');
-        //add provider to it
-        var web3 = new Web3(process.env.QUICK_NODE_HTTP);
-
-        const valueETH = web3.utils.fromWei(value, 'ether');
-
-        const valueUSD = parseFloat(valueETH * price.result[0].value);
-
-        return {valueETH, valueUSD, transactionDate};
+        //Return both values
+        return {valueETH, valueUSD};
     } catch (e) {
         console.error(e);
+        throw e;
     }
 };
 // {
@@ -305,18 +322,35 @@ module.exports._eth_getTransactionValueByHash = async (txhash, timeStamp) => {
  * get the gas paid in a transaction
  *
  * @author Allyn j. Alford <Allyn@tenablylabs.com>
- * @function _eth_getTransactionGasByReceipt
+ * @function _eth_getTransactionGasByHash
  * @param {String} txhash - blockchain transaction hash
+ * @param {Number} price - price of ETH on date of transaction
  * @example <caption>Example usage of Action Object.</caption>
  * @return {Promise<Object>}  Object
  * */
-module.exports._eth_getTransactionGasByReceipt = async (txhash) => {
-    try {
-        const response = await endpoint._get(`${process.env.ETHERSCAN_API_URL}?module=proxy&action=eth_getTransactionReceipt&txhash=${txhash}&apikey=${process.env.API_KEY_TOKEN}`);
-        return response.data;
-    } catch (e) {
-        console.error(e);
-    }
+module.exports._eth_getTransactionGasByHash = async (txhash, price) => {
+  try {
+    const response = await endpoint._get(
+      `${process.env.ETHERSCAN_API_URL}?module=proxy&action=eth_getTransactionReceipt&txhash=${txhash}&apikey=${process.env.API_KEY_TOKEN}`
+    );
+    //Grab the value from the response
+    const gasUsed = response.data.result.gasUsed.toString();
+
+    //Create a web3 object to convert data
+    var ethers = require("ethers");
+
+    //Convert to ETH from a BigInt
+    const gasETH = ethers.utils.formatEther(gasUsed);
+
+    //Convert to USD from ETH using the market rate of ETH
+    const gasUSD = parseFloat(gasETH * price);
+
+    //Return both values
+    return { gasETH, gasUSD };
+  } catch (e) {
+    console.error(e);
+    throw e;
+  }
 };
 
 
@@ -704,6 +738,55 @@ module.exports._getWalletNFT = async (owner, contractAddressTokenId) => {
             throw e;
           }
         };
+
+/**
+* Add NFT transaction
+*
+* @author Allyn j. Alford <Allyn@tenablylabs.com>
+* @async
+* @function _addWalletNFTWithData
+* @param {String} chain - ethereum
+* @param {String} owner - nft owner ethereum wallet address
+* @param {String} contractAddressTokenId - NFT Contract Address combined with tokenId
+* @param {Number} costETH
+* @param {Number} costUSD
+* @param {Number} valueUSD
+* @param {Number} valueETH
+* @param {Number} ethTransPriceUSD
+* @param {String} hash
+* @param {Array} mintTokenIds
+* @param {Date} transactionDate
+* @param {Object} gasData
+* @return {Promise<Array>} Response Array for next step to process.
+*/
+module.exports._addWalletNFTWithData = async (chain, owner, contractAddressTokenId, costETH, costUSD, valueUSD, valueETH, ethTransPriceUSD, hash, mintTokenIds, transactionDate, gasData) => {
+    try {
+        const dynamo = require('../common/dynamo');
+        const dateformat = require("dateformat");
+        return await dynamo.saveItemInDB({
+            TableName: process.env.DYNAMODB_TABLE_WALLET_NFT,
+            Item: {
+                chain,
+                owner,
+                contractAddressTokenId,
+                costETH,
+                costUSD,
+                valueUSD,
+                valueETH,
+                ethTransPriceUSD,
+                hash,
+                mintTokenIds,
+                transactionDate,
+                gasData,
+                createdatetime: dateformat(new Date(), "isoUtcDateTime"),
+                timestamp: new Date().getTime(),
+            },
+        });
+    } catch (e) {
+        console.error(e);
+        throw e;
+    }
+};
 
 
 /**
