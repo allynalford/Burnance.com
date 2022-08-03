@@ -8,6 +8,7 @@
 "USER_AGENT" : "rinkeby.nft.burnance.io",
 "OPEN" : "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",
 "KEY" : "adfb72ce9754e3cbc1e79e44a8e20804cebd3c4a347605c6a3462a8de05b8783",
+"NFT_PORT_BASE_API_URL" : "https://stoplight.io/mocks/nftport/nftport/5393499/v0",
 "NFT_PORT_API_KEY" : "147977c7-878b-49d5-b28f-7cc9df50d283",
 "ETH_NETWORK" : "rinkeby",
 "ALCHEMY_API_KEY" : "tE71kIxqJuuWQmw8vQa1XSI1hz3PGi--",

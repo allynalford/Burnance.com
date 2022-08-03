@@ -13,6 +13,25 @@ module.exports._get = (path) => {
     }
 };
 
+module.exports._getMulti = (paths) => {
+  try {
+    let request = [];
+    for (const path of paths) {
+      request.push(axios.get(path));
+    }
+    return axios.all(request).then(
+      axios.spread((...data) => {
+        return data;
+      })
+    );
+  } catch (e) {
+    console.error(e.message);
+    return { error: true, message: e.message, e: e };
+  }
+};
+
+
+
 module.exports._getWithOptions = (options) => {
     try {
         return axios.request(options);

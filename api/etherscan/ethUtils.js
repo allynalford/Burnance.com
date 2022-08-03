@@ -1,6 +1,7 @@
 /*jshint esversion: 8 */
 /* jshint -W117 */
 /* jshint -W097 */
+/* global BigInt */
 "use strict";
 const ethers = require("ethers");
 const endpoint = require('../common/endpoint');
@@ -95,27 +96,30 @@ module.exports.getNFTtx = async (chain, address, contractaddress, tokenId) => {
         const ethTransPriceUSD = price.result[0].value;
 
 
-        //console.log('Price',price);
-
         //Get the prices
+        const gasData = await this._eth_getTransactionValueAndGasByHash(tokenNftTx.hash, ethTransPriceUSD);
 
-        { valueETH, valueUSD } await this._eth_getTransactionValueByHash(tokenNftTx.hash, ethTransPriceUSD);
 
-        const gasData =  await this._eth_getTransactionGasByHash(tokenNftTx.hash, ethTransPriceUSD);
+        valueETH = Number(gasData.valueETH);
+        valueUSD = gasData.valueUSD;
 
-        { gasETH, gasUSD } gasData;
 
-         gasData.closingPrice = ethTransPriceUSD;
+        gasUSD = gasData.gasUSD;
+        gasETH = gasData.gasETH;
 
-         gasData.costETH = (valueETH + gasETH);
-         gasData.costUSD = (valueUSD + gasUSD);
+        gasData.closingPrice = ethTransPriceUSD;
 
-         gasData.valueETH = valueETH;
-         gasData.valueUSD = valueUSD;
+        console.log('Add Cost ETH', (Number(valueETH) + Number(gasETH)))
+        gasData.costETH = (Number(valueETH) + Number(gasETH));
+        gasData.costUSD = (Number(valueUSD) + Number(gasUSD));
 
-         console.log('Gas Data', gasData);
+        costETH = gasData.costETH;
+        costUSD = gasData.costUSD;
 
-        
+        //console.log(ethers.utils.formatEther(ethers.BigNumber.from(gasData.costETH)))
+        console.log('Gas Data', gasData);
+
+
   
         // //Create a web3 object to convert data
         // var Web3 = require('web3');
@@ -282,6 +286,49 @@ module.exports._eth_getTransactionValueByHash = async (txhash, price) => {
         throw e;
     }
 };
+
+module.exports._eth_getTransactionValueAndGasByHash = async (txhash, price) => {
+  try {
+    //Grab the transaction
+    const results = await endpoint._getMulti([
+      `${process.env.ETHERSCAN_API_URL}?module=proxy&action=eth_getTransactionByHash&txhash=${txhash}&apikey=${process.env.API_KEY_TOKEN}`,
+      `${process.env.ETHERSCAN_API_URL}?module=proxy&action=eth_getTransactionReceipt&txhash=${txhash}&apikey=${process.env.API_KEY_TOKEN}`,
+    ]);
+    
+    // const _value = await endpoint._get(
+    //   `${process.env.ETHERSCAN_API_URL}?module=proxy&action=eth_getTransactionByHash&txhash=${txhash}&apikey=${process.env.API_KEY_TOKEN}`
+    // );
+    // const gas = await endpoint._get(
+    //   `${process.env.ETHERSCAN_API_URL}?module=proxy&action=eth_getTransactionReceipt&txhash=${txhash}&apikey=${process.env.API_KEY_TOKEN}`
+    // );
+    //Grab the value from the response
+    const value = results[0].data.result.value.toString();
+
+    //Convert to ETH from BigInt
+    const valueETH = ethers.utils.formatEther(value);
+
+    //Convert from ETH to USD based on the market rate of ETH
+    const valueUSD = parseFloat(valueETH * price);
+
+    //Grab the value from the response
+    const gasUsed = results[1].data.result.gasUsed.toString();
+
+    //Convert to ETH from a BigInt
+    let gasETH = ethers.utils.formatEther(gasUsed);
+    //console.log('_eth_getTransactionGasByHash:',gasETH);
+    //gasETH = (21000 * gasETH);
+    //console.log('_eth_getTransactionGasByHash:::',gasETH);
+
+    //Convert to USD from ETH using the market rate of ETH
+    const gasUSD = parseFloat(gasETH * price);
+
+    //Return both values
+    return { valueETH, valueUSD, gasETH, gasUSD, closingPrice: price };
+  } catch (e) {
+    console.error(e);
+    throw e;
+  }
+};
 // {
 //     "jsonrpc":"2.0",
 //     "id":1,
@@ -336,11 +383,11 @@ module.exports._eth_getTransactionGasByHash = async (txhash, price) => {
     //Grab the value from the response
     const gasUsed = response.data.result.gasUsed.toString();
 
-    //Create a web3 object to convert data
-    var ethers = require("ethers");
-
     //Convert to ETH from a BigInt
-    const gasETH = ethers.utils.formatEther(gasUsed);
+    let gasETH = ethers.utils.formatEther(gasUsed);
+    //console.log('_eth_getTransactionGasByHash:',gasETH);
+    //gasETH = (21000 * gasETH);
+    //console.log('_eth_getTransactionGasByHash:::',gasETH);
 
     //Convert to USD from ETH using the market rate of ETH
     const gasUSD = parseFloat(gasETH * price);

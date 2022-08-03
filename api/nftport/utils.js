@@ -2,9 +2,7 @@
 /* jshint -W117 */
 /* jshint -W097 */
 "use strict";
-
 const endpoint = require('../common/endpoint');
-const baseURL = "https://api.nftport.xyz/v0";
 
 /**
 * returns NFT collection stats from NFT Port
@@ -21,7 +19,7 @@ module.exports._getCollectionStats = async (chain, contractAddress) => {
         const Chain = chain.toLowerCase();
         const options = {
             method: 'GET',
-            url: `${baseURL}/transactions/stats/${contractAddress}`,
+            url: `${process.env.NFT_PORT_BASE_API_URL}/transactions/stats/${contractAddress}`,
             params: {chain: Chain},
             headers: {
               'Content-Type': 'application/json',
