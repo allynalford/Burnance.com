@@ -7,10 +7,11 @@ import Badge from 'react-bootstrap/Badge'
 import {Event, initGA} from "../../common/gaUtils";
 import { getChain } from "../../common/config";
 import dateFormat from "dateformat";
+import Web3 from 'web3';
+import Burnance from '../../abis/Burnance.v2.1.json';
 const ethers = require('ethers');
 var endpoint = require('../../common/endpoint');
 var sessionstorage = require('sessionstorage');
-
 var USD = new Intl.NumberFormat('en-US', {style: 'currency',currency: 'USD'});
 var WEI = new Intl.NumberFormat('en-US', { maximumSignificantDigits: 6 })
 
@@ -21,6 +22,7 @@ class Topbar extends Component {
     this.state = {
       ethereumAddress: '',
       walletConnected: false,
+      burnanceAddr: '',
       isValidSig: false,
       provider: {},
       ethPrice: 0,
@@ -28,13 +30,7 @@ class Topbar extends Component {
       ethBalance: 0,
       isOpen: false,
       dropdownOpenShop: false,
-      navLinks: [
-        //Note : each child and nested child must have unique id
-        { id: 1, title: 'Home', link: '/' },
-        { id: 2, title: 'Account', link: '/account' },
-        { id: 3, title: 'Collections', link: '/collections' },
-        { id: 4, title: 'Batch', link: '/batch' },
-      ],
+      navLinks: [],
       wishlistModal: false,
       dropdownIsOpen: false,
     };
@@ -49,6 +45,38 @@ class Topbar extends Component {
     this.addWallet.bind(this);
     this.signAndVerify.bind(this);
     this.getEthPrice.bind(this);
+    this.loadBlockchainData.bind(this);
+  }
+
+  async loadWeb3() {
+    if (window.ethereum) {
+      window.web3 = new Web3(window.ethereum);
+      await window.ethereum.request({ method: 'eth_requestAccounts' });
+      //await window.ethereum.enable()
+    } else if (window.web3) {
+      window.web3 = new Web3(window.web3.currentProvider);
+    } else {
+      window.alert(
+        'Non-Ethereum browser detected. You should consider trying MetaMask!',
+      );
+    }
+  }
+
+  async loadBlockchainData() {
+    const web3 = window.web3;
+    const networkId = await web3.eth.net.getId();
+    const burnanceAddr = await Burnance.networks[networkId].address;
+    this.setState({ navLinks: [
+      { id: 1, title: 'Home', link: '/' },
+      { id: 2, title: 'Transactions', link: '/account' },
+      { id: 3, title: 'Collections', link: '/collections' },
+      { id: 4, title: 'Batch', link: '/batch' },
+      { id: 5, title: 'Contract', link: `${process.env.REACT_APP_ETHERSCAN_BASE_URL}address/${burnanceAddr}`, external: true },
+    ] });
+  };
+
+  async init() {
+    await this.loadBlockchainData();
   }
 
   toggleWishlistModal = () => {
@@ -87,11 +115,14 @@ class Topbar extends Component {
     }
 
     if (window.ethereum) {
+      window.web3 = new Web3(window.ethereum);
       window.ethereum.on('accountsChanged', this.accountsChanged);
       //We need ethers for this
       const ethers = require("ethers");
       const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
       this.setState({provider});
+
+      this.init();
 
       if (
         window.ethereum &&

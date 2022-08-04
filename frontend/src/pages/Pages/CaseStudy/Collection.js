@@ -1194,7 +1194,7 @@ class CollectionView extends Component {
                     {this.state.description}
                   </p>
                 </Col>
-                <Col md="12">
+{(this.state.loading === false ?                 <Col md="12">
                   <p className="text mb-0" style={{ marginTop: '25px' }}>
                     Approval the collection to burn an NFT from the collection.
                     Refresh the collection to view updates.
@@ -1263,7 +1263,7 @@ class CollectionView extends Component {
                     View Batch: {this.state.batchSize}{' '}
                     <FontAwesomeIcon icon={faBasketShopping} color="#E76E3C" />
                   </Link>
-                </Col>
+                </Col> : "")}
               </Row>
 
               {/* <Row
