@@ -50,13 +50,13 @@ module.exports.getCollections = async (chain, address) => {
       const walletUtils = require('../wallet/utils');
       const _ = require("lodash");
 
-      let addressesResp = await walletUtils._getAlchemyWalletCollectionFromCache(chain, address);
+      // let addressesResp = await walletUtils._getAlchemyWalletCollectionFromCache(chain, address);
 
-      console.log('Alchemy Wallet Collection Cache: ',addressesResp);
+      // console.log('Alchemy Wallet Collection Cache: ',addressesResp);
 
-        if (typeof addressesResp !== "undefined") {
-            addresses = addressesResp.addresses;
-        }
+      //   if (typeof addressesResp !== "undefined") {
+      //       addresses = addressesResp.addresses;
+      //   }
 
       if (typeof addresses === "undefined" | expired === true) {
         //Lets process the wallet list
@@ -87,7 +87,7 @@ module.exports.getCollections = async (chain, address) => {
         //Filter out the addresses for collections
         addresses = _.uniq(_.map(wallet, "contract.address"));
 
-        await walletUtils._addAlchemyWalletCollectionToCache(chain, address, addresses);
+        //await walletUtils._addAlchemyWalletCollectionToCache(chain, address, addresses);
       }
 
 

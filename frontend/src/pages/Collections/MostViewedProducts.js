@@ -644,7 +644,7 @@ class MostViewedProducts extends Component {
                     columns={[
                       {
                         cell: (row) => (
-                          <Link to={`/collection/${row.address}`}>
+                          <Link to={`/collection/${row.contractAddress}`}>
                             <Icon style={{ fill: '#43a047' }} />
                           </Link>
                         ),
@@ -657,7 +657,7 @@ class MostViewedProducts extends Component {
                       {
                         name: 'Collection',
                         selector: (row) => (
-                          <Link to={`/collection/${row.address}`}>
+                          <Link to={`/collection/${row.contractAddress}`}>
                             {row.name}
                           </Link>
                         ),
@@ -689,13 +689,6 @@ class MostViewedProducts extends Component {
                           fontWeight: 600,
                         },
                         when: (row) => row.FloorPrice < row.AmountInvested,
-                        style: {
-                          backgroundColor: '#8B0000',
-                          color: 'white',
-                          '&:hover': {
-                            cursor: 'pointer',
-                          },
-                        },
                       },
                       {
                         name: 'Est. Value',
@@ -727,21 +720,6 @@ class MostViewedProducts extends Component {
                           fontWeight: 600,
                         },
                         when: (row) => row.pnl < 0,
-                        style: {
-                          backgroundColor: '#8B0000',
-                          color: 'white',
-                          '&:hover': {
-                            cursor: 'pointer',
-                          },
-                        },
-                        when: (row) => (row.pnl = 0),
-                        style: {
-                          backgroundColor: '#D43900',
-                          color: 'white',
-                          '&:hover': {
-                            cursor: 'pointer',
-                          },
-                        },
                       },
                       {
                         name: 'Liquidity (1D)',

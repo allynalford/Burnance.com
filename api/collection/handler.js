@@ -173,8 +173,9 @@ module.exports.GetCollection = async (event) => {
     // - Liquidity(7D): The liquidity rate measures the relative liquidity of each collection. Liquidity = Sales / The number of NFTs * 100%
 
     //Check if the collection already exists in cache
-    var collections = await walletUtils._getWalletCollectionFromCache(chain, address);
-
+    //var collections = await walletUtils._getWalletCollectionFromCache(chain, address);
+    var collections;
+    
     if(typeof collections === "undefined"){
 
       const alchemyUtils = require('../alchemy/utils');
@@ -655,6 +656,81 @@ module.exports.DeleteCollection = async (event) => {
     const collection = await collectionUtils._deleteWallet(chain, address);
 
     return responses.respond({ error: false, success: true, collection, dt }, 200);
+  } catch (err) {
+    console.error(err);
+    const res = {
+      error: true,
+      success: false,
+      message: err.message,
+      e: err,
+      code: 201,
+    };
+    console.error("module.exports.DeleteCollection", res);
+    return responses.respond(res, 201);
+  }
+};
+
+module.exports.isCollectionApproved = async (event) => {
+  let dt, chain, owner,  tokenAddress, type = "ERC721", contractAddress;
+  try {
+    dt = dateFormat(new Date(), "isoUtcDateTime");
+
+    chain = event.pathParameters.chain;
+    owner = event.pathParameters.ownerAddress;
+    tokenAddress = event.pathParameters.tokenAddress;
+    contractAddress = event.pathParameters.contractAddress;
+
+    if (typeof chain === "undefined") throw new Error("chain is undefined");
+    if (typeof owner === "undefined") throw new Error("owner is undefined");
+    if (typeof contractAddress === "undefined") throw new Error("contractAddress is undefined");
+    if (typeof tokenAddress === "undefined") throw new Error("tokenAddress is undefined");
+  } catch (e) {
+    console.error(e);
+    return responses.respond(
+      {
+        success: false,
+        error: true,
+        message: e.message,
+        e,
+      },
+      416
+    );
+  }
+
+  try {
+    //We need etherscan utils
+    const etherScan = require('../etherscan/ethUtils');
+    //Grab both of the token contract types
+    const ERC721 = require('../abis/ERC721.json');
+    const ERC1155 = require('../abis/ERC1155.json');
+
+    //Grab a provider
+    const provider = await etherScan._getProvider(process.env.NODE);
+
+    //Use the provider and key to grab the wallet
+    const wallet = await etherScan._createWallet(process.env.KEY, provider);
+
+    //Check the type using ERC721 ABI to start
+    let contract = await etherScan._getContract(tokenAddress, ERC721, wallet);
+
+    //Check if it's a ERC721 (0x80ac58cd) | ERC1155 (0xd9b67a26)
+    const is721 = await contract.supportsInterface(0x80ac58cd);
+
+    if(is721 === false){
+      type = "ERC1155";
+    };
+
+    //Use type flag to load
+    const ABI = (type === "ERC721" ? ERC721 : ERC1155);
+
+    // initiating a new Contract with the contractAddress, ABI and wallet
+    contract = await etherScan._getContract(tokenAddress, ABI, wallet);
+
+    //Make the call
+    const isApproved = await contract.isApprovedForAll(owner, contractAddress);
+
+
+    return responses.respond({ error: false, success: true, isApproved, dt }, 200);
   } catch (err) {
     console.error(err);
     const res = {

@@ -77,7 +77,7 @@ class Footer extends Component {
                     <a
                       aria-label="burnance twitter"
                       target={'_new'}
-                      href="https://twitter.com/burnance"
+                      href="https://twitter.com/burnance_"
                       className="rounded"
                     >
                       <FeatherIcon

@@ -681,7 +681,7 @@ module.exports._getWalletCollectionFromCache = async (chain, address) => {
        const results = await dynamo.qetFromDB({
             TableName: process.env.DYNAMODB_TABLE_WALLET_COLLECTION_CACHE,
             Key: {
-              chain,
+             chain,
              address
             }
         });

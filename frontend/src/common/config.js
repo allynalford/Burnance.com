@@ -18,7 +18,8 @@ const serverVars = {
          getWalletApiUrl: process.env.REACT_APP_BASE_API_URL + '/wallet',
          viewWalletCollectionNftsApiUrl: process.env.REACT_APP_BASE_API_URL + '/wallet/collection',
          addWalletSellTxApiUrl: process.env.REACT_APP_BASE_API_URL + '/wallet/tx',
-         viewWalletGuarenteeSellTxApiUrl: process.env.REACT_APP_BASE_API_URL + '/wallet/txs/guarantees'
+         viewWalletGuarenteeSellTxApiUrl: process.env.REACT_APP_BASE_API_URL + '/wallet/txs/guarantees',
+         getIsCollectionApprovedApiUrl: process.env.REACT_APP_BASE_API_URL + '/collection/isapproved/'
         }
   },
 };
@@ -43,7 +44,8 @@ const localVars = {
          getWalletApiUrl: process.env.REACT_APP_BASE_API_URL + '/wallet',
          viewWalletCollectionNftsApiUrl: process.env.REACT_APP_BASE_API_URL + '/wallet/collection',
          addWalletSellTxApiUrl: process.env.REACT_APP_BASE_API_URL + '/wallet/tx',
-         viewWalletGuarenteeSellTxApiUrl: process.env.REACT_APP_BASE_API_URL + '/wallet/txs/guarantees'
+         viewWalletGuarenteeSellTxApiUrl: process.env.REACT_APP_BASE_API_URL + '/wallet/txs/guarantees',
+         getIsCollectionApprovedApiUrl: process.env.REACT_APP_BASE_API_URL + '/collection/isapproved/'
         }
   },
 };

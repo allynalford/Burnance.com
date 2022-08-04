@@ -93,7 +93,11 @@ module.exports.getNFTtx = async (chain, address, contractaddress, tokenId) => {
         //Based on the date of the transaction, lets get the price of ETH
         price = await this._ethDailyPrice(startAndStop, startAndStop);
 
-        const ethTransPriceUSD = price.result[0].value;
+        if(typeof price.result[0] === "undefined"){
+            console.warn('price', price);
+        }
+
+        const ethTransPriceUSD = (typeof price.result[0] === "undefined" ? 0 : price.result[0].value);
 
 
         //Get the prices
@@ -504,6 +508,7 @@ module.exports._eth_getTransactionReceipt = async (txhash) => {
  */
 module.exports._ethDailyPrice = async (startdate, enddate) => {
     try {
+        console.log(`${process.env.ETHERSCAN_PRICE_API_URL}?module=stats&action=ethdailyprice&startdate=${startdate}&enddate=${enddate}&sort=asc&apikey=${process.env.API_KEY_TOKEN}`)
          const response = await endpoint._get(`${process.env.ETHERSCAN_PRICE_API_URL}?module=stats&action=ethdailyprice&startdate=${startdate}&enddate=${enddate}&sort=asc&apikey=${process.env.API_KEY_TOKEN}`);
         return response.data;
     } catch (e) {

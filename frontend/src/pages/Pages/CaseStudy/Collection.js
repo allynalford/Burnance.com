@@ -1,38 +1,46 @@
 /* global BigInt */
-import React, { Component, CSSProperties } from "react";
-import { Container, Row, Col, Card, CardBody, Button, ButtonGroup} from "reactstrap";
-import DropdownButton from 'react-bootstrap/DropdownButton';
-import Dropdown from 'react-bootstrap/Dropdown';
-import { Link, withRouter } from "react-router-dom";
-import BasicPopperToolTip from "../../../components/BasicPopperToolTip";
-import FadeIn from "react-fade-in";
+import React, { Component, CSSProperties } from 'react';
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  CardBody,
+  Button,
+  ButtonGroup,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  Input,
+  Table
+} from 'reactstrap';
+import { Link, withRouter } from 'react-router-dom';
+import BasicPopperToolTip from '../../../components/BasicPopperToolTip';
+import FadeIn from 'react-fade-in';
 import { getChain } from '../../../common/config';
 import ImageGrid from '../../../components/ImageGrid';
-import {initGA, PageView, Event} from '../../../common/gaUtils';
-import RingLoader from "react-spinners/RingLoader";
-import { ERC721, ERC1155 } from "../../../common/contractUtils";
+import { initGA, PageView, Event } from '../../../common/gaUtils';
+import RingLoader from 'react-spinners/RingLoader';
+import { ERC721, ERC1155 } from '../../../common/contractUtils';
 import Web3 from 'web3';
 import Burnance from '../../../abis/Burnance.v2.json';
-
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faBasketShopping,
+  faFireBurner,
+  faShieldHalved,
+} from '@fortawesome/free-solid-svg-icons';
+import LoadingOverlay from 'react-loading-overlay';
 //Import Images
 import bgImg from "../../../assets/images/nfts/ac1_unfit_digital_collage_of_locally_owned_nfts_by_annie_bur.jpg";
 const Swal = require('sweetalert2');
 const Batch = require('../../../model/Batch');
+const CollectionObj = require('../../../model/Collection');
 var sessionstorage = require('sessionstorage');
 var endpoint = require('../../../common/endpoint');
 // Create our number formatter.
-var formatter = new Intl.NumberFormat('en-US', {
-  style: 'currency',
-  currency: 'USD',
-
-  // These options are needed to round to whole numbers if that's what you want.
-  //minimumFractionDigits: 0, // (this suffices for whole numbers, but will print 2500.10 as $2,500.1)
-  //maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
-});
-
+var formatter = new Intl.NumberFormat('en-US', {style: 'currency',currency: 'USD'});
 var numFormatter = new Intl.NumberFormat('en-US', { maximumSignificantDigits: 3 })
-
 
 const override: CSSProperties = {
   display: "block",
@@ -40,11 +48,12 @@ const override: CSSProperties = {
   borderColor: "red",
 };
 
-class Collection extends Component {
+class CollectionView extends Component {
   constructor(props, { match }) {
     super(props);
     this.state = {
       type: "ERC721",
+      isOpen: false,
       collection: { name: '' },
       batchSize: 0,
       ethereumAddress: '',
@@ -52,6 +61,7 @@ class Collection extends Component {
       batch: '',
       walletConnected: false,
       collectionApproved: false,
+      contentLoading: false,
       loading: false,
       loadingCollection: false,
       approving: false,
@@ -72,7 +82,11 @@ class Collection extends Component {
       thirtyDayVolume: 0,
       totalSupply: 0,
       owners: 0,
-      held: 0
+      held: 0,
+      guaranteeFee: 0,
+      guaranteeMonths: 1,
+      guaranteeTransferToken: {title: ''}
+
     };
     this.setCategory.bind(this);
     this.getNFTs.bind(this);
@@ -89,7 +103,36 @@ class Collection extends Component {
     this.transfer.bind(this);
     this.refresh.bind(this);
     this.recordTx.bind(this);
+    this.openModal.bind(this);
+    this.checkApprovedForAll.bind(this);
+    this.NotApproved.bind(this);
   }
+
+  openModal = async (tokenId) => {
+    const _ = require('lodash');
+
+    if (typeof tokenId !== 'undefined') {
+      const guaranteeTransferToken = _.find(this.state.nfts, [
+        'tokenId',
+        tokenId,
+      ]);
+
+      if (typeof guaranteeTransferToken !== 'undefined') {
+
+        let guaranteeFee = await this.state.burnance.methods.guaranteeFee().call();
+
+        //let guaranteeFee = 1700000000000000;
+
+        guaranteeFee = Web3.utils.fromWei(guaranteeFee.toString(), 'ether');
+
+        this.setState({ guaranteeFee, guaranteeTransferToken });
+      }
+    }
+
+    this.setState((prevState) => ({
+      isOpen: !prevState.isOpen,
+    }));
+  };
 
   setCategory(category) {
     this.setState({
@@ -142,8 +185,7 @@ class Collection extends Component {
 
         
 
-        //this.isApprovedForAll(window.ethereum._state.accounts[0], "0x22dAd90Ed748282668fAB428319a248C9DE86Ae8");
-
+      
       }
     }
   }
@@ -168,6 +210,35 @@ class Collection extends Component {
     })
   }
 
+  NotApproved(tokenId, type){
+    Swal.fire({
+      title: 'Collection Not Approved',
+      text: "Would you like to approve the collection? This will allow you to complete the transaction you requested.",
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      cancelButtonText: 'Continue Transaction',
+      confirmButtonText: 'Yes, approve it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+
+        this.approveForAll();
+
+      } else if (result.dismiss === Swal.DismissReason.cancel) {
+
+        console.log({tokenId, type})
+        if(type === "burn"){
+          this.transfer(tokenId);
+        }else if(type === "guarantee"){
+          this.openModal(tokenId);
+        }
+      }
+    })
+  }
+
+  
+
   async loadWeb3() {
     if (window.ethereum) {
         window.web3 = new Web3(window.ethereum);
@@ -187,10 +258,11 @@ async loadBlockchainData() {
     const networkId = await web3.eth.net.getId()
     const contractAddr = await Burnance.networks[networkId].address;
     const burnance = new web3.eth.Contract(Burnance.abi, contractAddr)   
-    console.log('contractAddr', contractAddr)
     this.setState({ burnance })
     //this.getPromissoryList()
     this.setState({ loading:false, burnanceAddr:contractAddr });
+
+    this.isApprovedForAll(window.ethereum._state.accounts[0], this.props.match.params.address, contractAddr);
 
 }
 
@@ -236,150 +308,147 @@ async loadBlockchainData() {
   getNFTs = async (ethereumAddress, contractAddress, ethusd) => {
     //console.log('Loading Page:',pageNumber);
     try {
-      this.setState({ loading: true, loadingCollection: true, approving: true });
-      const exists = JSON.parse(
-        sessionstorage.getItem(ethereumAddress + '-' + contractAddress),
-      );
+      this.setState({
+        loading: true,
+        loadingCollection: true,
+        approving: true,
+      });
 
-      const existsNFTS = JSON.parse(
-        sessionstorage.getItem(ethereumAddress + '-' + contractAddress + '-nfts'),
-      );
+      let Collection, NFTS, gets;
 
-      //console.log('Exists in Cache', exists);
+      const collectionObj = new CollectionObj(ethereumAddress, contractAddress);
 
+      //Check the cache
+      gets = collectionObj.get(collectionObj.wallet, collectionObj.address);
 
-      //Check if the records exists in storage
-      if (typeof exists !== 'undefined' && exists !== null && existsNFTS !== null) {
+      if (gets !== null) {
+        Collection = gets.collection;
+        NFTS = gets.nfts;
 
-        const collection = exists.collection;
-        const floorPrice = (typeof collection.statistics !== "undefined" ? formatter.format(parseFloat(Number(collection.statistics.floor_price) * Number(ethusd))) : formatter.format(0.00));
-        const marketCap = (typeof collection.statistics !== "undefined" ? formatter.format(parseFloat(Number(collection.statistics.market_cap) * Number(ethusd))) : formatter.format(0.00));
-        const avgPrice = (typeof collection.statistics !== "undefined" ? formatter.format(parseFloat(Number(collection.statistics.average_price) * Number(ethusd))) : formatter.format(0.00))
-        //const holdingValue = (typeof collection.statistics !== "undefined" ? formatter.format(parseFloat(Number((existsNFTS.nfts.length * collection.statistics.average_price)) * Number(ethusd))) : formatter.format(0.00))
-        const thirtyDayVolume = (typeof collection.statistics !== "undefined" ? formatter.format(parseFloat(Number(collection.statistics.thirty_day_volume) * Number(ethusd))) : formatter.format(0.00));
-        
-        //console.log('Setting State');
-        this.setState({
-          collection: exists.collection,
-          nfts: existsNFTS.nfts,
-          loadingCollection: false,
-          loading: false,
-          approving: false,
-          description: existsNFTS.nfts[0].description,
-          floorPrice,
-          marketCap,
-          avgPrice,
-          //holdingValue,
-          thirtyDayVolume,
-          totalSupply: (typeof collection.statistics !== "undefined" ? collection.statistics.total_supply : '-'),
-          owners: (typeof collection.statistics !== "undefined" ? collection.statistics.num_owners : '-'),
-          held: existsNFTS.nfts.length,
-          liquidity1d: (typeof collection.statistics !== "undefined" ? ((collection.statistics.one_day_sales / (collection.statistics.total_supply - collection.statistics.num_owners)) * 100).toFixed(2) : 0.0),
-          liquidity7d:(typeof collection.statistics !== "undefined" ? ((collection.statistics.seven_day_sales / (collection.statistics.total_supply - collection.statistics.num_owners)) * 100).toFixed(2) : 0.0),
-          liquidity30d:(typeof collection.statistics !== "undefined" ? ((collection.statistics.thirty_day_sales / (collection.statistics.total_supply - collection.statistics.num_owners)) * 100).toFixed(2) : 0.0),
-        });
+        console.log('Cache', { Collection, NFTS });
       } else {
-        
-        //Call the service to get the NFTs
-        let Collection;
-
-        try{
-          console.log('Called Collection Service');
-          Collection = await endpoint._get(
+        try {
+          gets = await endpoint._getMulti([
             getChain()['eth'].viewWalletCollectionApiUrl +
               `/ethereum/${ethereumAddress}/${contractAddress}`,
-          );
-        }catch(e){
+            getChain()['eth'].viewWalletCollectionNftsApiUrl +
+              `/ethereum/${ethereumAddress}/${contractAddress}`,
+          ]);
+        } catch (e) {
           console.warn(e);
-          Collection = await endpoint._get(
+          gets = await endpoint._getMulti([
             getChain()['eth'].viewWalletCollectionApiUrl +
               `/ethereum/${ethereumAddress}/${contractAddress}`,
-          );
+            getChain()['eth'].viewWalletCollectionNftsApiUrl +
+              `/ethereum/${ethereumAddress}/${contractAddress}`,
+          ]);
         }
 
-        console.log('Called Service', Collection);
-       
-        const collection = Collection.data.collection;
-        const floorPrice = (typeof collection.statistics !== "undefined" ? formatter.format(parseFloat(Number(collection.statistics.floor_price) * Number(ethusd))) : formatter.format(0.00));
-        const marketCap = (typeof collection.statistics !== "undefined" ? formatter.format(parseFloat(Number(collection.statistics.market_cap) * Number(ethusd))) : formatter.format(0.00));
-        const avgPrice = (typeof collection.statistics !== "undefined" ? formatter.format(parseFloat(Number(collection.statistics.average_price) * Number(ethusd))) : formatter.format(0.00))
-        const thirtyDayVolume = (typeof collection.statistics !== "undefined" ? formatter.format(parseFloat(Number(collection.statistics.thirty_day_volume) * Number(ethusd))) : formatter.format(0.00));
-          
-
-        this.setState({
-          collection: Collection.data.collection,
-          loadingCollection: false,
-          floorPrice,
-          avgPrice,
-          marketCap,
-          thirtyDayVolume,
-          totalSupply: (typeof collection.statistics !== "undefined" ? collection.statistics.total_supply : '-'),
-          owners: (typeof collection.statistics !== "undefined" ? collection.statistics.num_owners : '-'),
-          liquidity1d: (typeof collection.statistics !== "undefined" ? ((collection.statistics.one_day_sales / (collection.statistics.total_supply - collection.statistics.num_owners)) * 100).toFixed(2) : 0.0),
-          liquidity7d:(typeof collection.statistics !== "undefined" ? ((collection.statistics.seven_day_sales / (collection.statistics.total_supply - collection.statistics.num_owners)) * 100).toFixed(2) : 0.0),
-          liquidity30d:(typeof collection.statistics !== "undefined" ? ((collection.statistics.thirty_day_sales / (collection.statistics.total_supply - collection.statistics.num_owners)) * 100).toFixed(2) : 0.0),
+        collectionObj.set(ethereumAddress, contractAddress, {
+          collection: gets[0],
+          nfts: gets[1],
         });
 
-        sessionstorage.setItem(
-          ethereumAddress + '-' + contractAddress,
-          JSON.stringify(Collection.data),
-        );
+        Collection = gets[0];
+        NFTS = gets[1];
 
-
-        let NFTS;
-        try{
-          console.log('Calling NFT Service');
-          NFTS = await endpoint._get(
-            getChain()['eth'].viewWalletCollectionNftsApiUrl +
-              `/ethereum/${ethereumAddress}/${contractAddress}`,
-          );
-        }catch(e){
-          console.warn(e);
-          NFTS = await endpoint._get(
-            getChain()['eth'].viewWalletCollectionNftsApiUrl +
-              `/ethereum/${ethereumAddress}/${contractAddress}`,
-          );
-        }
-
-        try{
-          
-
-          console.log('NFTS', NFTS)
-
-        const holdingValue = (typeof collection.statistics !== "undefined" ? formatter.format(parseFloat(Number((NFTS.data.nfts.length * collection.statistics.average_price)) * Number(ethusd))) : formatter.format(0.00))
-
-
-        this.setState({
-          nfts: NFTS.data.nfts,
-          loading: false,
-          approving: false,
-          holdingValue,
-          description: NFTS.data.nfts[0].description,
-          held: NFTS.data.nfts.length,
-           });
-
-           sessionstorage.setItem(
-            ethereumAddress + '-' + contractAddress + '-nfts',
-            JSON.stringify(NFTS.data),
-          );
-        }catch(e){
-          console.error(e);
-          this.setState({
-            loading: false,
-            approving: false,
-            loadingCollection: false,
-            holdingValue: 0,
-            description: "",
-            held: NFTS.data.nfts.length,
-             });
-  
-             sessionstorage.setItem(
-              ethereumAddress + '-' + contractAddress + '-nfts',
-              JSON.stringify(NFTS.data),
-            );
-        }
-
+        console.log('Called Service', { Collection, NFTS });
       }
+
+      const collection = Collection.data.collection;
+      const floorPrice =
+        typeof collection.statistics !== 'undefined'
+          ? formatter.format(
+              parseFloat(
+                Number(collection.statistics.floor_price) * Number(ethusd),
+              ),
+            )
+          : formatter.format(0.0);
+      const marketCap =
+        typeof collection.statistics !== 'undefined'
+          ? formatter.format(
+              parseFloat(
+                Number(collection.statistics.market_cap) * Number(ethusd),
+              ),
+            )
+          : formatter.format(0.0);
+      const avgPrice =
+        typeof collection.statistics !== 'undefined'
+          ? formatter.format(
+              parseFloat(
+                Number(collection.statistics.average_price) * Number(ethusd),
+              ),
+            )
+          : formatter.format(0.0);
+      const thirtyDayVolume =
+        typeof collection.statistics !== 'undefined'
+          ? formatter.format(
+              parseFloat(
+                Number(collection.statistics.thirty_day_volume) *
+                  Number(ethusd),
+              ),
+            )
+          : formatter.format(0.0);
+      const holdingValue =
+        typeof collection.statistics !== 'undefined'
+          ? formatter.format(
+              parseFloat(
+                Number(
+                  NFTS.data.nfts.length * collection.statistics.average_price,
+                ) * Number(ethusd),
+              ),
+            )
+          : formatter.format(0.0);
+
+      this.setState({
+        collection: Collection.data.collection,
+        loadingCollection: false,
+        nfts: NFTS.data.nfts,
+        loading: false,
+        approving: false,
+        holdingValue,
+        description: NFTS.data.nfts[0].description,
+        held: NFTS.data.nfts.length,
+        floorPrice,
+        avgPrice,
+        marketCap,
+        thirtyDayVolume,
+        totalSupply:
+          typeof collection.statistics !== 'undefined'
+            ? collection.statistics.total_supply
+            : '-',
+        owners:
+          typeof collection.statistics !== 'undefined'
+            ? collection.statistics.num_owners
+            : '-',
+        liquidity1d:
+          typeof collection.statistics !== 'undefined'
+            ? (
+                (collection.statistics.one_day_sales /
+                  (collection.statistics.total_supply -
+                    collection.statistics.num_owners)) *
+                100
+              ).toFixed(2)
+            : 0.0,
+        liquidity7d:
+          typeof collection.statistics !== 'undefined'
+            ? (
+                (collection.statistics.seven_day_sales /
+                  (collection.statistics.total_supply -
+                    collection.statistics.num_owners)) *
+                100
+              ).toFixed(2)
+            : 0.0,
+        liquidity30d:
+          typeof collection.statistics !== 'undefined'
+            ? (
+                (collection.statistics.thirty_day_sales /
+                  (collection.statistics.total_supply -
+                    collection.statistics.num_owners)) *
+                100
+              ).toFixed(2)
+            : 0.0,
+      });
     } catch (e) {
       console.error(e);
     }
@@ -416,9 +485,8 @@ async loadBlockchainData() {
 
   approveForAll = async() => {
   
-    this.setState({approving: true});
+    this.setState({approving: true, contentLoading: true});
     const thisss = this;
-    this.setState({ approving: true });
     const address = this.props.match.params.address;
     const type = this.state.type;
     
@@ -433,21 +501,21 @@ async loadBlockchainData() {
                 if(response.status){ 
                     //alert("Set Approve for all Successfully");
                     thisss.fireMsg("Collection Approval","Collection Approval Successfully", "INFO");
-                    thisss.setState({ approving: false});
+                    thisss.setState({ approving: false, collectionApproved: true, contentLoading: false});
 
                     //Update the collection as Approved
 
                 }else{
                     alert(response.msg);
                     thisss.fireMsg("Collection Approval",response.msg, "WARN");
-                    thisss.setState({ approving: false});
+                    thisss.setState({ approving: false, contentLoading: false});
                 }
             });
         }).on('error', function(error, receipt) {
             const title = error.message.split(':')[0];
             const msg = error.message.split(':')[1]; 
             thisss.fireMsg(title, msg, "WARN");
-            thisss.setState({ approving: false});
+            thisss.setState({ approving: false, contentLoading: false});
         });
 
     }else if(type === "ERC1155"){
@@ -459,95 +527,68 @@ async loadBlockchainData() {
               if(response.status){ 
                 //alert("Set Approve for all Successfully");
                 thisss.fireMsg("Collection Approval","Collection Approval Successfully", "INFO");
-                thisss.setState({ approving: false});
+                thisss.setState({ approving: false, collectionApproved: true, contentLoading: false});
             }else{
                 //alert(response.msg);
                 thisss.fireMsg("Collection Approval",response.msg, "WARN");
-                thisss.setState({ approving: false});
+                thisss.setState({ approving: false, contentLoading: false});
             }
             });
         }).on('error', function(error, receipt) {
           const title = error.message.split(':')[0];
           const msg = error.message.split(':')[1]; 
           thisss.fireMsg(title, msg, "WARN");
-          thisss.setState({ approving: false});
+          thisss.setState({ approving: false, contentLoading: false});
         });
     }
 
 
 }
 
-isApprovedForAll = async(account, burnanceAddr) => {
-  
-  this.setState({approving: true});
-  const thisss = this;
-  this.setState({ approving: true });
-  const address = this.props.match.params.address;
-  const type = this.state.type;
-
-  console.log("Approving");
-  
-  if(type === "ERC721"){
-      ERC721(address).methods.isApprovedForAll(account, burnanceAddr).send({ from: account }).on('transactionHash', (transactionHash) => {
-         
-        console.log('transactionHash(ERC721)', transactionHash);
-
-       
-        
-        thisss.waitForReceipt(transactionHash, function (response) {
-              if(response.status){ 
-                  
-                console.log(response)
-
-              }else{
-                  alert(response.msg);
-                  thisss.fireMsg("Collection Approval",response.msg, "WARN");
-                  thisss.setState({ approving: false});
-              }
-          });
-      }).on('error', function(error, receipt) {
-          const title = error.message.split(':')[0];
-          const msg = error.message.split(':')[1]; 
-          thisss.fireMsg(title, msg, "WARN");
-          thisss.setState({ approving: false});
-      });
-
-  }else if(type === "ERC1155"){
-      ERC1155(address).methods.isApprovedForAll(account, burnanceAddr).send({ from: account }).on('transactionHash', (transactionHash) => {
-         
-        console.log('transactionHash', transactionHash)
-        
-        thisss.waitForReceipt(transactionHash, function (response) {
-            if(response.status){ 
-              console.log(response)
-          }else{
-              //alert(response.msg);
-              thisss.fireMsg("Collection Approval",response.msg, "WARN");
-              thisss.setState({ approving: false});
-          }
-          });
-      }).on('error', function(error, receipt) {
-        const title = error.message.split(':')[0];
-        const msg = error.message.split(':')[1]; 
-        thisss.fireMsg(title, msg, "WARN");
-        thisss.setState({ approving: false});
-      });
+  isApprovedForAll = async (account, tokenAddress, burnanceAddr) => {
+    try {
+      const collectionApproved = await endpoint._get(
+        getChain()['eth'].getIsCollectionApprovedApiUrl +
+          `ethereum/${account}/${tokenAddress}/${burnanceAddr}`,
+      );
+      this.setState({collectionApproved: collectionApproved.data.isApproved});
+    } catch (e) {
+      console.error(e);
+    }
   }
 
+  checkApprovedForAll = async (account, tokenAddress, burnanceAddr) => {
+    try {
+      const collectionApproved = await endpoint._get(
+        getChain()['eth'].getIsCollectionApprovedApiUrl +
+          `ethereum/${account}/${tokenAddress}/${burnanceAddr}`,
+      );
 
-}
+      //Makre sure some weird error didn't happen
+      if(typeof collectionApproved.data === "undefined"){
+        return false;
+      }
 
-guaranteeTransfer = async(tokenId) => {
+      return collectionApproved.data.isApproved
+    } catch (e) {
+      console.error(e);
+      return false;
+    }
+  }
+
+guaranteeTransfer = async(tokenId, months) => {
   //e.preventDefault();
   const thisss = this;
-  this.setState({ transferring: true })
+  this.setState({ transferring: true, approving: true, contentLoading: true });
 
   const address = this.props.match.params.address;
   //const tokenId = e.target.tokenId.value
+  let guaranteeFee = await this.state.burnance.methods.guaranteeFee().call();
+  console.log(guaranteeFee);
+  guaranteeFee = (guaranteeFee * months)
+  console.log(guaranteeFee);
 
-  const guaranteeFee = await this.state.burnance.methods.guaranteeFee().call();
-
-  this.state.burnance.methods.gauranteeTransfer(address, tokenId).send({ from: this.state.ethereumAddress, value: Number(guaranteeFee) }).on('transactionHash', (transactionHash) => {
+  this.state.burnance.methods.gauranteeTransfer(address, tokenId, months).send({ from: this.state.ethereumAddress, value: Number(guaranteeFee) }).on('transactionHash', (transactionHash) => {
     console.log('guaranteeTransfer transactionHash',transactionHash)  
     thisss.waitForReceipt(transactionHash, function (response) {
           if(response.status){ 
@@ -555,6 +596,9 @@ guaranteeTransfer = async(tokenId) => {
               
               sessionstorage.removeItem(`${thisss.state.ethereumAddress}-${thisss.props.match.params.address}-nfts`);
               sessionstorage.removeItem(`${thisss.state.ethereumAddress}-${thisss.props.match.params.address}`);
+
+
+              thisss.setState({ transferring: false, guaranteeMonths: 1, approving: false, contentLoading: false});
 
               thisss.getEthPrice(
                 thisss.state.ethereumAddress,
@@ -566,14 +610,14 @@ guaranteeTransfer = async(tokenId) => {
             }else{
               //alert(response.msg);
               thisss.fireMsg("Guarantee nft Transfer",response.msg, "WARN");
-              thisss.setState({ transferring: false});
+              thisss.setState({ transferring: false, approving: false, contentLoading: false});
           }
       });
   }).on('error', function(error, receipt) {
       const title = error.message.split(':')[0];
       const msg = error.message.split(':')[1]; 
       thisss.fireMsg(title, msg, "WARN");
-      thisss.setState({ transferring: false});
+      thisss.setState({ transferring: false, approving: false, contentLoading: false});
   });
 }
 
@@ -586,7 +630,7 @@ recordTx = async(tokenId, transactionHash) =>{
 transfer = async(tokenId) => {
   //e.preventDefault();
   const thisss = this;
-  this.setState({ transferring: true })
+  this.setState({ transferring: true, approving: true, contentLoading: true })
 
   const address = this.props.match.params.address;
   //const tokenId = e.target.tokenId.value
@@ -611,6 +655,8 @@ transfer = async(tokenId) => {
 
             }).catch(err => alert(err))
 
+            thisss.setState({ transferring: false, approving: false, contentLoading: false });
+
             }else{
               //alert(response.msg);
               thisss.fireMsg("NFT Transfer",response.msg, "WARN");
@@ -622,6 +668,8 @@ transfer = async(tokenId) => {
       const msg = error.message.split(':')[1]; 
       thisss.fireMsg(title, msg, "WARN");
       thisss.setState({ transferring: false});
+      console.warn(error.message)
+      console.error(error)
   });
 }
 
@@ -703,402 +751,427 @@ async waitForReceipt(hash, cb) {
             </svg>
           </div>
         </div>
-
-        <section className="section">
-          <Container>
-            <Row className="justify-content-center">
-              <Col md="3">
-                <div
-                  key={1}
-                  className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
-                >
-                  {/* <img
+        <LoadingOverlay
+          active={this.state.contentLoading}
+          spinner
+          text='Processing transaction......'
+        >
+          <section className="section">
+            <Container>
+              <Row className="justify-content-center">
+                <Col md="3">
+                  <div
+                    key={1}
+                    className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
+                  >
+                    {/* <img
                   src={work1}
                   className="avatar avatar-ex-sm"
                   alt=""
                 /> */}
-                  <div className="flex-1 content ms-3">
-                    <BasicPopperToolTip
-                      title="Floor Price"
-                      text={
-                        'The real-time lowest listing price of NFTs in the collection in the market'
-                      }
-                    />
-                    {this.state.loading === true ? (
-                      <RingLoader
-                        color={"#ff914d"}
-                        loading={this.state.loadingCollection}
-                        cssOverride={override}
-                        size={50}
+                    <div className="flex-1 content ms-3">
+                      <BasicPopperToolTip
+                        title="Floor Price"
+                        text={
+                          'The real-time lowest listing price of NFTs in the collection in the market'
+                        }
                       />
-                    ) : (
-                      <p className="text h3 mb-0">{this.state.floorPrice}</p>
-                    )}
+                      {this.state.loading === true ? (
+                        <RingLoader
+                          color={'#ff914d'}
+                          loading={this.state.loadingCollection}
+                          cssOverride={override}
+                          size={50}
+                        />
+                      ) : (
+                        <p className="text h3 mb-0">{this.state.floorPrice}</p>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </Col>
-              <Col md="3">
-                <div
-                  key={1}
-                  className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
-                >
-                  {/* <img
+                </Col>
+                <Col md="3">
+                  <div
+                    key={1}
+                    className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
+                  >
+                    {/* <img
                   src={work1}
                   className="avatar avatar-ex-sm"
                   alt=""
                 /> */}
-                  <div className="flex-1 content ms-3">
-                    <BasicPopperToolTip
-                      title="Market Cap"
-                      text={
-                        'Market capitalization is calculated as the sum of each NFT valued at the greater of its last traded price and the floor price of the collection, respectively.'
-                      }
-                    />
-                    {this.state.loading === true ? (
-                      <RingLoader
-                        color={"#ff914d"}
-                        loading={this.state.loadingCollection}
-                        cssOverride={override}
-                        size={50}
+                    <div className="flex-1 content ms-3">
+                      <BasicPopperToolTip
+                        title="Market Cap"
+                        text={
+                          'Market capitalization is calculated as the sum of each NFT valued at the greater of its last traded price and the floor price of the collection, respectively.'
+                        }
                       />
-                    ) : (
-                      <p className="text h3 mb-0">{this.state.marketCap}</p>
-                    )}
+                      {this.state.loading === true ? (
+                        <RingLoader
+                          color={'#ff914d'}
+                          loading={this.state.loadingCollection}
+                          cssOverride={override}
+                          size={50}
+                        />
+                      ) : (
+                        <p className="text h3 mb-0">{this.state.marketCap}</p>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </Col>
-              <Col md="3">
-                <div
-                  key={1}
-                  className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
-                >
-                  {/* <img
+                </Col>
+                <Col md="3">
+                  <div
+                    key={1}
+                    className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
+                  >
+                    {/* <img
                   src={work1}
                   className="avatar avatar-ex-sm"
                   alt=""
                 /> */}
-                  <div className="flex-1 content ms-3">
-                    <BasicPopperToolTip
-                      title="30 Day Volume"
-                      text={
-                        'Market capitalization is calculated as the sum of each NFT valued at the greater of its last traded price and the floor price of the collection, respectively.'
-                      }
-                    />
-                    {this.state.loading === true ? (
-                      <RingLoader
-                        color={"#ff914d"}
-                        loading={this.state.loadingCollection}
-                        cssOverride={override}
-                        size={50}
+                    <div className="flex-1 content ms-3">
+                      <BasicPopperToolTip
+                        title="30 Day Volume"
+                        text={
+                          'Market capitalization is calculated as the sum of each NFT valued at the greater of its last traded price and the floor price of the collection, respectively.'
+                        }
                       />
-                    ) : (
-                      <p className="text h3 mb-0">{this.state.thirtyDayVolume}</p>
-                    )}
+                      {this.state.loading === true ? (
+                        <RingLoader
+                          color={'#ff914d'}
+                          loading={this.state.loadingCollection}
+                          cssOverride={override}
+                          size={50}
+                        />
+                      ) : (
+                        <p className="text h3 mb-0">
+                          {this.state.thirtyDayVolume}
+                        </p>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </Col>
-              <Col md="3">
-                <div
-                  key={1}
-                  className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
-                >
-                  {/* <img
+                </Col>
+                <Col md="3">
+                  <div
+                    key={1}
+                    className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
+                  >
+                    {/* <img
                   src={work1}
                   className="avatar avatar-ex-sm"
                   alt=""
                 /> */}
-                  {/* The liquidity rate measures the relative liquidity of each collection. 
+                    {/* The liquidity rate measures the relative liquidity of each collection. 
                 Liquidity = Sales / The number of NFTs * 100% */}
-                  <div className="flex-1 content ms-3">
-                    <BasicPopperToolTip
-                      title="Liquidity (1D)"
-                      text={
-                        'The liquidity rate measures the relative liquidity of each collection. Liquidity = 1 Day Sales / number of NFTs owners * 100%'
-                      }
-                    />
-                    
-                    {this.state.loading === true ? (
-                      <RingLoader
-                        color={"#ff914d"}
-                        loading={this.state.loadingCollection}
-                        cssOverride={override}
-                        size={50}
+                    <div className="flex-1 content ms-3">
+                      <BasicPopperToolTip
+                        title="Liquidity (1D)"
+                        text={
+                          'The liquidity rate measures the relative liquidity of each collection. Liquidity = 1 Day Sales / number of NFTs owners * 100%'
+                        }
                       />
-                    ) : (
-                      <p className="text h3 mb-0">{this.state.liquidity1d}%</p>
-                    )}
+
+                      {this.state.loading === true ? (
+                        <RingLoader
+                          color={'#ff914d'}
+                          loading={this.state.loadingCollection}
+                          cssOverride={override}
+                          size={50}
+                        />
+                      ) : (
+                        <p className="text h3 mb-0">{this.state.liquidity1d}%</p>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </Col>
-              <Col md="3">
-                <div
-                  key={1}
-                  className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
-                >
-                  {/* <img
+                </Col>
+                <Col md="3">
+                  <div
+                    key={1}
+                    className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
+                  >
+                    {/* <img
                   src={work1}
                   className="avatar avatar-ex-sm"
                   alt=""
                 /> */}
-                  {/* The liquidity rate measures the relative liquidity of each collection. 
+                    {/* The liquidity rate measures the relative liquidity of each collection. 
                 Liquidity = Sales / The number of NFTs * 100% */}
-                  <div className="flex-1 content ms-3">
-                    <BasicPopperToolTip
-                      title="Liquidity (7D)"
-                      text={
-                        'The liquidity rate measures the relative liquidity of each collection. Liquidity = 7 Day Sales / number of NFTs owners * 100%'
-                      }
-                    />
-                    
-                    {this.state.loading === true ? (
-                      <RingLoader
-                        color={"#ff914d"}
-                        loading={this.state.loadingCollection}
-                        cssOverride={override}
-                        size={50}
+                    <div className="flex-1 content ms-3">
+                      <BasicPopperToolTip
+                        title="Liquidity (7D)"
+                        text={
+                          'The liquidity rate measures the relative liquidity of each collection. Liquidity = 7 Day Sales / number of NFTs owners * 100%'
+                        }
                       />
-                    ) : (
-                      <p className="text h3 mb-0">{this.state.liquidity7d}%</p>
-                    )}
+
+                      {this.state.loading === true ? (
+                        <RingLoader
+                          color={'#ff914d'}
+                          loading={this.state.loadingCollection}
+                          cssOverride={override}
+                          size={50}
+                        />
+                      ) : (
+                        <p className="text h3 mb-0">{this.state.liquidity7d}%</p>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </Col>
-              <Col md="3">
-                <div
-                  key={1}
-                  className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
-                >
-                  {/* <img
+                </Col>
+                <Col md="3">
+                  <div
+                    key={1}
+                    className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
+                  >
+                    {/* <img
                   src={work1}
                   className="avatar avatar-ex-sm"
                   alt=""
                 /> */}
-                  {/* The liquidity rate measures the relative liquidity of each collection. 
+                    {/* The liquidity rate measures the relative liquidity of each collection. 
                 Liquidity = Sales / The number of NFTs * 100% */}
-                  <div className="flex-1 content ms-3">
-                    <BasicPopperToolTip
-                      title="Liquidity (30D)"
-                      text={
-                        'The liquidity rate measures the relative liquidity of each collection. Liquidity = 30 Day Sales / number of NFTs owners * 100%'
-                      }
-                    />
-                    {this.state.loading === true ? (
-                      <RingLoader
-                        color={"#ff914d"}
-                        loading={this.state.loadingCollection}
-                        cssOverride={override}
-                        size={50}
+                    <div className="flex-1 content ms-3">
+                      <BasicPopperToolTip
+                        title="Liquidity (30D)"
+                        text={
+                          'The liquidity rate measures the relative liquidity of each collection. Liquidity = 30 Day Sales / number of NFTs owners * 100%'
+                        }
                       />
-                    ) : (
-                      <p className="text h3 mb-0">{this.state.liquidity30d}%</p>
-                    )}
+                      {this.state.loading === true ? (
+                        <RingLoader
+                          color={'#ff914d'}
+                          loading={this.state.loadingCollection}
+                          cssOverride={override}
+                          size={50}
+                        />
+                      ) : (
+                        <p className="text h3 mb-0">{this.state.liquidity30d}%</p>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </Col>
-              <Col md="3">
-                <div
-                  key={1}
-                  className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
-                >
-                  {/* <img
+                </Col>
+                <Col md="3">
+                  <div
+                    key={1}
+                    className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
+                  >
+                    {/* <img
                   src={work1}
                   className="avatar avatar-ex-sm"
                   alt=""
                 /> */}
-                  <div className="flex-1 content ms-3">
-                    <BasicPopperToolTip
-                      title="Avg. Price"
-                      text={'Test Tool tip text: Sales (7D)'}
-                    />
-                    
-                    {this.state.loading === true ? (
-                      <RingLoader
-                        color={"#ff914d"}
-                        loading={this.state.loadingCollection}
-                        cssOverride={override}
-                        size={50}
+                    <div className="flex-1 content ms-3">
+                      <BasicPopperToolTip
+                        title="Avg. Price"
+                        text={'Test Tool tip text: Sales (7D)'}
                       />
-                    ) : (
-                      <p className="text h3 mb-0">{this.state.avgPrice}</p>
-                    )}
+
+                      {this.state.loading === true ? (
+                        <RingLoader
+                          color={'#ff914d'}
+                          loading={this.state.loadingCollection}
+                          cssOverride={override}
+                          size={50}
+                        />
+                      ) : (
+                        <p className="text h3 mb-0">{this.state.avgPrice}</p>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </Col>
-              <Col md="3">
-                <div
-                  key={1}
-                  className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
-                >
-                  {/* <img
+                </Col>
+                <Col md="3">
+                  <div
+                    key={1}
+                    className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
+                  >
+                    {/* <img
                   src={work1}
                   className="avatar avatar-ex-sm"
                   alt=""
                 /> */}
-                  <div className="flex-1 content ms-3">
-                    <BasicPopperToolTip
-                      title="Holding Value"
-                      text={'Test Tool tip text: Sales (7D)'}
-                    />
-                 
-                    {this.state.loading === true ? (
-                      <RingLoader
-                        color={"#ff914d"}
-                        loading={this.state.loadingCollection}
-                        cssOverride={override}
-                        size={50}
+                    <div className="flex-1 content ms-3">
+                      <BasicPopperToolTip
+                        title="Holding Value"
+                        text={'Test Tool tip text: Sales (7D)'}
                       />
-                    ) : (
-                      <p className="text h3 mb-0">{this.state.holdingValue}</p>
-                    )}
-                  </div>
-                </div>
-              </Col>
-              <Col md="3">
-                <div
-                  key={1}
-                  className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
-                >
-                  <div className="flex-1 content ms-3">
-                    <BasicPopperToolTip
-                      title="Held"
-                      text={
-                        "Number of NFT's from this collection held in wallet"
-                      }
-                    />
 
-                    {this.state.loading === true ? (
-                      <RingLoader
-                        color={"#ff914d"}
-                        loading={this.state.loadingCollection}
-                        cssOverride={override}
-                        size={50}
-                      />
-                    ) : (
-                      <p className="text h3 mb-0">
-                      {numFormatter.format(this.state.held)}
-                    </p>
-                    )}
+                      {this.state.loading === true ? (
+                        <RingLoader
+                          color={'#ff914d'}
+                          loading={this.state.loadingCollection}
+                          cssOverride={override}
+                          size={50}
+                        />
+                      ) : (
+                        <p className="text h3 mb-0">{this.state.holdingValue}</p>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </Col>
-              <Col md="3">
-                <div
-                  key={1}
-                  className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
-                >
-                  <div className="flex-1 content ms-3">
-                    <BasicPopperToolTip
-                      title="Owners"
-                      text={
-                        'The number of unique addresses that hold at least one NFT of the collection currently.'
-                      }
-                    />
+                </Col>
+                <Col md="3">
+                  <div
+                    key={1}
+                    className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
+                  >
+                    <div className="flex-1 content ms-3">
+                      <BasicPopperToolTip
+                        title="Held"
+                        text={
+                          "Number of NFT's from this collection held in wallet"
+                        }
+                      />
 
-                    {this.state.loading === true ? (
-                      <RingLoader
-                        color={"#ff914d"}
-                        loading={this.state.loadingCollection}
-                        cssOverride={override}
-                        size={50}
-                      />
-                    ) : (
-                      <p className="text h3 mb-0">
-                      {numFormatter.format(this.state.owners)}
-                    </p>
-                    )}
+                      {this.state.loading === true ? (
+                        <RingLoader
+                          color={'#ff914d'}
+                          loading={this.state.loadingCollection}
+                          cssOverride={override}
+                          size={50}
+                        />
+                      ) : (
+                        <p className="text h3 mb-0">
+                          {numFormatter.format(this.state.held)}
+                        </p>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </Col>
-              <Col md="3">
-                <div
-                  key={1}
-                  className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
-                >
-                  {/* <img
+                </Col>
+                <Col md="3">
+                  <div
+                    key={1}
+                    className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
+                  >
+                    <div className="flex-1 content ms-3">
+                      <BasicPopperToolTip
+                        title="Owners"
+                        text={
+                          'The number of unique addresses that hold at least one NFT of the collection currently.'
+                        }
+                      />
+
+                      {this.state.loading === true ? (
+                        <RingLoader
+                          color={'#ff914d'}
+                          loading={this.state.loadingCollection}
+                          cssOverride={override}
+                          size={50}
+                        />
+                      ) : (
+                        <p className="text h3 mb-0">
+                          {numFormatter.format(this.state.owners)}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </Col>
+                <Col md="3">
+                  <div
+                    key={1}
+                    className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
+                  >
+                    {/* <img
                   src={work1}
                   className="avatar avatar-ex-sm"
                   alt=""
                 /> */}
-                  <div className="flex-1 content ms-3">
-                    <BasicPopperToolTip
-                      title="Total Supply"
-                      text={"Total NFT's within collection"}
-                    />
-
-                    {this.state.loading === true ? (
-                      <RingLoader
-                        color={"#ff914d"}
-                        loading={this.state.loadingCollection}
-                        cssOverride={override}
-                        size={50}
+                    <div className="flex-1 content ms-3">
+                      <BasicPopperToolTip
+                        title="Total Supply"
+                        text={"Total NFT's within collection"}
                       />
-                    ) : (
-                      <p className="text h3 mb-0">
-                      {numFormatter.format(this.state.totalSupply)}
-                    </p>
-                    )}
+
+                      {this.state.loading === true ? (
+                        <RingLoader
+                          color={'#ff914d'}
+                          loading={this.state.loadingCollection}
+                          cssOverride={override}
+                          size={50}
+                        />
+                      ) : (
+                        <p className="text h3 mb-0">
+                          {numFormatter.format(this.state.totalSupply)}
+                        </p>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </Col>
-              <Col md="12">
-                <p className="text mb-0" style={{ marginTop: '25px' }}>
-                  {this.state.description}
-                </p>
-              </Col>
-              <Col md="12">
-                <p className="text mb-0" style={{ marginTop: '25px' }}>
-                  Approval the collection to burn an NFT from the collection. Refresh the collection to view updates.
-                </p>
-                <Link
-                  to="#"
-                  className="btn mouse-down"
-                  style={{
-                    marginRight: '10px',
-                    backgroundColor:
+                </Col>
+                <Col md="12">
+                  <p className="text mb-0" style={{ marginTop: '25px' }}>
+                    {this.state.description}
+                  </p>
+                </Col>
+                <Col md="12">
+                  <p className="text mb-0" style={{ marginTop: '25px' }}>
+                    Approval the collection to burn an NFT from the collection.
+                    Refresh the collection to view updates.
+                  </p>
+                  <Link
+                    to="#"
+                    className="btn mouse-down"
+                    style={{
+                      marginRight: '10px',
+                      backgroundColor:
+                        this.state.collectionApproved === true
+                          ? '#24A159'
+                          : '#E76E3C',
+                      color: 'white',
+                    }}
+                    disabled={
                       this.state.collectionApproved === true
-                        ? '#24A159'
-                        : '#E76E3C',
-                    color: 'white',
-                  }}
-                  disabled={(this.state.loading === true | this.state.approving === true ? true : false)}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    this.approveForAll();
-                  }}
-                >
-                  {this.state.collectionApproved === true
-                    ? 'Approved'
-                    : 'Approve Collection'}
-                </Link>
-                <Link
-                  to="#"
-                  className="btn mouse-down"
-                  style={{
-                    marginRight: '10px',
-                    backgroundColor:'blue',
-                    color: 'white',
-                  }}
-                  disabled={(this.state.loading === true | this.state.approving === true ? true : false)}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    this.refresh();
-                  }}
-                >
-                  {(this.state.loading === true ? "Loading Collection..." : "Refresh Collection")}
-                </Link>
-                <Link
-                  to="/batch"
-                  className="btn mouse-down"
-                  style={{
-                    backgroundColor:'#939393',
-                    color: 'white',
-                  }}>
-                  View Batch: {this.state.batchSize}<i className="mdi mdi-cart-variant h6" style={{ color: '#F22613' }}> </i>
-                </Link>
-              </Col>
-            </Row>
+                        ? true
+                        : (this.state.loading === true) |
+                          (this.state.approving === true)
+                          ? true
+                          : false
+                    }
+                    onClick={(e) => {
+                      e.preventDefault();
+                      this.approveForAll();
+                    }}
+                  >
+                    {this.state.collectionApproved === true
+                      ? 'Approved'
+                      : this.state.loading === true
+                        ? 'Loading Collection...'
+                        : 'Approve Collection'}
+                  </Link>
+                  <Link
+                    to="#"
+                    className="btn mouse-down"
+                    style={{
+                      marginRight: '10px',
+                      backgroundColor: 'blue',
+                      color: 'white',
+                    }}
+                    disabled={
+                      (this.state.loading === true) |
+                        (this.state.approving === true)
+                        ? true
+                        : false
+                    }
+                    onClick={(e) => {
+                      e.preventDefault();
+                      this.refresh();
+                    }}
+                  >
+                    {this.state.loading === true
+                      ? 'Loading Collection...'
+                      : 'Refresh Collection'}
+                  </Link>
+                  <Link
+                    to="/batch"
+                    className="btn mouse-down btn-info"
+                    style={{
+                      backgroundColor: '#939393',
+                      color: 'white',
+                    }}
+                  >
+                    View Batch: {this.state.batchSize}{' '}
+                    <FontAwesomeIcon icon={faBasketShopping} color="#E76E3C" />
+                  </Link>
+                </Col>
+              </Row>
 
-            {/* <Row
+              {/* <Row
               className="justify-content-center"
               style={{ marginTop: '25px' }}
             >
@@ -1190,94 +1263,104 @@ async waitForReceipt(hash, cb) {
                 </div>
               </div>
             </Row> */}
-            {this.state.loading === true ? (
-              <Row className="projects-wrapper">
-                <ImageGrid />
-              </Row>
-            ) : (
-              <Row className="projects-wrapper">
-                {this.state.nfts
-                  .filter(
-                    ({ category }) =>
-                      this.state.displayCategory === category ||
-                      this.state.displayCategory === 'All',
-                  )
-                  .map((cases, key) => { 
-                    let currentCost = 0, diff = 0;
-                    if (typeof cases.costETH !== "undefined") {
-                      currentCost = parseFloat(cases.costETH * this.state.ethPrice.ethusd)
-                      diff = (currentCost - cases.costUSD);
-                    }
-                   
-                    const exists = this.state.batch.existsInBatch(this.state.batch.address, cases.contract.address, cases.tokenId)
-                    const title = (cases.title === "" ? `Test Net Asset ${BigInt(cases.tokenId).toString()}` : cases.title);
-                    return (
-                      <Col
-                        key={key}
-                        lg={4}
-                        md={6}
-                        xs={12}
-                        className="mt-4 pt-2 business"
-                      >
-                        <FadeIn delay={100}>
-                          <Card className="blog border-0 work-container work-classic shadow rounded-md overflow-hidden">
-                            <img
-                              src={
-                                (typeof cases.media === 'undefined') |
-                                (typeof cases.media[0] === 'undefined')
-                                  ? `${process.env.REACT_APP_BASE_CDN_URL}/default-image.jpg`
-                                  : cases.media[0].gateway
-                              }
-                              className="img-fluid rounded work-image"
-                              alt={cases.description}
-                            />
+              {this.state.loading === true ? (
+                <Row className="projects-wrapper">
+                  <ImageGrid />
+                </Row>
+              ) : (
+                <Row className="projects-wrapper">
+                  {this.state.nfts
+                    .filter(
+                      ({ category }) =>
+                        this.state.displayCategory === category ||
+                        this.state.displayCategory === 'All',
+                    )
+                    .map((cases, key) => {
+                      let currentCost = 0,
+                        diff = 0;
+                      if (typeof cases.costETH !== 'undefined') {
+                        currentCost = parseFloat(
+                          cases.costETH * this.state.ethPrice.ethusd,
+                        );
+                        diff = currentCost - cases.costUSD;
+                      }
 
-                            <CardBody>
-                              <div className="content">
-                                {exists === true && (
-                                  <Link
-                                    to="#"
-                                    className="badge badge-link bg-success"
-                                  >
-                                    In Batch
-                                  </Link>
-                                )}
-                                {cases.isMarketing && (
-                                  <Link
-                                    to="#"
-                                    className="badge badge-link bg-warning"
-                                  >
-                                    Marketing
-                                  </Link>
-                                )}
-                                {cases.isFinance && (
-                                  <Link
-                                    to="#"
-                                    onClick={(e) => {
-                                      e.preventDefault();
-                                      window.open(
-                                        `https://opensea.io/assets/${this.state.collection.chain}/${cases.contract.address}/${cases.tokenId}`,
-                                      );
-                                    }}
-                                  >
-                                    <img
-                                      alt="OpenSea listing"
-                                      align="right"
-                                      width="25"
-                                      height="25"
-                                      src="https://storage.googleapis.com/opensea-static/Logomark/Logomark-Blue.png"
-                                    />
-                                  </Link>
-                                )}
-                                {cases.isHR && (
-                                  <Link
-                                    to="#"
-                                    className="badge badge-link bg-info"
-                                  >
-                                    HR
-                                  </Link>
-                                )}
-                                {/* <Link
+                      const exists = this.state.batch.existsInBatch(
+                        this.state.batch.address,
+                        cases.contract.address,
+                        cases.tokenId,
+                      );
+                      const title =
+                        cases.title === ''
+                          ? `Test Net Asset ${BigInt(cases.tokenId).toString()}`
+                          : cases.title;
+                      return (
+                        <Col
+                          key={key}
+                          lg={4}
+                          md={6}
+                          xs={12}
+                          className="mt-4 pt-2 business"
+                        >
+                          <FadeIn delay={100}>
+                            <Card className="blog border-0 work-container work-classic shadow rounded-md overflow-hidden">
+                              <img
+                                src={
+                                  (typeof cases.media === 'undefined') |
+                                    (typeof cases.media[0] === 'undefined')
+                                    ? `${process.env.REACT_APP_BASE_CDN_URL}/default-image.jpg`
+                                    : cases.media[0].gateway
+                                }
+                                className="img-fluid rounded work-image"
+                                alt={cases.description}
+                              />
+
+                              <CardBody>
+                                <div className="content">
+                                  {exists === true && (
+                                    <Link
+                                      to="#"
+                                      className="badge badge-link bg-success"
+                                    >
+                                      In Batch
+                                    </Link>
+                                  )}
+                                  {cases.isMarketing && (
+                                    <Link
+                                      to="#"
+                                      className="badge badge-link bg-warning"
+                                    >
+                                      Marketing
+                                    </Link>
+                                  )}
+                                  {cases.isFinance && (
+                                    <Link
+                                      to="#"
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        window.open(
+                                          `https://opensea.io/assets/${this.state.collection.chain}/${cases.contract.address}/${cases.tokenId}`,
+                                        );
+                                      }}
+                                    >
+                                      <img
+                                        alt="OpenSea listing"
+                                        align="right"
+                                        width="25"
+                                        height="25"
+                                        src="https://storage.googleapis.com/opensea-static/Logomark/Logomark-Blue.png"
+                                      />
+                                    </Link>
+                                  )}
+                                  {cases.isHR && (
+                                    <Link
+                                      to="#"
+                                      className="badge badge-link bg-info"
+                                    >
+                                      HR
+                                    </Link>
+                                  )}
+                                  {/* <Link
                                   to="#"
                                   onClick={ e =>{
                                     e.preventDefault();
@@ -1307,212 +1390,304 @@ async waitForReceipt(hash, cb) {
                                       src="https://etherscan.io/images/brandassets/etherscan-logo-circle.png"
                                     />
                                 </Link> */}
-                                <h5 className="mt-3">
-                                  <Link
-                                    to="page-case-detail"
-                                    className="text-dark title"
-                                  >
-                                    {title}
-                                  </Link>
-                                </h5>
-                                <Row>
-                                  <Col md="6">
-                                    <Row>
-                                      <Col
-                                        md="6"
-                                        style={{ fontSize: '16px' }}
-                                        className="text-center font-weight-bold"
-                                      >
-                                        {(typeof cases.valueUSD === "undefined" ? "$0.00" : formatter.format(cases.valueUSD))}{' '}
-                                      </Col>
-                                      <Col
-                                        md="6"
-                                        style={{ fontSize: '16px' }}
-                                        className="text-center"
-                                      >
-                                        {(typeof cases.gasUSD === "undefined" ? "$0.00" : formatter.format(cases.gasUSD))}{' '}
-                                      </Col>
-                                      <Col
-                                        md="6"
-                                        style={{ fontSize: '16px' }}
-                                        className="text-center"
-                                      >
-                                        Cost
-                                      </Col>
-                                      <Col
-                                        md="6"
-                                        style={{ fontSize: '16px' }}
-                                        className="text-center"
-                                      >
-                                        <i className="uil uil-angle-right-b align-middle"></i>
-                                        Gas
-                                      </Col>
-                                    </Row>
-                                  </Col>
-                                  <Col md="6">
-                                    <Row>
-                                      <Col md="12" className="text-center h3">
-                                        {(typeof cases.costUSD === "undefined" ? "$0.00" : formatter.format(cases.costUSD))}
-                                      </Col>
-                                      <Col md="12" className="text-center">
-                                        Cost Basis
-                                      </Col>
-                                    </Row>
-                                  </Col>
-                                </Row>
-                                <hr />
-                                <Row>
-                                  <Col md="12">
-                                    <h6>Cost Today</h6>
-                                  </Col>
-                                  <Col md="3" className="text-center">
-                                    {formatter.format(currentCost)}
-                                  </Col>
-                                  <Col md="3" className="text-center">
-                                    {(typeof cases.costETH === "undefined" ? 0.00 : numFormatter.format(cases.costETH))}
-                                  </Col>
-                                  <Col md="6" className="text-center h3">
-                                    <span
-                                      style={{
-                                        color: diff <= 0 ? 'red' : 'green',
-                                      }}
+                                  <h5 className="mt-3">
+                                    <Link
+                                      to="page-case-detail"
+                                      className="text-dark title"
                                     >
-                                      {formatter.format(diff)}
-                                    </span>
-                                  </Col>
-                                  <Col md="3" className="text-center">
-                                    Cost
-                                  </Col>
-                                  <Col md="3" className="text-center">
-                                    ETH
-                                  </Col>
-                                  <Col
-                                    md="6"
-                                    className="text-center font-weight-bold"
-                                  >
-                                    P / L
-                                  </Col>
-                                </Row>
-                                <hr />
-                                <Row>
-                                  <Col md="12">
-                                    <h6>ETH Prices</h6>
-                                  </Col>
-                                  <Col md="6" className="text-center">
-                                    {(typeof cases.ethTransPriceUSD === "undefined" ? "$0.00" : formatter.format(cases.ethTransPriceUSD))}
-                                  </Col>
-                                  <Col md="6" className="text-center">
-                                    {formatter.format(
-                                      this.state.ethPrice.ethusd,
-                                    )}
-                                  </Col>
-                                  <Col
-                                    md="6"
-                                    className="text-center font-weight-bold"
-                                  >
-                                    2/22/2020
-                                  </Col>
-                                  <Col
-                                    md="6"
-                                    className="text-center font-weight-bold"
-                                  >
-                                    Current
-                                  </Col>
-                                </Row>
-
-                                <hr />
-
-                                <Row>
-                                  <Col md="12">
-                                    <ButtonGroup size="sm" role="group">
-                                      <Button
-                                        style={{ backgroundColor: "#24A159"}}
-                                        className="btn rounded"
-                                        disabled={this.state.approving}
-                                        onClick={(e) => {
-                                          e.preventDefault();
-                                          this.approveForAll();
+                                      {title}
+                                    </Link>
+                                  </h5>
+                                  <Row>
+                                    <Col md="6">
+                                      <Row>
+                                        <Col
+                                          md="6"
+                                          style={{ fontSize: '16px' }}
+                                          className="text-center font-weight-bold"
+                                        >
+                                          {typeof cases.valueUSD === 'undefined'
+                                            ? '$0.00'
+                                            : formatter.format(
+                                              cases.valueUSD,
+                                            )}{' '}
+                                        </Col>
+                                        <Col
+                                          md="6"
+                                          style={{ fontSize: '16px' }}
+                                          className="text-center"
+                                        >
+                                          {typeof cases.gasUSD === 'undefined'
+                                            ? '$0.00'
+                                            : formatter.format(cases.gasUSD)}{' '}
+                                        </Col>
+                                        <Col
+                                          md="6"
+                                          style={{ fontSize: '16px' }}
+                                          className="text-center"
+                                        >
+                                          Cost
+                                        </Col>
+                                        <Col
+                                          md="6"
+                                          style={{ fontSize: '16px' }}
+                                          className="text-center"
+                                        >
+                                          <i className="uil uil-angle-right-b align-middle"></i>
+                                          Gas
+                                        </Col>
+                                      </Row>
+                                    </Col>
+                                    <Col md="6">
+                                      <Row>
+                                        <Col md="12" className="text-center h3">
+                                          {typeof cases.costUSD === 'undefined'
+                                            ? '$0.00'
+                                            : formatter.format(cases.costUSD)}
+                                        </Col>
+                                        <Col md="12" className="text-center">
+                                          Cost Basis
+                                        </Col>
+                                      </Row>
+                                    </Col>
+                                  </Row>
+                                  <hr />
+                                  <Row>
+                                    <Col md="12">
+                                      <h6>Cost Today</h6>
+                                    </Col>
+                                    <Col md="3" className="text-center">
+                                      {formatter.format(currentCost)}
+                                    </Col>
+                                    <Col md="3" className="text-center">
+                                      {typeof cases.costETH === 'undefined'
+                                        ? 0.0
+                                        : numFormatter.format(cases.costETH)}
+                                    </Col>
+                                    <Col md="6" className="text-center h3">
+                                      <span
+                                        style={{
+                                          color: diff <= 0 ? 'red' : 'green',
                                         }}
                                       >
-                                        Approve
-                                      </Button>
-                                      <DropdownButton
-                                        as={ButtonGroup}
-                                        title="Options"
-                                        id="bg-nested-dropdown"
-                                        disabled={this.state.approving}
-                                      >
-                                        <Dropdown.Item
-                                          className="btn"
-                                          eventKey="1"
+                                        {formatter.format(diff)}
+                                      </span>
+                                    </Col>
+                                    <Col md="3" className="text-center">
+                                      Cost
+                                    </Col>
+                                    <Col md="3" className="text-center">
+                                      ETH
+                                    </Col>
+                                    <Col
+                                      md="6"
+                                      className="text-center font-weight-bold"
+                                    >
+                                      P / L
+                                    </Col>
+                                  </Row>
+                                  <hr />
+                                  <Row>
+                                    <Col md="12">
+                                      <h6>ETH Prices</h6>
+                                    </Col>
+                                    <Col md="6" className="text-center">
+                                      {typeof cases.ethTransPriceUSD ===
+                                        'undefined'
+                                        ? '$0.00'
+                                        : formatter.format(
+                                          cases.ethTransPriceUSD,
+                                        )}
+                                    </Col>
+                                    <Col md="6" className="text-center">
+                                      {formatter.format(
+                                        this.state.ethPrice.ethusd,
+                                      )}
+                                    </Col>
+                                    <Col
+                                      md="6"
+                                      className="text-center font-weight-bold"
+                                    >
+                                      2/22/2020
+                                    </Col>
+                                    <Col
+                                      md="6"
+                                      className="text-center font-weight-bold"
+                                    >
+                                      Current
+                                    </Col>
+                                  </Row>
+
+                                  <hr />
+
+                                  <Row>
+                                    <Col md="12">
+                                      <ButtonGroup size="sm" role="group">
+                                        <Button
+                                          aria-label={`Sell ${cases.title} with Burn option`}
+                                          style={{
+                                            backgroundColor: '#24A159',
+                                            marginRight: '10px',
+                                          }}
+                                          className="btn rounded btn-warning"
+                                          disabled={this.state.approving}
                                           onClick={(e) => {
-                                            console.log(
-                                              'Sell (Burn)',
-                                              cases.contract.address,
-                                            );
-                                            console.log(
-                                              'Sell (Burn) Token',
-                                              BigInt(cases.tokenId).toString(),
-                                            );
-                                            this.transfer(BigInt(cases.tokenId).toString());
                                             Event(
                                               'Collection NFT',
                                               'Option',
                                               'Sell (Burn)',
                                             );
+                                            // this.setState({ transferring: true });
+                                            // this.transfer(
+                                            //   BigInt(
+                                            //     cases.tokenId,
+                                            //   ).toString(),
+                                            // );
+                                            this.setState({ transferring: true });
+                                            this.checkApprovedForAll(
+                                              this.state.ethereumAddress,
+                                              cases.contract.address,
+                                              this.state.burnanceAddr,
+                                            ).then((isApproved) => {
+
+                                              if (isApproved === false) {
+                                                this.NotApproved(cases.tokenId, "burn");
+
+                                                this.setState({
+                                                  transferring: false,
+                                                });
+                                              } else {
+                                                this.transfer(
+                                                  BigInt(
+                                                    cases.tokenId,
+                                                  ).toString(),
+                                                );
+                                              }
+                                            });
                                           }}
                                         >
-                                          Sell (Burn)
-                                        </Dropdown.Item>
-                                        <Dropdown.Item
-                                          className="btn"
-                                          eventKey="1"
+                                          <FontAwesomeIcon
+                                            icon={faFireBurner}
+                                            size="2x"
+                                            alt="Sell with Burn option"
+                                          />
+                                        </Button>
+                                        <Button
+                                          aria-label={`Sell ${cases.title} with Buy Back guarantee option`}
+                                          style={{
+                                            backgroundColor: '#24A159',
+                                            marginRight: '10px',
+                                          }}
+                                          className="btn rounded btn-success"
+                                          disabled={this.state.approving}
                                           onClick={(e) => {
-                                            console.log(
-                                              'Buy Back',
-                                              cases.contract.address,
-                                            );
-                                            console.log(
-                                              'Buy Back Token',
-                                              BigInt(cases.tokenId).toString(),
-                                            );
-                                            this.guaranteeTransfer(BigInt(cases.tokenId).toString());
                                             Event(
                                               'Collection NFT',
                                               'Option',
                                               'Sell (w/Buy Back)',
                                             );
+
+
+                                            //this.openModal(cases.tokenId);
+                                            this.setState({ transferring: true });
+                                            this.checkApprovedForAll(
+                                              this.state.ethereumAddress,
+                                              cases.contract.address,
+                                              this.state.burnanceAddr,
+                                            ).then((isApproved) => {
+                                              console.log(isApproved)
+                                              if (isApproved === false) {
+
+                                                this.NotApproved(cases.tokenId, "guarantee");
+
+                                                this.setState({
+                                                  transferring: false,
+                                                });
+                                              } else {
+                                                this.setState({
+                                                  transferring: false,
+                                                });
+                                                this.openModal(cases.tokenId);
+                                              }
+                                            });
                                           }}
                                         >
-                                          Sell (w/Buy Back)
-                                        </Dropdown.Item>
-                                        <Dropdown.Item
-                                          defaultValue={'Add'}
-                                          className="btn-info"
-                                          eventKey="2"
+                                          <FontAwesomeIcon
+                                            icon={faShieldHalved}
+                                            size="2x"
+                                            alt="Sell with Buy Back guarantee"
+                                          />
+                                        </Button>
+                                        <Button
+                                          aria-label={`Add ${cases.title} to basket`}
+                                          style={{
+                                            backgroundColor: '#24A159',
+                                            marginRight: '10px',
+                                          }}
+                                          className="btn rounded btn-info"
+                                          disabled={this.state.approving}
                                           onClick={(e) => {
-
-                                            const exists = this.state.batch.existsInBatch(this.state.batch.address, cases.contract.address, cases.tokenId)
+                                            const exists =
+                                              this.state.batch.existsInBatch(
+                                                this.state.batch.address,
+                                                cases.contract.address,
+                                                cases.tokenId,
+                                              );
                                             //console.log('Cost',cases.costUSD)
-                                            const costUSD = (typeof cases.costUSD !== "undefined" ? cases.costUSD : 0);
-                                            const tokenType = (typeof cases.tokenType !== "undefined" ? cases.tokenType : "ERC721");
+                                            const costUSD =
+                                              typeof cases.costUSD !== 'undefined'
+                                                ? cases.costUSD
+                                                : 0;
+                                            const tokenType =
+                                              typeof cases.tokenType !==
+                                                'undefined'
+                                                ? cases.tokenType
+                                                : 'ERC721';
 
-                                            const imgSrc = (typeof cases.media === 'undefined') |
-                                            (typeof cases.media[0] === 'undefined')
-                                              ? `${process.env.REACT_APP_BASE_CDN_URL}/default-image.jpg`
-                                              : cases.media[0].gateway
+                                            const imgSrc =
+                                              (typeof cases.media ===
+                                                'undefined') |
+                                                (typeof cases.media[0] ===
+                                                  'undefined')
+                                                ? `${process.env.REACT_APP_BASE_CDN_URL}/default-image.jpg`
+                                                : cases.media[0].gateway;
 
                                             if (exists === false) {
-                                              const add = this.state.batch.addToBatch(this.state.batch.address, title, cases.contract.address, cases.tokenId, tokenType, 1, imgSrc, costUSD);
+                                              const add =
+                                                this.state.batch.addToBatch(
+                                                  this.state.batch.address,
+                                                  title,
+                                                  cases.contract.address,
+                                                  cases.tokenId,
+                                                  tokenType,
+                                                  1,
+                                                  imgSrc,
+                                                  costUSD,
+                                                );
                                               if (add === true) {
-                                                const batchSize = new Batch().length(this.state.ethereumAddress);
-                                                this.setState({batchSize});
-                                                this.fireMsg("NFT Sell Batch", "NFT added to batch.", "INFO");
+                                                const batchSize =
+                                                  new Batch().length(
+                                                    this.state.ethereumAddress,
+                                                  );
+                                                this.setState({ batchSize });
+                                                this.fireMsg(
+                                                  'NFT Sell Batch',
+                                                  'NFT added to batch.',
+                                                  'INFO',
+                                                );
                                               } else {
-                                                this.fireMsg("NFT Sell Batch", "NFT already exists in batch.", "INFO")
+                                                this.fireMsg(
+                                                  'NFT Sell Batch',
+                                                  'NFT already exists in batch.',
+                                                  'INFO',
+                                                );
                                               }
                                             } else {
-                                              this.fireMsg("NFT Sell Batch", "NFT already exists in batch.", "INFO")
+                                              this.fireMsg(
+                                                'NFT Sell Batch',
+                                                'NFT already exists in batch.',
+                                                'INFO',
+                                              );
                                             }
 
                                             Event(
@@ -1522,12 +1697,16 @@ async waitForReceipt(hash, cb) {
                                             );
                                           }}
                                         >
-                                          Add to Batch
-                                        </Dropdown.Item>
-                                      </DropdownButton>
-                                    </ButtonGroup>
+                                          <FontAwesomeIcon
+                                            icon={faBasketShopping}
+                                            color="#E76E3C"
+                                            size="2x"
+                                            alt={`Add ${cases.title} to basket`}
+                                          />
+                                        </Button>
+                                      </ButtonGroup>
 
-                                    {/* <Link
+                                      {/* <Link
                                     to="#"
                                     className="text h7 badge badge-link bg-warning"
                                   >
@@ -1547,21 +1726,160 @@ async waitForReceipt(hash, cb) {
                                   >
                                     Sell (Burn)
                                   </Link> */}
-                                  </Col>
-                                </Row>
-                              </div>
-                            </CardBody>
-                          </Card>
-                        </FadeIn>
-                      </Col>
-                    );})}
-              </Row>
-            )}
-          </Container>
-        </section>
+                                    </Col>
+                                  </Row>
+                                </div>
+                              </CardBody>
+                            </Card>
+                          </FadeIn>
+                        </Col>
+                      );
+                    })}
+                </Row>
+              )}
+            </Container>
+          </section>
+        </LoadingOverlay>
+        <Modal
+          isOpen={this.state.isOpen}
+          role="dialog"
+          autoFocus={true}
+          centered={true}
+          style={{ maxWidth: '500px', width: '500px' }}
+        >
+          <ModalHeader toggle={this.openModal}>
+            Sell with Buy Back Guarantee
+          </ModalHeader>
+          <ModalBody>
+            <div className="rounded shadow-lg p-4 sticky-bar">
+              <div className="d-flex mb-4 justify-content-between">
+                <h5>
+                  {typeof this.state.guaranteeTransferToken !== 'undefined' &&
+                  this.state.guaranteeTransferToken.title === ''
+                    ? `Test net Asset ${this.state.guaranteeTransferToken.tokenId}`
+                    : this.state.guaranteeTransferToken.title}
+                </h5>
+              </div>
+              <div className="table-responsive">
+                <Table className="table-end table-padding mb-0">
+                  <tbody>
+                    <tr>
+                      <td className="h6 border-0">Guarantee Fee</td>
+                      <td className="text-end fw-bold border-0">
+                        {this.state.guaranteeFee} ETH
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="h6 border-0">Guaranteed Months</td>
+                      <td className="text-end fw-bold border-0">
+                        <div className="qty-icons">
+                          <Input
+                            type="button"
+                            value="-"
+                            aria-label="reduce quantity"
+                            onClick={() => {
+                              if (this.state.guaranteeMonths !== 1) {
+                                const guaranteeMonths =
+                                  this.state.guaranteeMonths - 1;
+                                this.setState({ guaranteeMonths });
+                              }
+                            }}
+                            className="minus btn btn-icon btn-soft-primary"
+                            disabled={this.state.transferring}
+                            readOnly
+                          />{' '}
+                          <Input
+                            type="text"
+                            step="1"
+                            min="1"
+                            name="guaranteemonths"
+                            value={this.state.guaranteeMonths}
+                            onChange={(e) => {
+                              if (e.target.value <= 36) {
+                                this.setState({
+                                  guaranteeMonths: e.target.value,
+                                });
+                              } else {
+                                this.fireMsg(
+                                  'Guarantee Months',
+                                  'A guarantee can not exceed 36 months',
+                                  'warn',
+                                );
+                                this.setState({
+                                  guaranteeMonths: 36,
+                                });
+                              }
+                            }}
+                            title="Qty"
+                            disabled={this.state.transferring}
+                            className="btn btn-icon btn-soft-primary qty-btn quantity"
+                          />{' '}
+                          <Input
+                            type="button"
+                            value="+"
+                            aria-label="Increase quantity"
+                            onClick={() => {
+                              const guaranteeMonths =
+                                this.state.guaranteeMonths + 1;
+                              this.setState({ guaranteeMonths });
+                            }}
+                            disabled={this.state.transferring}
+                            readOnly
+                            className="plus btn btn-icon btn-soft-primary"
+                          />
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="h6">Est. Gas Fee</td>
+                      <td className="text-end fw-bold">$ 0.00</td>
+                    </tr>
+                    <tr className="bg-light">
+                      <td className="h5 fw-bold">Total</td>
+                      <td className="text-end text-primary h4 fw-bold">
+                        {(
+                          this.state.guaranteeFee * this.state.guaranteeMonths
+                        ).toFixed(4)}{' '}
+                        ETH
+                      </td>
+                    </tr>
+                  </tbody>
+                </Table>
+
+                <div className="mt-4 pt-2">
+                  <div>
+                    <Link
+                      to="#"
+                      className="btn btn-warning"
+                      onClick={this.openModal}
+                    >
+                      Cancel
+                    </Link>
+                    <Link
+                      style={{ marginLeft: '15px' }}
+                      to="#"
+                      className="btn btn-primary"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        console.log("Transferring")
+                        this.guaranteeTransfer(
+                          this.state.guaranteeTransferToken.tokenId,
+                          this.state.guaranteeMonths,
+                        );
+                        this.setState({ transferring: true, isOpen: false });
+                      }}
+                    >
+                      Place Guarantee
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ModalBody>
+        </Modal>
       </React.Fragment>
     );
   }
 }
 
-export default withRouter(Collection);
+export default withRouter(CollectionView);

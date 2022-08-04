@@ -66,6 +66,14 @@ collectionLoadStart:
         method: get 
         authorizer: aws_iam
         cors: true
+collectionApproved:
+  handler: collection/handler.isCollectionApproved
+  events:
+    - http:
+        path: collection/isapproved/{chain}/{ownerAddress}/{tokenAddress}/{contractAddress}
+        method: get 
+        authorizer: aws_iam
+        cors: true
 collectionLoad:
     handler: collection/steps.loadWalletCollections  
 collectionNFTListLoad:

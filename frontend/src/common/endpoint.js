@@ -113,6 +113,30 @@ export const generateApiClient = (url, region, path, method) => {
             return {error: true, message: e.message, e: e};
         }
     };
+
+/**
+ * _get - GET request to a AWS auth URL
+ * Base API URL (REACT_APP_BASE_API_URL) and REGION (REACT_APP_REGION) are pulled from environment file settings
+ * @param {string} path 
+ * @param {Array} req 
+ */
+export const _getMulti = (paths) => {
+    try {
+      let request = [];
+      for (const path of paths) {
+        request.push(_getApiClient(path));
+      }
+      return axios.all(request).then(
+        axios.spread((...data) => {
+          return data;
+        })
+      );
+    } catch (e) {
+      console.error(e.message);
+      return { error: true, message: e.message, e: e };
+    }
+  };
+
 /**
  * _getExternal - GET request to an external URL
  * @param {string} path  
