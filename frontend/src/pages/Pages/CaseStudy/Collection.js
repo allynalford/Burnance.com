@@ -23,7 +23,7 @@ import { initGA, PageView, Event } from '../../../common/gaUtils';
 import RingLoader from 'react-spinners/RingLoader';
 import { ERC721, ERC1155 } from '../../../common/contractUtils';
 import Web3 from 'web3';
-import Burnance from '../../../abis/Burnance.v2.json';
+import Burnance from '../../../abis/Burnance.v2.1.json';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faBasketShopping,
@@ -52,7 +52,7 @@ class CollectionView extends Component {
   constructor(props, { match }) {
     super(props);
     this.state = {
-      type: "ERC721",
+      type: 'ERC721',
       isOpen: false,
       collection: { name: '' },
       batchSize: 0,
@@ -66,18 +66,18 @@ class CollectionView extends Component {
       loadingCollection: false,
       approving: false,
       transferring: false,
-      burnanceAddr: "",
-      burnance: "",
+      burnanceAddr: '',
+      burnance: '',
       nfts: [],
       displayCategory: 'All',
-      description: "",
+      description: '',
       floorPrice: 0,
       avgPrice: 0,
       holdingValue: 0,
       ethPrice: 0,
       marketCap: 0,
       liquidity1d: 0,
-      liquidity7d:0,
+      liquidity7d: 0,
       liquidity30d: 0,
       thirtyDayVolume: 0,
       totalSupply: 0,
@@ -85,8 +85,7 @@ class CollectionView extends Component {
       held: 0,
       guaranteeFee: 0,
       guaranteeMonths: 1,
-      guaranteeTransferToken: {title: ''}
-
+      guaranteeTransferToken: { title: '' },
     };
     this.setCategory.bind(this);
     this.getNFTs.bind(this);
@@ -106,6 +105,7 @@ class CollectionView extends Component {
     this.openModal.bind(this);
     this.checkApprovedForAll.bind(this);
     this.NotApproved.bind(this);
+    this.ConfirmBurn.bind(this);
   }
 
   openModal = async (tokenId) => {
@@ -118,8 +118,9 @@ class CollectionView extends Component {
       ]);
 
       if (typeof guaranteeTransferToken !== 'undefined') {
-
-        let guaranteeFee = await this.state.burnance.methods.guaranteeFee().call();
+        let guaranteeFee = await this.state.burnance.methods
+          .guaranteeFee()
+          .call();
 
         //let guaranteeFee = 1700000000000000;
 
@@ -140,24 +141,39 @@ class CollectionView extends Component {
     });
   }
 
-  async componentWillMount() {
+  // async componentWillMount() {
+  //   await this.loadWeb3();
+  //   await this.loadBlockchainData();
+  // }
+
+  async init() {
     await this.loadWeb3();
     await this.loadBlockchainData();
   }
 
+  // Make sure to remove the DOM listener when the component is unmounted.
+  componentWillUnmount() {
+    window.removeEventListener('scroll', this.scrollNavigation, true);
+  }
+
   componentDidMount() {
+    try {
 
-
-    try{
+      //Template stuff
       document.body.classList = '';
       document.getElementById('top-menu').classList.add('nav-light');
       window.addEventListener('scroll', this.scrollNavigation, true);
-    }catch(e){
+
+      //Start GA
+      initGA();
+      PageView();
+
+      //Kick off Web3
+      this.init();
+
+    } catch (e) {
       console.warn(e.message);
     }
-
-    initGA();
-    PageView();
 
     if (window.ethereum) {
       window.ethereum.on('accountsChanged', this.accountsChanged);
@@ -165,16 +181,15 @@ class CollectionView extends Component {
         window.ethereum._state.isConnected &&
         typeof window.ethereum._state.accounts[0] !== 'undefined'
       ) {
-
         let batch = new Batch(window.ethereum._state.accounts[0]);
 
         const batchSize = batch.length(window.ethereum._state.accounts[0]);
-         this.setState({batchSize});
-     
+        this.setState({ batchSize });
+
         this.setState({
           ethereumAddress: window.ethereum._state.accounts[0],
           walletConnected: true,
-          batch
+          batch,
         });
         this.getEthPrice(
           window.ethereum._state.accounts[0],
@@ -182,94 +197,108 @@ class CollectionView extends Component {
         );
 
         this.getWallet('ethereum', window.ethereum._state.accounts[0]);
-
-        
-
-      
       }
     }
   }
 
-  fireMsg(title, text, icon){
+  fireMsg(title, text, icon) {
     icon = icon.toLowerCase();
     Swal.fire({
       title,
       text,
       icon,
       confirmButtonText: 'Ok',
-      confirmButtonAriaLabel:'Ok',
+      confirmButtonAriaLabel: 'Ok',
       focusConfirm: true,
       showClass: {
-        popup: 'animate__animated animate__fadeInDown'
+        popup: 'animate__animated animate__fadeInDown',
       },
       hideClass: {
-        popup: 'animate__animated animate__fadeOutUp'
+        popup: 'animate__animated animate__fadeOutUp',
       },
       timer: 5000,
       timerProgressBar: true,
-    })
+    });
   }
 
-  NotApproved(tokenId, type){
+  NotApproved(tokenId, type) {
     Swal.fire({
       title: 'Collection Not Approved',
-      text: "Would you like to approve the collection? This will allow you to complete the transaction you requested.",
+      html: '<p>Would you like to approve the collection? This will allow you to complete the transaction you requested.</p>',
       icon: 'question',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
       cancelButtonText: 'Continue Transaction',
-      confirmButtonText: 'Yes, approve it!'
+      confirmButtonText: 'Yes, approve it!',
     }).then((result) => {
       if (result.isConfirmed) {
-
         this.approveForAll();
-
       } else if (result.dismiss === Swal.DismissReason.cancel) {
-
-        console.log({tokenId, type})
-        if(type === "burn"){
-          this.transfer(tokenId);
-        }else if(type === "guarantee"){
+        console.log({ tokenId, type });
+        if (type === 'burn') {
+          this.ConfirmBurn(tokenId);
+        } else if (type === 'guarantee') {
           this.openModal(tokenId);
         }
       }
-    })
+    });
   }
 
-  
+  ConfirmBurn(tokenId) {
+    Swal.fire({
+      title: 'Standard Burn',
+      html: '<h3 style="color:red">WARNING!</h3><br /><p>Doing a standard burn will send your asset to the <span style="color:red;font-weight:500;">furnace</span> to be <b style="text-decoration: red wavy underline;">BURNED</b> forever, or <br />secure your burn with <span style="color:green;font-weight:bold">BUYBACK Guarantee</span>.</p>',
+      icon: 'warning',
+      showDenyButton: true,
+      showCancelButton: true,
+      denyButtonColor: '#008040',
+      confirmButtonColor: '#D43900',
+      denyButtonText: "BUYBACK",
+      cancelButtonText: 'Cancel',
+      confirmButtonText: 'BURN it!',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.transfer(tokenId);
+      } else if (result.isDenied) {
+        this.openModal(tokenId);
+      }
+    });
+  }
 
   async loadWeb3() {
     if (window.ethereum) {
-        window.web3 = new Web3(window.ethereum);
-        await window.ethereum.request({method: 'eth_requestAccounts'});
-        //await window.ethereum.enable()
+      window.web3 = new Web3(window.ethereum);
+      await window.ethereum.request({ method: 'eth_requestAccounts' });
+      //await window.ethereum.enable()
     } else if (window.web3) {
-        window.web3 = new Web3(window.web3.currentProvider)
+      window.web3 = new Web3(window.web3.currentProvider);
     } else {
-        window.alert('Non-Ethereum browser detected. You should consider trying MetaMask!')
+      window.alert(
+        'Non-Ethereum browser detected. You should consider trying MetaMask!',
+      );
     }
-}
-
-async loadBlockchainData() {
-    const web3 = window.web3
-    const accounts = await web3.eth.getAccounts()
-    this.setState({ account: accounts[0] })
-    const networkId = await web3.eth.net.getId()
-    const contractAddr = await Burnance.networks[networkId].address;
-    const burnance = new web3.eth.Contract(Burnance.abi, contractAddr)   
-    this.setState({ burnance })
-    //this.getPromissoryList()
-    this.setState({ loading:false, burnanceAddr:contractAddr });
-
-    this.isApprovedForAll(window.ethereum._state.accounts[0], this.props.match.params.address, contractAddr);
-
-}
-
-  // Make sure to remove the DOM listener when the component is unmounted.
-  componentWillUnmount() {
-    window.removeEventListener('scroll', this.scrollNavigation, true);
   }
+
+  async loadBlockchainData() {
+    const web3 = window.web3;
+    const accounts = await web3.eth.getAccounts();
+    this.setState({ account: accounts[0] });
+    const networkId = await web3.eth.net.getId();
+    const contractAddr = await Burnance.networks[networkId].address;
+    const burnance = new web3.eth.Contract(Burnance.abi, contractAddr);
+    this.setState({ burnance });
+    //this.getPromissoryList()
+    this.setState({ loading: false, burnanceAddr: contractAddr });
+
+    this.isApprovedForAll(
+      window.ethereum._state.accounts[0],
+      this.props.match.params.address,
+      contractAddr,
+    );
+  }
+
+
 
   scrollNavigation = () => {
     var doc = document.documentElement;
@@ -286,16 +315,13 @@ async loadBlockchainData() {
       window.ethereum._state.isConnected &&
       typeof window.ethereum._state.accounts[0] !== 'undefined'
     ) {
-
-      if (this.state.ethereumAddress === "") {
-
-        let batch = new Batch(window.ethereum._state.accounts[0])
-
+      if (this.state.ethereumAddress === '') {
+        let batch = new Batch(window.ethereum._state.accounts[0]);
 
         this.setState({
           ethereumAddress: window.ethereum._state.accounts[0],
           walletConnected: true,
-          batch
+          batch,
         });
 
         this.getWallet('ethereum', window.ethereum._state.accounts[0]);
@@ -325,7 +351,7 @@ async loadBlockchainData() {
         Collection = gets.collection;
         NFTS = gets.nfts;
 
-        console.log('Cache', { Collection, NFTS });
+        //console.log('Cache', { Collection, NFTS });
       } else {
         try {
           gets = await endpoint._getMulti([
@@ -352,7 +378,7 @@ async loadBlockchainData() {
         Collection = gets[0];
         NFTS = gets[1];
 
-        console.log('Called Service', { Collection, NFTS });
+        //console.log('Called Service', { Collection, NFTS });
       }
 
       const collection = Collection.data.collection;
@@ -455,95 +481,115 @@ async loadBlockchainData() {
   };
 
   getEthPrice = async (ethereumAddress, contractAddress) => {
-
-    let ethPrice = JSON.parse(sessionstorage.getItem("ethPrice"));
+    let ethPrice = JSON.parse(sessionstorage.getItem('ethPrice'));
 
     if ((typeof ethPrice === 'undefined') | (ethPrice === null)) {
       ethPrice = await endpoint._get(getChain()['eth'].getEthPriceApiUrl);
       ethPrice = ethPrice.data.result;
-      sessionstorage.setItem("ethPrice", JSON.stringify(ethPrice));
-    };
+      sessionstorage.setItem('ethPrice', JSON.stringify(ethPrice));
+    }
 
     //console.log('EthPrice: Running getNFTs', ethPrice)
     this.getNFTs(ethereumAddress, contractAddress, ethPrice.ethusd);
 
-    this.setState({ethPrice});
+    this.setState({ ethPrice });
   };
 
-  refresh = async () =>{
-    sessionstorage.removeItem(this.state.ethereumAddress + "-" + this.props.match.params.address);
-    this.getEthPrice(this.state.ethereumAddress, this.props.match.params.address);
-  }
+  refresh = async () => {
 
+    const collectionObj = new CollectionObj(this.state.ethereumAddress, this.props.match.params.address);
+    collectionObj.remove(this.state.ethereumAddress, this.props.match.params.address);
+    
+    this.getEthPrice(
+      this.state.ethereumAddress,
+      this.props.match.params.address,
+    );
+  };
 
   getWallet = async (chain, address) => {
+    const walletResp = await endpoint._get(
+      getChain()['eth'].getWalletApiUrl + `/${chain}/${address}`,
+    );
 
-    const walletResp = await endpoint._get(getChain()['eth'].getWalletApiUrl + `/${chain}/${address}`);
-    
-    this.setState({wallet: walletResp.data});
+    this.setState({ wallet: walletResp.data });
   };
 
-  approveForAll = async() => {
-  
-    this.setState({approving: true, contentLoading: true});
+  approveForAll = async () => {
+    this.setState({ approving: true, contentLoading: true });
     const thisss = this;
     const address = this.props.match.params.address;
     const type = this.state.type;
-    
-    if(type === "ERC721"){
-        ERC721(address).methods.setApprovalForAll(this.state.burnanceAddr, true).send({ from: this.state.account }).on('transactionHash', (transactionHash) => {
-           
-          console.log('transactionHash(ERC721)', transactionHash);
 
-         
-          
+    if (type === 'ERC721') {
+      ERC721(address)
+        .methods.setApprovalForAll(this.state.burnanceAddr, true)
+        .send({ from: this.state.account })
+        .on('transactionHash', (transactionHash) => {
+          //console.log('transactionHash(ERC721)', transactionHash);
+
           thisss.waitForReceipt(transactionHash, function (response) {
-                if(response.status){ 
-                    //alert("Set Approve for all Successfully");
-                    thisss.fireMsg("Collection Approval","Collection Approval Successfully", "INFO");
-                    thisss.setState({ approving: false, collectionApproved: true, contentLoading: false});
+            if (response.status) {
+              //alert("Set Approve for all Successfully");
+              thisss.fireMsg(
+                'Collection Approval',
+                'Collection Approval Successfully',
+                'INFO',
+              );
+              thisss.setState({
+                approving: false,
+                collectionApproved: true,
+                contentLoading: false,
+              });
 
-                    //Update the collection as Approved
-
-                }else{
-                    alert(response.msg);
-                    thisss.fireMsg("Collection Approval",response.msg, "WARN");
-                    thisss.setState({ approving: false, contentLoading: false});
-                }
-            });
-        }).on('error', function(error, receipt) {
-            const title = error.message.split(':')[0];
-            const msg = error.message.split(':')[1]; 
-            thisss.fireMsg(title, msg, "WARN");
-            thisss.setState({ approving: false, contentLoading: false});
-        });
-
-    }else if(type === "ERC1155"){
-        ERC1155(address).methods.setApprovalForAll(this.state.burnanceAddr, true).send({ from: this.state.account }).on('transactionHash', (transactionHash) => {
-           
-          console.log('transactionHash', transactionHash)
-          
-          thisss.waitForReceipt(transactionHash, function (response) {
-              if(response.status){ 
-                //alert("Set Approve for all Successfully");
-                thisss.fireMsg("Collection Approval","Collection Approval Successfully", "INFO");
-                thisss.setState({ approving: false, collectionApproved: true, contentLoading: false});
-            }else{
-                //alert(response.msg);
-                thisss.fireMsg("Collection Approval",response.msg, "WARN");
-                thisss.setState({ approving: false, contentLoading: false});
+              //Update the collection as Approved
+            } else {
+              alert(response.msg);
+              thisss.fireMsg('Collection Approval', response.msg, 'WARN');
+              thisss.setState({ approving: false, contentLoading: false });
             }
-            });
-        }).on('error', function(error, receipt) {
+          });
+        })
+        .on('error', function (error, receipt) {
           const title = error.message.split(':')[0];
-          const msg = error.message.split(':')[1]; 
-          thisss.fireMsg(title, msg, "WARN");
-          thisss.setState({ approving: false, contentLoading: false});
+          const msg = error.message.split(':')[1];
+          thisss.fireMsg(title, msg, 'WARN');
+          thisss.setState({ approving: false, contentLoading: false });
+        });
+    } else if (type === 'ERC1155') {
+      ERC1155(address)
+        .methods.setApprovalForAll(this.state.burnanceAddr, true)
+        .send({ from: this.state.account })
+        .on('transactionHash', (transactionHash) => {
+          console.log('transactionHash', transactionHash);
+
+          thisss.waitForReceipt(transactionHash, function (response) {
+            if (response.status) {
+              //alert("Set Approve for all Successfully");
+              thisss.fireMsg(
+                'Collection Approval',
+                'Collection Approval Successfully',
+                'INFO',
+              );
+              thisss.setState({
+                approving: false,
+                collectionApproved: true,
+                contentLoading: false,
+              });
+            } else {
+              //alert(response.msg);
+              thisss.fireMsg('Collection Approval', response.msg, 'WARN');
+              thisss.setState({ approving: false, contentLoading: false });
+            }
+          });
+        })
+        .on('error', function (error, receipt) {
+          const title = error.message.split(':')[0];
+          const msg = error.message.split(':')[1];
+          thisss.fireMsg(title, msg, 'WARN');
+          thisss.setState({ approving: false, contentLoading: false });
         });
     }
-
-
-}
+  };
 
   isApprovedForAll = async (account, tokenAddress, burnanceAddr) => {
     try {
@@ -551,11 +597,11 @@ async loadBlockchainData() {
         getChain()['eth'].getIsCollectionApprovedApiUrl +
           `ethereum/${account}/${tokenAddress}/${burnanceAddr}`,
       );
-      this.setState({collectionApproved: collectionApproved.data.isApproved});
+      this.setState({ collectionApproved: collectionApproved.data.isApproved });
     } catch (e) {
       console.error(e);
     }
-  }
+  };
 
   checkApprovedForAll = async (account, tokenAddress, burnanceAddr) => {
     try {
@@ -565,137 +611,178 @@ async loadBlockchainData() {
       );
 
       //Makre sure some weird error didn't happen
-      if(typeof collectionApproved.data === "undefined"){
+      if (typeof collectionApproved.data === 'undefined') {
         return false;
       }
 
-      return collectionApproved.data.isApproved
+      return collectionApproved.data.isApproved;
     } catch (e) {
       console.error(e);
       return false;
     }
-  }
+  };
 
-guaranteeTransfer = async(tokenId, months) => {
-  //e.preventDefault();
-  const thisss = this;
-  this.setState({ transferring: true, approving: true, contentLoading: true });
+  guaranteeTransfer = async (tokenId, months) => {
+    //e.preventDefault();
+    const thisss = this;
+    this.setState({
+      transferring: true,
+      approving: true,
+      contentLoading: true,
+    });
 
-  const address = this.props.match.params.address;
-  //const tokenId = e.target.tokenId.value
-  let guaranteeFee = await this.state.burnance.methods.guaranteeFee().call();
-  console.log(guaranteeFee);
-  guaranteeFee = (guaranteeFee * months)
-  console.log(guaranteeFee);
+    const address = this.props.match.params.address;
+    //const tokenId = e.target.tokenId.value
+    let guaranteeFee = await this.state.burnance.methods.guaranteeFee().call();
+    //console.log(guaranteeFee);
+    guaranteeFee = guaranteeFee * months;
+    //console.log(guaranteeFee);
 
-  this.state.burnance.methods.gauranteeTransfer(address, tokenId, months).send({ from: this.state.ethereumAddress, value: Number(guaranteeFee) }).on('transactionHash', (transactionHash) => {
-    console.log('guaranteeTransfer transactionHash',transactionHash)  
-    thisss.waitForReceipt(transactionHash, function (response) {
-          if(response.status){ 
-              thisss.fireMsg("Guarantee NFT Transfer", "NFT transfer was successful", "INFO");
-              
-              sessionstorage.removeItem(`${thisss.state.ethereumAddress}-${thisss.props.match.params.address}-nfts`);
-              sessionstorage.removeItem(`${thisss.state.ethereumAddress}-${thisss.props.match.params.address}`);
+    this.state.burnance.methods
+      .gauranteeTransfer(address, tokenId, months)
+      .send({ from: this.state.ethereumAddress, value: Number(guaranteeFee) })
+      .on('transactionHash', (transactionHash) => {
+        //console.log('guaranteeTransfer transactionHash', transactionHash);
+        thisss.waitForReceipt(transactionHash, function (response) {
+          if (response.status) {
+            thisss.fireMsg(
+              'Guarantee NFT Transfer',
+              'NFT transfer was successful',
+              'INFO',
+            );
+
+            const collectionObj = new CollectionObj(thisss.state.ethereumAddress, thisss.props.match.params.address);
+            collectionObj.remove(thisss.state.ethereumAddress, thisss.props.match.params.address);
 
 
-              thisss.setState({ transferring: false, guaranteeMonths: 1, approving: false, contentLoading: false});
+            thisss.setState({
+              transferring: false,
+              guaranteeMonths: 1,
+              approving: false,
+              contentLoading: false,
+            });
 
-              thisss.getEthPrice(
-                thisss.state.ethereumAddress,
-                thisss.props.match.params.address,
-              );
-
-              
-
-            }else{
-              //alert(response.msg);
-              thisss.fireMsg("Guarantee nft Transfer",response.msg, "WARN");
-              thisss.setState({ transferring: false, approving: false, contentLoading: false});
+            thisss.getEthPrice(
+              thisss.state.ethereumAddress,
+              thisss.props.match.params.address,
+            );
+          } else {
+            //alert(response.msg);
+            thisss.fireMsg('Guarantee nft Transfer', response.msg, 'WARN');
+            thisss.setState({
+              transferring: false,
+              approving: false,
+              contentLoading: false,
+            });
           }
+        });
+      })
+      .on('error', function (error, receipt) {
+        const title = error.message.split(':')[0];
+        const msg = error.message.split(':')[1];
+        thisss.fireMsg(title, msg, 'WARN');
+        thisss.setState({
+          transferring: false,
+          approving: false,
+          contentLoading: false,
+        });
       });
-  }).on('error', function(error, receipt) {
-      const title = error.message.split(':')[0];
-      const msg = error.message.split(':')[1]; 
-      thisss.fireMsg(title, msg, "WARN");
-      thisss.setState({ transferring: false, approving: false, contentLoading: false});
-  });
-}
+  };
 
-recordTx = async(tokenId, transactionHash) =>{
-  const _ = require('lodash');
-  const nft = _.find(this.state.nfts, {tokenId:tokenId});
-  console.log({tokenId, nft, transactionHash});
-}
+  recordTx = async (tokenId, transactionHash) => {
+    const _ = require('lodash');
+    const nft = _.find(this.state.nfts, { tokenId: tokenId });
+    console.log({ tokenId, nft, transactionHash });
+  };
 
-transfer = async(tokenId) => {
-  //e.preventDefault();
-  const thisss = this;
-  this.setState({ transferring: true, approving: true, contentLoading: true })
+  transfer = async (tokenId) => {
+    //e.preventDefault();
+    const thisss = this;
+    this.setState({
+      transferring: true,
+      approving: true,
+      contentLoading: true,
+    });
 
-  const address = this.props.match.params.address;
-  //const tokenId = e.target.tokenId.value
+    const address = this.props.match.params.address;
+    //const tokenId = e.target.tokenId.value
 
+    this.state.burnance.methods
+      .batchTransfer([address], [tokenId], [1])
+      .send({ from: this.state.ethereumAddress })
+      .on('transactionHash', (transactionHash) => {
+        //console.log('Transfer transactionHash', transactionHash);
+        thisss.waitForReceipt(transactionHash, function (response) {
+          if (response.status) {
+            thisss.fireMsg(
+              'NFT Transfer',
+              'NFT transfer was successful',
+              'INFO',
+            );
 
-  this.state.burnance.methods.batchTransfer([address], [tokenId], [1]).send({ from: this.state.ethereumAddress }).on('transactionHash', (transactionHash) => {
-    console.log('Transfer transactionHash',transactionHash)  
-    thisss.waitForReceipt(transactionHash, function (response) {
-          if(response.status){ 
-              thisss.fireMsg("NFT Transfer", "NFT transfer was successful", "INFO");
-              
-              sessionstorage.removeItem(`${thisss.state.ethereumAddress}-${thisss.props.match.params.address}-nfts`);
-              sessionstorage.removeItem(`${thisss.state.ethereumAddress}-${thisss.props.match.params.address}`);
+            const collectionObj = new CollectionObj(thisss.state.ethereumAddress, thisss.props.match.params.address);
+            collectionObj.remove(thisss.state.ethereumAddress, thisss.props.match.params.address);
 
-             
-            thisss.recordTx(tokenId, transactionHash).then(function (result) { // (**)
+            thisss
+              .recordTx(tokenId, transactionHash)
+              .then(function (result) {
+                // (**)
 
-              thisss.getEthPrice(
-                thisss.state.ethereumAddress,
-                thisss.props.match.params.address,
-              );
+                thisss.getEthPrice(
+                  thisss.state.ethereumAddress,
+                  thisss.props.match.params.address,
+                );
+              })
+              .catch((err) => alert(err));
 
-            }).catch(err => alert(err))
-
-            thisss.setState({ transferring: false, approving: false, contentLoading: false });
-
-            }else{
-              //alert(response.msg);
-              thisss.fireMsg("NFT Transfer",response.msg, "WARN");
-              thisss.setState({ transferring: false});
+            thisss.setState({
+              transferring: false,
+              approving: false,
+              contentLoading: false,
+            });
+          } else {
+            //alert(response.msg);
+            thisss.fireMsg('NFT Transfer', response.msg, 'WARN');
+            thisss.setState({ transferring: false, contentLoading: false });
           }
+        });
+      })
+      .on('error', function (error, receipt) {
+        const title = error.message.split(':')[0];
+        const msg = error.message.split(':')[1];
+        thisss.fireMsg(title, msg, 'WARN');
+        thisss.setState({ transferring: false, contentLoading: false  });
+        console.warn(error.message);
+        console.error(error);
       });
-  }).on('error', function(error, receipt) {
-      const title = error.message.split(':')[0];
-      const msg = error.message.split(':')[1]; 
-      thisss.fireMsg(title, msg, "WARN");
-      thisss.setState({ transferring: false});
-      console.warn(error.message)
-      console.error(error)
-  });
-}
+  };
 
-async waitForReceipt(hash, cb) {
-  const web3 = window.web3;
-  const thiss = this;
-  web3.eth.getTransactionReceipt(hash, function (err, receipt) {
+  async waitForReceipt(hash, cb) {
+    const web3 = window.web3;
+    const thiss = this;
+    web3.eth.getTransactionReceipt(hash, function (err, receipt) {
       if (err) {
         console.log(err);
-      }  
-  
+      }
+
       if (receipt !== null) {
         if (cb) {
-            if(receipt.status === '0x0') {
-                cb({status:false, msg: "The contract execution was not successful, check your transaction !"});
-            } else {
-                cb({status:true, msg:"Execution worked fine!"});
-            }
+          if (receipt.status === '0x0') {
+            cb({
+              status: false,
+              msg: 'The contract execution was not successful, check your transaction !',
+            });
+          } else {
+            cb({ status: true, msg: 'Execution worked fine!' });
+          }
         }
       } else {
         window.setTimeout(function () {
           thiss.waitForReceipt(hash, cb);
         }, 1000);
       }
-  });
-}
+    });
+  }
 
   render() {
     return (
@@ -754,7 +841,7 @@ async waitForReceipt(hash, cb) {
         <LoadingOverlay
           active={this.state.contentLoading}
           spinner
-          text='Processing transaction......'
+          text="Processing transaction......"
         >
           <section className="section">
             <Container>
@@ -879,7 +966,9 @@ async waitForReceipt(hash, cb) {
                           size={50}
                         />
                       ) : (
-                        <p className="text h3 mb-0">{this.state.liquidity1d}%</p>
+                        <p className="text h3 mb-0">
+                          {this.state.liquidity1d}%
+                        </p>
                       )}
                     </div>
                   </div>
@@ -912,7 +1001,9 @@ async waitForReceipt(hash, cb) {
                           size={50}
                         />
                       ) : (
-                        <p className="text h3 mb-0">{this.state.liquidity7d}%</p>
+                        <p className="text h3 mb-0">
+                          {this.state.liquidity7d}%
+                        </p>
                       )}
                     </div>
                   </div>
@@ -944,7 +1035,9 @@ async waitForReceipt(hash, cb) {
                           size={50}
                         />
                       ) : (
-                        <p className="text h3 mb-0">{this.state.liquidity30d}%</p>
+                        <p className="text h3 mb-0">
+                          {this.state.liquidity30d}%
+                        </p>
                       )}
                     </div>
                   </div>
@@ -1002,7 +1095,9 @@ async waitForReceipt(hash, cb) {
                           size={50}
                         />
                       ) : (
-                        <p className="text h3 mb-0">{this.state.holdingValue}</p>
+                        <p className="text h3 mb-0">
+                          {this.state.holdingValue}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -1120,8 +1215,8 @@ async waitForReceipt(hash, cb) {
                         ? true
                         : (this.state.loading === true) |
                           (this.state.approving === true)
-                          ? true
-                          : false
+                        ? true
+                        : false
                     }
                     onClick={(e) => {
                       e.preventDefault();
@@ -1131,8 +1226,8 @@ async waitForReceipt(hash, cb) {
                     {this.state.collectionApproved === true
                       ? 'Approved'
                       : this.state.loading === true
-                        ? 'Loading Collection...'
-                        : 'Approve Collection'}
+                      ? 'Loading Collection...'
+                      : 'Approve Collection'}
                   </Link>
                   <Link
                     to="#"
@@ -1144,7 +1239,7 @@ async waitForReceipt(hash, cb) {
                     }}
                     disabled={
                       (this.state.loading === true) |
-                        (this.state.approving === true)
+                      (this.state.approving === true)
                         ? true
                         : false
                     }
@@ -1307,7 +1402,7 @@ async waitForReceipt(hash, cb) {
                               <img
                                 src={
                                   (typeof cases.media === 'undefined') |
-                                    (typeof cases.media[0] === 'undefined')
+                                  (typeof cases.media[0] === 'undefined')
                                     ? `${process.env.REACT_APP_BASE_CDN_URL}/default-image.jpg`
                                     : cases.media[0].gateway
                                 }
@@ -1409,8 +1504,8 @@ async waitForReceipt(hash, cb) {
                                           {typeof cases.valueUSD === 'undefined'
                                             ? '$0.00'
                                             : formatter.format(
-                                              cases.valueUSD,
-                                            )}{' '}
+                                                cases.valueUSD,
+                                              )}{' '}
                                         </Col>
                                         <Col
                                           md="6"
@@ -1419,7 +1514,9 @@ async waitForReceipt(hash, cb) {
                                         >
                                           {typeof cases.gasUSD === 'undefined'
                                             ? '$0.00'
-                                            : formatter.format(cases.gasUSD)}{' '}
+                                            : formatter.format(
+                                                cases.gasUSD,
+                                              )}{' '}
                                         </Col>
                                         <Col
                                           md="6"
@@ -1493,11 +1590,11 @@ async waitForReceipt(hash, cb) {
                                     </Col>
                                     <Col md="6" className="text-center">
                                       {typeof cases.ethTransPriceUSD ===
-                                        'undefined'
+                                      'undefined'
                                         ? '$0.00'
                                         : formatter.format(
-                                          cases.ethTransPriceUSD,
-                                        )}
+                                            cases.ethTransPriceUSD,
+                                          )}
                                     </Col>
                                     <Col md="6" className="text-center">
                                       {formatter.format(
@@ -1543,25 +1640,30 @@ async waitForReceipt(hash, cb) {
                                             //     cases.tokenId,
                                             //   ).toString(),
                                             // );
-                                            this.setState({ transferring: true });
+                                            this.setState({
+                                              transferring: true,
+                                            });
                                             this.checkApprovedForAll(
                                               this.state.ethereumAddress,
                                               cases.contract.address,
                                               this.state.burnanceAddr,
                                             ).then((isApproved) => {
-
                                               if (isApproved === false) {
-                                                this.NotApproved(cases.tokenId, "burn");
+                                                this.NotApproved(
+                                                  cases.tokenId,
+                                                  'burn',
+                                                );
 
                                                 this.setState({
                                                   transferring: false,
                                                 });
                                               } else {
-                                                this.transfer(
-                                                  BigInt(
-                                                    cases.tokenId,
-                                                  ).toString(),
-                                                );
+                                                this.ConfirmBurn(cases.tokenId);
+                                                // this.transfer(
+                                                //   BigInt(
+                                                //     cases.tokenId,
+                                                //   ).toString(),
+                                                // );
                                               }
                                             });
                                           }}
@@ -1587,18 +1689,21 @@ async waitForReceipt(hash, cb) {
                                               'Sell (w/Buy Back)',
                                             );
 
-
                                             //this.openModal(cases.tokenId);
-                                            this.setState({ transferring: true });
+                                            this.setState({
+                                              transferring: true,
+                                            });
                                             this.checkApprovedForAll(
                                               this.state.ethereumAddress,
                                               cases.contract.address,
                                               this.state.burnanceAddr,
                                             ).then((isApproved) => {
-                                              console.log(isApproved)
+                                              //console.log(isApproved);
                                               if (isApproved === false) {
-
-                                                this.NotApproved(cases.tokenId, "guarantee");
+                                                this.NotApproved(
+                                                  cases.tokenId,
+                                                  'guarantee',
+                                                );
 
                                                 this.setState({
                                                   transferring: false,
@@ -1635,20 +1740,21 @@ async waitForReceipt(hash, cb) {
                                               );
                                             //console.log('Cost',cases.costUSD)
                                             const costUSD =
-                                              typeof cases.costUSD !== 'undefined'
+                                              typeof cases.costUSD !==
+                                              'undefined'
                                                 ? cases.costUSD
                                                 : 0;
                                             const tokenType =
                                               typeof cases.tokenType !==
-                                                'undefined'
+                                              'undefined'
                                                 ? cases.tokenType
                                                 : 'ERC721';
 
                                             const imgSrc =
                                               (typeof cases.media ===
                                                 'undefined') |
-                                                (typeof cases.media[0] ===
-                                                  'undefined')
+                                              (typeof cases.media[0] ===
+                                                'undefined')
                                                 ? `${process.env.REACT_APP_BASE_CDN_URL}/default-image.jpg`
                                                 : cases.media[0].gateway;
 
@@ -1861,7 +1967,7 @@ async waitForReceipt(hash, cb) {
                       className="btn btn-primary"
                       onClick={(e) => {
                         e.preventDefault();
-                        console.log("Transferring")
+                        //console.log('Transferring');
                         this.guaranteeTransfer(
                           this.state.guaranteeTransferToken.tokenId,
                           this.state.guaranteeMonths,

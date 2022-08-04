@@ -25,31 +25,46 @@ import "slick-carousel/slick/slick-theme.css";
 import PageBreadcrumb from "../../components/Shared/PageBreadcrumb";
 
 //Import Images
-import client from "../../assets/images/default-image.jpg";
+//import client from "../../assets/images/default-image.jpg";
 import { getChain } from "../../common/config";
 import dateFormat from "dateformat";
+import moment from "moment";
+import DataTableLoader from '../../components/DataTable';
+import DataTable from 'react-data-table-component';
+import Web3 from 'web3';
+import Burnance from '../../abis/Burnance.v2.1.json'
 const endpoint = require('../../common/endpoint');
-
+const Swal = require('sweetalert2');
+var storage = require('lscache');
 class MyAccount extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      activeTab: "1",
+      activeTab: "3",
       pathItems: [
         //id must required
         { id: 1, name: "Burnance", link: "/" },
-        { id: 2, name: "My Account", link: "/account" },
+        { id: 2, name: "Collections", link: "/collections" },
+        { id: 3, name: "My Account", link: "/account" },
       ],
       burnanceAddr: "",
       burnance: "",
       ethereumAddress: '',
       walletConnected: false,
       account: '',
-      guarantees: []
+      guarantees: [],
+      transferring: false,
+      loading: false,
     };
     this.toggleTab = this.toggleTab.bind(this);
     this.getPromissoryList.bind(this);
     this.accountsChanged.bind(this);
+    this.recordTx.bind(this);
+    this.buyBack.bind(this);
+    this.waitForReceipt.bind(this);
+    this.loadBlockchainData.bind(this);
+    this.loadWeb3.bind(this);
+    this.fireMsg.bind(this);
   }
   toggleTab(tab) {
     if (this.state.activeTab !== tab) {
@@ -59,6 +74,30 @@ class MyAccount extends Component {
     }
   }
 
+  fireMsg(title, text, icon) {
+    icon = icon.toLowerCase();
+    Swal.fire({
+      title,
+      text,
+      icon,
+      confirmButtonText: 'Ok',
+      confirmButtonAriaLabel: 'Ok',
+      focusConfirm: true,
+      showClass: {
+        popup: 'animate__animated animate__fadeInDown',
+      },
+      hideClass: {
+        popup: 'animate__animated animate__fadeOutUp',
+      },
+      timer: 5000,
+      timerProgressBar: true,
+    });
+  }
+
+  async init() {
+    await this.loadWeb3();
+    await this.loadBlockchainData();
+  }
 
   componentDidMount() {
     try{
@@ -71,6 +110,8 @@ class MyAccount extends Component {
 
     initGA();
     PageView();
+
+    this.init();
 
     if (window.ethereum) {
       window.ethereum.on('accountsChanged', this.accountsChanged);
@@ -91,6 +132,32 @@ class MyAccount extends Component {
   // Make sure to remove the DOM listener when the component is unmounted.
   componentWillUnmount() {
     window.removeEventListener("scroll", this.scrollNavigation, true);
+  };
+
+  async loadWeb3() {
+    if (window.ethereum) {
+      window.web3 = new Web3(window.ethereum);
+      await window.ethereum.request({ method: 'eth_requestAccounts' });
+      //await window.ethereum.enable()
+    } else if (window.web3) {
+      window.web3 = new Web3(window.web3.currentProvider);
+    } else {
+      window.alert(
+        'Non-Ethereum browser detected. You should consider trying MetaMask!',
+      );
+    }
+  }
+
+  async loadBlockchainData() {
+    const web3 = window.web3;
+    const accounts = await web3.eth.getAccounts();
+    this.setState({ account: accounts[0] });
+    const networkId = await web3.eth.net.getId();
+    const contractAddr = await Burnance.networks[networkId].address;
+    const burnance = new web3.eth.Contract(Burnance.abi, contractAddr);
+    this.setState({ burnance });
+    //this.getPromissoryList()
+    this.setState({ loading: false, burnanceAddr: contractAddr });
   }
 
   accountsChanged = () => {
@@ -123,14 +190,134 @@ class MyAccount extends Component {
     }
   };
 
+  recordTx = async (tokenId, transactionHash) => {
+    const _ = require('lodash');
+    const nft = _.find(this.state.nfts, { tokenId: tokenId });
+    console.log({ tokenId, nft, transactionHash });
+  };
+
+  buyBack = async (id) => {
+    //e.preventDefault();
+    const thisss = this;
+    this.setState({
+      transferring: true,
+      approving: true,
+      contentLoading: true,
+    });
+
+    let buyBackPrice = await this.state.burnance.methods.buyBackPrice().call();
+
+    //console.log(buyBackPrice);
+
+    this.state.burnance.methods
+      .buyBack(id)
+      .send({ from: this.state.ethereumAddress, value: Number(buyBackPrice) })
+      .on('transactionHash', (transactionHash) => {
+        //console.log('Transfer transactionHash', transactionHash);
+        thisss.waitForReceipt(transactionHash, function (response) {
+          if (response.status) {
+            thisss.fireMsg(
+              'NFT Buyback',
+              'NFT buy back was successful',
+              'INFO',
+            );
+
+            
+            thisss.recordTx(id, transactionHash).then(function (result) {
+                
+              //Reload the list
+              thisss.getPromissoryList(thisss.state.ethereumAddress);
+
+              //Clear out the cache
+              storage.flush();
+
+         
+              }).catch((err) => console.log(err));
+
+            thisss.setState({
+              transferring: false,
+              loading: false,
+            });
+
+          } else {
+            //alert(response.msg);
+            thisss.fireMsg('NFT Buyback', response.msg, 'WARN');
+            thisss.setState({ transferring: false, loading: false });
+          }
+        });
+      })
+      .on('error', function (error, receipt) {
+        const title = error.message.split(':')[0];
+        const msg = error.message.split(':')[1];
+        thisss.fireMsg(title, msg, 'WARN');
+        thisss.setState({ transferring: false, loading: false  });
+        console.warn(error.message);
+        console.error(error);
+      });
+  };
+
+  async waitForReceipt(hash, cb) {
+    const web3 = window.web3;
+    const thiss = this;
+    web3.eth.getTransactionReceipt(hash, function (err, receipt) {
+      if (err) {
+        console.log(err);
+      }
+
+      if (receipt !== null) {
+        if (cb) {
+          if (receipt.status === '0x0') {
+            cb({
+              status: false,
+              msg: 'The contract execution was not successful, check your transaction !',
+            });
+          } else {
+            cb({ status: true, msg: 'Execution worked fine!' });
+          }
+        }
+      } else {
+        window.setTimeout(function () {
+          thiss.waitForReceipt(hash, cb);
+        }, 1000);
+      }
+    });
+  }
 
 getPromissoryList = async(address) => {
   this.setState({ loading:true });
   const guarantees = await endpoint._get(getChain()['eth'].viewWalletGuarenteeSellTxApiUrl + `/ethereum/${address}`)
   this.setState({ guarantees: guarantees.data.transactions, loading:false });
-}
+};
 
   render() {
+    const customStyles = {
+      headRow: {
+        style: {
+          border: 'none',
+
+        },
+      },
+      headCells: {
+        style: {
+          color: '#202124',
+          fontWeight: 'bold',
+          fontSize: '16px'
+        },
+      },
+      rows: {
+        highlightOnHoverStyle: {
+          backgroundColor: 'rgb(230, 244, 244)',
+          borderBottomColor: '#FFFFFF',
+          borderRadius: '25px',
+          outline: '1px solid #FFFFFF',
+        },
+      },
+      pagination: {
+        style: {
+          border: 'none',
+        },
+      },
+    };
     return (
       <React.Fragment>
         {/* breadcrumb */}
@@ -155,17 +342,17 @@ getPromissoryList = async(address) => {
         <section className="section">
           <Container>
             <Row>
-              <Col md={4} className="mt-4 pt-2">
+              <Col md={3} className="mt-4 pt-2">
                 <div className="d-flex align-items-center">
-                  <img
+                  {/* <img
                     src={client}
                     className="avatar avatar-md-md rounded-circle"
                     alt=""
-                  />
-                  <div className="ms-3">
-                    <h6 className="text-muted mb-0">Address</h6>
-                    <h5 className="mb-0">{this.state.ethereumAddress}</h5>
-                  </div>
+                  /> */}
+                  {/* <div className="ms-3">
+                    <h6 className="text mb-0">Address</h6>
+                    <p className="mb-0" style={{fontSize: '10px'}}></p>
+                  </div> */}
                 </div>
 
                 <ul
@@ -173,7 +360,7 @@ getPromissoryList = async(address) => {
                   id="pills-tab"
                   role="tablist"
                 >
-                  <NavItem>
+                  {/* <NavItem>
                     <NavLink
                       to="#"
                       className={classnames(
@@ -191,7 +378,7 @@ getPromissoryList = async(address) => {
                         </h6>
                       </div>
                     </NavLink>
-                  </NavItem>
+                  </NavItem> */}
 
                   <NavItem className="mt-2">
                     <NavLink
@@ -304,7 +491,7 @@ getPromissoryList = async(address) => {
                 </ul>
               </Col>
 
-              <Col md={8} xs={12} className="mt-4 pt-2">
+              <Col md={9} xs={12} className="mt-4 pt-2">
                 <TabContent activeTab={this.state.activeTab}>
                   <TabPane
                     className="fade bg-white show shadow rounded p-4"
@@ -405,35 +592,104 @@ getPromissoryList = async(address) => {
                     className="show fade bg-white shadow rounded p-4"
                     tabId="3"
                   >
-                    <div className="table-responsive bg-white shadow rounded">
+                    <DataTable
+                    title={'Guarantee(s): ' + this.state.ethereumAddress}
+                    customStyles={customStyles}
+                    highlightOnHover
+                    pointerOnHover
+                    progressPending={this.state.loading}
+                    progressComponent={<DataTableLoader width={'100%'} />}
+                    columns={[
+                      {
+                        name: 'BuyBack',
+                        selector: (row) => new Date(row.expireTime * 1000),
+                        format: (row) => (
+                          moment(new Date(row.expireTime * 1000)).isAfter(Date.now()) === true ? <Link 
+                          onClick={ e =>{
+                            this.buyBack(row.id);
+                          }}
+                          to={`#`}>
+                          Buy
+                        </Link> : <span style={{color: '#8B0000'}}>Expired</span>
+                        ),
+                        sortable: true,
+                        style: {
+                          color: '#202124',
+                          fontSize: '16px',
+                          fontWeight: 600,
+                        },
+                      },
+                      {
+                        name: 'Asset',
+                        selector: (row) => row.title,
+                        sortable: true,
+                        grow: 3,
+                        style: {
+                          color: '#202124',
+                          fontSize: '16px',
+                          fontWeight: 600,
+                        },
+                      },
+                      {
+                        name: 'Cost',
+                        selector: (row) => row.transferValueETH,
+                        sortable: true,
+                        format: (row) => row.transferValueETH + ' ETH',
+                        style: {
+                          fontSize: '14px',
+                          fontWeight: 600,
+                        },
+                      },
+                      {
+                        name: 'Fee',
+                        selector: (row) => row.transferGasETH,
+                        sortable: true,
+                        format: (row) => row.transferGasETH + ' wei',
+                        style: {
+                          fontSize: '14px',
+                          fontWeight: 600,
+                        },
+                      },
+                      {
+                        name: 'Exp Date',
+                        selector: (row) => row.expireTime,
+                        sortable: true,
+                        grow: 3,
+                        format: (row) => dateFormat(new Date(row.expireTime * 1000), "mm/dd/yyyy h:MM TT Z"),
+                        style: {
+                          fontSize: '14px',
+                          fontWeight: 600,
+                        },
+                      },
+                    ]}
+                    data={this.state.guarantees}
+                    pagination
+                  />
+                    {/* <div className="table-responsive bg-white shadow rounded">
                       <Table className="mb-0 table-center table-nowrap">
                         <thead>
                           <tr>
-                            <th scope="col" className="border-bottom">Tx. Hash</th>
-                            <th scope="col" className="border-bottom">Collection</th>
-                            <th scope="col" className="border-bottom">TokenId</th>
-                            <th scope="col" className="border-bottom">Cost</th>
+                            <th scope="col" className="border-bottom">Buy Back</th>
+                            <th scope="col" className="border-bottom">Asset</th>
+                            <th scope="col" className="border-bottom">Tx. Cost</th>
                             <th scope="col" className="border-bottom">Tx. Fee</th>
-                            <th scope="col" className="border-bottom">Date</th>
+                            <th scope="col" className="border-bottom">Exp. Date</th>
                           </tr>
                         </thead>
                         <tbody>
                           {this.state.guarantees.map((tx) => {
-                           
-                            console.log(tx)
                             return (<tr>
-                              <th scope="row"><a target={"_new"} href={`${process.env.REACT_APP_ETHERSCAN_BASE_URL}/tx/${tx.transactionHash}`}>Explorer</a></th>
+                              <th scope="row"><a target={"_new"} href={`${process.env.REACT_APP_ETHERSCAN_BASE_URL}/tx/${tx.transactionHash}`}>Buy</a></th>
                               <td className="text-success">{tx.title}</td>
-                              <td>{tx.tokenID}</td>
                               <td>{tx.transferValueETH}</td>
                               <td>{tx.transferGasETH}</td>
-                              <td>{dateFormat(new Date(tx.timeStamp * 1000), "mm/dd/yyyy")}</td>
+                              <td>{dateFormat(new Date(tx.expireTime * 1000), "mm/dd/yyyy h:MM TT Z")}</td>
                             </tr>)
                           }
                           )}
                         </tbody>
                       </Table>
-                    </div>
+                    </div> */}
                   </TabPane>
                   <TabPane
                     className="show fade bg-white shadow rounded p-4"

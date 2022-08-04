@@ -1,4 +1,6 @@
-var localStorage = require('localStorage')
+//var localStorage = require('localStorage');
+var localStorage = require('lscache');
+const expires = 90;
 /**
  * constructor for Batch Object
  *
@@ -11,61 +13,58 @@ var localStorage = require('localStorage')
  */
 function Batch(address) { 
     this.address  = address;
-}
+};
 
 Batch.prototype.getBatch = (wallet) => {
-    const batch = JSON.parse(localStorage.getItem('batch:'+wallet));
-    if(batch !== null){
-        return batch;
-    }
-    return [];
-}
+    const batch = localStorage.get('batch:'+wallet);
+    return (batch === null ? [] : batch);
+};
 
 Batch.prototype.addToBatch = (wallet, name, address, tokenId, tokenType, qty, imgSrc, costUSD) => {
-    let batch = JSON.parse(localStorage.getItem('batch:'+wallet));
+    let batch = localStorage.get('batch:'+wallet);
 
     if(batch === null){
         batch = [{name, address, tokenId, tokenType, qty, imgSrc, costUSD}];
     }else{
         batch.push({name, address, tokenId, tokenType, qty, imgSrc, costUSD});
     }
-    localStorage.setItem('batch:'+wallet, JSON.stringify(batch));
+    localStorage.set('batch:'+wallet, batch, expires);
 
     return true;
 }
 
 Batch.prototype.qty = (wallet, address, tokenId) => {
-    let batch = JSON.parse(localStorage.getItem('batch:' + wallet));
+    let batch = localStorage.get('batch:' + wallet);
     const index = batch.findIndex(x => x.address === address && x.tokenId === tokenId); 
 
     return batch[index].qty;
 }
 
 Batch.prototype.increment = (wallet, address, tokenId) => {
-    let batch = JSON.parse(localStorage.getItem('batch:' + wallet));
+    let batch = localStorage.get('batch:' + wallet);
 
     const index = batch.findIndex(x => x.address === address && x.tokenId === tokenId);
 
     batch[index].qty = (batch[index].qty + 1);
 
     //Update the batch
-    localStorage.setItem('batch:' + wallet, JSON.stringify(batch));
+    localStorage.set('batch:' + wallet, batch, expires);
 }
 
 Batch.prototype.decrement = (wallet, address, tokenId) => {
     //Grab the batch
-    let batch = JSON.parse(localStorage.getItem('batch:' + wallet));
+    let batch = localStorage.get('batch:' + wallet);
     //Get the index of the NFT
     const index = batch.findIndex(x => x.address === address && x.tokenId === tokenId); 
     //Update the QTY
     batch[index].qty = (batch[index].qty - 1);
     //Update the batch
-    localStorage.setItem('batch:' + wallet, JSON.stringify(batch));
+    localStorage.set('batch:' + wallet, batch, expires);
 }
 
 Batch.prototype.removeFromBatch = (wallet, address, tokenId) => {;
      //Grab the batch
-     let batch = JSON.parse(localStorage.getItem('batch:'+wallet));
+     let batch = localStorage.get('batch:'+wallet);
 
      const index = batch.findIndex(x => x.address === address && x.tokenId === tokenId);
 
@@ -73,17 +72,17 @@ Batch.prototype.removeFromBatch = (wallet, address, tokenId) => {;
      batch.splice(index, 1);
 
      //Update the batch
-     localStorage.setItem('batch:'+wallet, JSON.stringify(batch));
+     localStorage.set('batch:'+wallet, batch, expires);
 }
 
 Batch.prototype.delete = (wallet) => {;
     //delete the batch
-    localStorage.removeItem('batch:'+wallet);
+    localStorage.remove('batch:'+wallet);
 }
 
 Batch.prototype.existsInBatch = (wallet, address, tokenId) => {
    //Grab the batch
-    const batch = JSON.parse(localStorage.getItem('batch:'+wallet));
+    const batch = localStorage.get('batch:'+wallet);
   
     if (batch !== null) {
         //We need lodash for this
@@ -101,7 +100,7 @@ Batch.prototype.existsInBatch = (wallet, address, tokenId) => {
 }
 
 Batch.prototype.batchExists = (wallet) => {
-    const batch = JSON.parse(localStorage.getItem('batch:'+wallet));
+    const batch = localStorage.get('batch:'+wallet);
     if(batch === null){
         return false
     }
@@ -111,7 +110,7 @@ Batch.prototype.batchExists = (wallet) => {
 
 Batch.prototype.length = (wallet) => {
     //Grab the batch
-     const batch = JSON.parse(localStorage.getItem('batch:'+wallet));
+     const batch = localStorage.get('batch:'+wallet);
    
      if (batch !== null) {
         return batch.length

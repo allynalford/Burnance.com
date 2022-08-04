@@ -22,6 +22,7 @@ var _ = require('lodash');
 var endpoint = require('../../common/endpoint');
 const Swal = require('sweetalert2');
 const exportUtils = require('../../common/exportUtils');
+const CollectionsCache = require('../../model/Collections');
 // Create our number formatter.
 var formatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
@@ -190,7 +191,9 @@ class MostViewedProducts extends Component {
 
       this.setState({ loading: true});
 
-      let Collections = JSON.parse(sessionstorage.getItem(ethereumAddress));
+      let _CollectionsCache = new CollectionsCache(ethereumAddress);
+      
+      let Collections = _CollectionsCache.get(ethereumAddress);
 
       if ((typeof Collections === 'undefined') | (Collections === null)) {
         Collections = await endpoint._get(
@@ -207,7 +210,7 @@ class MostViewedProducts extends Component {
           id++;
         }
         Collections = collections;
-        sessionstorage.setItem(ethereumAddress, JSON.stringify(Collections));
+        _CollectionsCache.set(ethereumAddress, Collections);
       }
 
 

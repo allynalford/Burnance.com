@@ -125,7 +125,7 @@ module.exports.getGuaranteesTxs = async event => {
   
 
     try {
-        const Burnance = require('../abis/HarvestArt.json');
+        const Burnance = require('../abis/Burnance.v2.1.json');
         const etherScan = require('../etherscan/ethUtils');
         const collectionUtils = require('../collection/collectionUtils');
 
@@ -145,7 +145,10 @@ module.exports.getGuaranteesTxs = async event => {
 
           
             const contractAddress = token[0].toLowerCase();
-            const tokenId = BigInt(token[1]).toString();
+            const tokenId = BigInt(token[2]).toString();
+            const owner = BigInt(token[1]).toString();
+            const expireTime = BigInt(token[3]).toString();
+            const id = BigInt(token[4]).toString();
 
        
             //We need to grab the collection, Check if it's in the list already
@@ -166,6 +169,9 @@ module.exports.getGuaranteesTxs = async event => {
 
             tx.title = collection.name + ' ' + tokenId;
             tx.type = type;
+            tx.id = id;
+            tx.expireTime = expireTime;
+            tx.owner = owner;
 
             transactions.push(tx);
         }

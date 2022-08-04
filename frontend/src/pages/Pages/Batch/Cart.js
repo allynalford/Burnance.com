@@ -9,6 +9,7 @@ import Web3 from 'web3';
 import Burnance from '../../../abis/Burnance.json';
 const Batch = require('../../../model/Batch');
 const Swal = require('sweetalert2');
+var storage = require('lscache');
 var USD = new Intl.NumberFormat('en-US', {style: 'currency',currency: 'USD'});
 
 class ShopCart extends Component {
@@ -94,6 +95,8 @@ async loadBlockchainData() {
 recordTx = async(batch, transactionHash) =>{
   console.log({transactionHash, batch});
 
+  storage.flush();
+
   //Loop the batch and record each NFT
      //Record the batch transaction
      //Record the batch item
@@ -133,12 +136,12 @@ transfer = async() => {
              
             thisss.recordTx(batch, transactionHash).then(function (result) { // (**)
 
-              thisss.getEthPrice(
-                thisss.state.ethereumAddress,
-                thisss.props.match.params.address,
-              );
+              thisss.setState({ transferring: true, batch: [] });
 
-            }).catch(err => alert(err))
+            }).catch(err => {
+              console.error(err)
+              thisss.setState({ transferring: true, batch: [] });
+            })
 
             }else{
               //alert(response.msg);
@@ -234,9 +237,8 @@ async waitForReceipt(hash, cb) {
       ) {
 
         const batchObj = new Batch(window.ethereum._state.accounts[0]);
-
         const batch = batchObj.getBatch(batchObj.address);
-        console.log(batch);
+
      
         this.setState({
           ethereumAddress: window.ethereum._state.accounts[0],
