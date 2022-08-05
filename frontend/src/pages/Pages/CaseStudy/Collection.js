@@ -90,6 +90,7 @@ class CollectionView extends Component {
       guaranteeFee: 0,
       guaranteeMonths: 1,
       guaranteeTransferToken: { title: '' },
+      backgroundImg: bgImg
     };
     this.setCategory.bind(this);
     this.getNFTs.bind(this);
@@ -385,7 +386,16 @@ class CollectionView extends Component {
         //console.log('Called Service', { Collection, NFTS });
       }
 
+      
+
       const collection = Collection.data.collection;
+
+      if(collection.contract.image_url !== null){
+        this.setState({backgroundImg: collection.contract.image_url})
+      }
+
+
+
       const floorPrice =
         typeof collection.statistics !== 'undefined'
           ? formatter.format(
@@ -437,7 +447,8 @@ class CollectionView extends Component {
         loading: false,
         approving: false,
         holdingValue,
-        description: NFTS.data.nfts[0].description,
+        description: Collection.data.collection.description,
+        type: Collection.data.collection.schema_name,
         held: NFTS.data.nfts.length,
         floorPrice,
         avgPrice,
@@ -794,7 +805,7 @@ class CollectionView extends Component {
         {/* breadcrumb */}
         <section
           className="bg-half d-table w-100"
-          style={{ background: `url(${bgImg}) center center` }}
+          style={{ background: `url(${this.state.backgroundImg}) center center` }}
         >
           <div className="bg-overlay"></div>
           <div className="container">
