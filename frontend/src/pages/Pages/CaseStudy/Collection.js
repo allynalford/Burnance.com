@@ -28,7 +28,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faBasketShopping,
   faFireBurner,
+  faRotate,
   faShieldHalved,
+  faUsersRectangle,
 } from '@fortawesome/free-solid-svg-icons';
 import LoadingOverlay from 'react-loading-overlay';
 //Import Images
@@ -1249,8 +1251,12 @@ class CollectionView extends Component {
                     }}
                   >
                     {this.state.loading === true
-                      ? 'Loading Collection...'
-                      : 'Refresh Collection'}
+                      ? `Loading Collection... `
+                      : `Refresh Collection ` }
+                      <FontAwesomeIcon size="lg" icon={(this.state.loading === false ? faRotate : faUsersRectangle)} color="#E76E3C" spinPulse={(this.state.loading === true) |
+                        (this.state.approving === true)
+                          ? true
+                          : false} />
                   </Link>
                   <Link
                     to="/batch"
@@ -1261,7 +1267,7 @@ class CollectionView extends Component {
                     }}
                   >
                     View Batch: {this.state.batchSize}{' '}
-                    <FontAwesomeIcon icon={faBasketShopping} color="#E76E3C" />
+                    <FontAwesomeIcon size="lg" icon={faBasketShopping} color="#E76E3C" />
                   </Link>
                 </Col> : "")}
               </Row>
@@ -1618,7 +1624,7 @@ class CollectionView extends Component {
                                   <hr />
 
                                   <Row>
-                                    <Col md="12">
+                                    <Col md="12" className="text font-weight-bold">
                                       <ButtonGroup size="sm" role="group">
                                         <Button
                                           aria-label={`Sell ${cases.title} with Burn option`}
@@ -1668,7 +1674,7 @@ class CollectionView extends Component {
                                             });
                                           }}
                                         >
-                                          <FontAwesomeIcon
+                                          Burn {' '}<FontAwesomeIcon
                                             icon={faFireBurner}
                                             size="2x"
                                             alt="Sell with Burn option"
@@ -1717,7 +1723,7 @@ class CollectionView extends Component {
                                             });
                                           }}
                                         >
-                                          <FontAwesomeIcon
+                                          Buy Back {' '}<FontAwesomeIcon
                                             icon={faShieldHalved}
                                             size="2x"
                                             alt="Sell with Buy Back guarantee"
@@ -1803,7 +1809,7 @@ class CollectionView extends Component {
                                             );
                                           }}
                                         >
-                                          <FontAwesomeIcon
+                                          Batch{' '}<FontAwesomeIcon
                                             icon={faBasketShopping}
                                             color="#E76E3C"
                                             size="2x"
