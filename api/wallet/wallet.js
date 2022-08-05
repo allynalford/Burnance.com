@@ -477,3 +477,50 @@ module.exports.ViewWalletCollectionNFTs = async (event) => {
     return responses.respond(res, 201);
   }
 };
+
+module.exports.updateEmail = async (event) => {
+  let req, dt, chain, address, email;
+  try {
+    req = JSON.parse(event.body);
+    dt = dateFormat(new Date(), "isoUtcDateTime");
+
+    chain = req.chain;
+    address = req.address;
+    email = req.email;
+
+    if (typeof chain === "undefined") throw new Error("chain is undefined");
+    if (typeof address === "undefined") throw new Error("address is undefined");
+    if (typeof email === "undefined") throw new Error("email is undefined");
+
+  } catch (e) {
+    console.error(e);
+    return respond(
+      {
+        success: false,
+        error: true,
+        message: e.message,
+        e,
+      },
+      416
+    );
+  }
+
+  try {
+    const walletUtils = require('../wallet/utils');
+    
+    const result = await walletUtils._updateWalletFields(chain, address, [{name: 'emailaddress', value: email}])
+
+    return responses.respond({ error: false, success: true, result, dt }, 200);
+  } catch (err) {
+    console.error(err);
+    const res = {
+      error: true,
+      success: false,
+      message: err.message,
+      e: err,
+      code: 201,
+    };
+    console.error("module.exports.updateEmail", res);
+    return responses.respond(res, 201);
+  }
+};

@@ -28,8 +28,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faBasketShopping,
   faFireBurner,
+  faPersonCirclePlus,
   faRotate,
   faShieldHalved,
+  faThumbsUp,
   faUsersRectangle,
 } from '@fortawesome/free-solid-svg-icons';
 import LoadingOverlay from 'react-loading-overlay';
@@ -1196,80 +1198,108 @@ class CollectionView extends Component {
                     {this.state.description}
                   </p>
                 </Col>
-{(this.state.loading === false ?                 <Col md="12">
-                  <p className="text mb-0" style={{ marginTop: '25px' }}>
-                    Approval the collection to burn an NFT from the collection.
-                    Refresh the collection to view updates.
-                  </p>
-                  <Link
-                    to="#"
-                    className="btn mouse-down"
-                    style={{
-                      marginRight: '10px',
-                      backgroundColor:
+                {this.state.loading === false ? (
+                  <Col md="12">
+                    <p className="text mb-0" style={{ marginTop: '25px' }}>
+                      Approval the collection to burn an NFT from the
+                      collection. Refresh the collection to view updates.
+                    </p>
+                    <Link
+                      to="#"
+                      className="btn mouse-down"
+                      style={{
+                        marginRight: '10px',
+                        backgroundColor:
+                          this.state.collectionApproved === true
+                            ? '#24A159'
+                            : '#E76E3C',
+                        color: 'white',
+                      }}
+                      disabled={
                         this.state.collectionApproved === true
-                          ? '#24A159'
-                          : '#E76E3C',
-                      color: 'white',
-                    }}
-                    disabled={
-                      this.state.collectionApproved === true
-                        ? true
-                        : (this.state.loading === true) |
-                          (this.state.approving === true)
-                        ? true
-                        : false
-                    }
-                    onClick={(e) => {
-                      e.preventDefault();
-                      this.approveForAll();
-                    }}
-                  >
-                    {this.state.collectionApproved === true
-                      ? 'Approved'
-                      : this.state.loading === true
-                      ? 'Loading Collection...'
-                      : 'Approve Collection'}
-                  </Link>
-                  <Link
-                    to="#"
-                    className="btn mouse-down"
-                    style={{
-                      marginRight: '10px',
-                      backgroundColor: 'blue',
-                      color: 'white',
-                    }}
-                    disabled={
-                      (this.state.loading === true) |
-                      (this.state.approving === true)
-                        ? true
-                        : false
-                    }
-                    onClick={(e) => {
-                      e.preventDefault();
-                      this.refresh();
-                    }}
-                  >
-                    {this.state.loading === true
-                      ? `Loading Collection... `
-                      : `Refresh Collection ` }
-                      <FontAwesomeIcon size="lg" icon={(this.state.loading === false ? faRotate : faUsersRectangle)} color="#E76E3C" spinPulse={(this.state.loading === true) |
+                          ? true
+                          : (this.state.loading === true) |
+                            (this.state.approving === true)
+                          ? true
+                          : false
+                      }
+                      onClick={(e) => {
+                        e.preventDefault();
+                        this.approveForAll();
+                      }}
+                    >
+                      {this.state.collectionApproved === true
+                        ? 'Approved '
+                        : this.state.loading === true
+                        ? 'Loading Collection... '
+                        : 'Approve Collection '}
+                      <FontAwesomeIcon
+                        icon={
+                          this.state.collectionApproved === true
+                            ? faThumbsUp
+                            : this.state.loading === true
+                            ? faUsersRectangle
+                            : faPersonCirclePlus
+                        }
+                        size="lg"
+                        alt="Collection Approval"
+                      />
+                    </Link>
+                    <Link
+                      to="#"
+                      className="btn mouse-down"
+                      style={{
+                        marginRight: '10px',
+                        backgroundColor: 'blue',
+                        color: 'white',
+                      }}
+                      disabled={
+                        (this.state.loading === true) |
                         (this.state.approving === true)
                           ? true
-                          : false} />
-                  </Link>
-                  <Link
-                    to="/batch"
-                    className="btn mouse-down btn-info"
-                    style={{
-                      backgroundColor: '#939393',
-                      color: 'white',
-                    }}
-                  >
-                    View Batch: {this.state.batchSize}{' '}
-                    <FontAwesomeIcon size="lg" icon={faBasketShopping} color="#E76E3C" />
-                  </Link>
-                </Col> : "")}
+                          : false
+                      }
+                      onClick={(e) => {
+                        e.preventDefault();
+                        this.refresh();
+                      }}
+                    >
+                      {this.state.loading === true
+                        ? `Loading Collection... `
+                        : `Refresh Collection `}
+                      <FontAwesomeIcon
+                        size="lg"
+                        icon={
+                          this.state.loading === false
+                            ? faRotate
+                            : faUsersRectangle
+                        }
+                        spinPulse={
+                          (this.state.loading === true) |
+                          (this.state.approving === true)
+                            ? true
+                            : false
+                        }
+                      />
+                    </Link>
+                    <Link
+                      to="/batch"
+                      className="btn mouse-down btn-info"
+                      style={{
+                        backgroundColor: '#939393',
+                        color: 'white',
+                      }}
+                    >
+                      View Batch: {this.state.batchSize}{' '}
+                      <FontAwesomeIcon
+                        size="lg"
+                        icon={faBasketShopping}
+                      />
+                    </Link>
+                  </Col>
+                ) : (
+                  ''
+                )}
               </Row>
 
               {/* <Row
@@ -1624,7 +1654,10 @@ class CollectionView extends Component {
                                   <hr />
 
                                   <Row>
-                                    <Col md="12" className="text font-weight-bold">
+                                    <Col
+                                      md="12"
+                                      className="text font-weight-bold"
+                                    >
                                       <ButtonGroup size="sm" role="group">
                                         <Button
                                           aria-label={`Sell ${cases.title} with Burn option`}
@@ -1674,7 +1707,8 @@ class CollectionView extends Component {
                                             });
                                           }}
                                         >
-                                          Burn {' '}<FontAwesomeIcon
+                                          Burn{' '}
+                                          <FontAwesomeIcon
                                             icon={faFireBurner}
                                             size="2x"
                                             alt="Sell with Burn option"
@@ -1723,7 +1757,8 @@ class CollectionView extends Component {
                                             });
                                           }}
                                         >
-                                          Buy Back {' '}<FontAwesomeIcon
+                                          Buy Back{' '}
+                                          <FontAwesomeIcon
                                             icon={faShieldHalved}
                                             size="2x"
                                             alt="Sell with Buy Back guarantee"
@@ -1809,7 +1844,8 @@ class CollectionView extends Component {
                                             );
                                           }}
                                         >
-                                          Batch{' '}<FontAwesomeIcon
+                                          Batch{' '}
+                                          <FontAwesomeIcon
                                             icon={faBasketShopping}
                                             color="#E76E3C"
                                             size="2x"
