@@ -93,7 +93,7 @@ module.exports.getCollections = async (chain, address) => {
 
     const nfts = await this.getNFTs(chain, address);
 
-    console.log('API First Pull FULL', typeof nfts === "undefined");
+    //console.log('API First Pull FULL', typeof nfts === "undefined");
     
     var wallet = [];
 
@@ -102,10 +102,10 @@ module.exports.getCollections = async (chain, address) => {
      wallet = [...nfts.ownedNfts];
     }
 
-    console.log("API First Pull", {
-      length: wallet.length,
-      key: nfts.pageKey,
-    });
+    // console.log("API First Pull", {
+    //   length: wallet.length,
+    //   key: nfts.pageKey,
+    // });
 
     //Check if the list has more NFTs
     if (typeof nfts.pageKey !== "undefined") {

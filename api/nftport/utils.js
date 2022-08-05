@@ -58,7 +58,7 @@ module.exports._getCollectionStats = async (chain, contractAddress) => {
         //     }
         // }
 
-        return stats.data;
+        return {stats: stats.data.statistics, response: stats.data.response}
 
     } catch (e) {
         console.error(e.message);

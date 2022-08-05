@@ -18,12 +18,7 @@ import BasicPopperToolTip from "../../components/BasicPopperToolTip";
 import RingLoader from "react-spinners/RingLoader";
 import DataTable from 'react-data-table-component';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faBasketShopping,
-  faFireBurner,
-  faShieldHalved,
-  faUsersRectangle,
-} from '@fortawesome/free-solid-svg-icons';
+import { faUsersRectangle } from '@fortawesome/free-solid-svg-icons';
 var sessionstorage = require('sessionstorage');
 var _ = require('lodash');
 var endpoint = require('../../common/endpoint');
@@ -737,7 +732,7 @@ class MostViewedProducts extends Component {
                         selector: (row) => row.Liquidity7D,
                         sortable: true,
                         grow: 2,
-                        format: (row) => `${row.Liquidity7D}%`,
+                        format: (row) => `${row.Liquidity7D.toFixed(2)}%`,
                         style: {
                           fontSize: '14px',
                           fontWeight: 600,

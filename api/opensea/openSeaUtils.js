@@ -18,7 +18,7 @@ module.exports._getAssetContract = async (address) => {
     const result =  await endpoint._get(`${process.env.OPENSEA_API_URL}/asset_contract/${address}`)
     return result.data;
   } catch (e) {
-    console.error(e);
+    console.error('_getAssetContract', {message: e.message, url: e.config.url});
     throw e;
   }
 };
@@ -36,7 +36,7 @@ module.exports._getAssetContract = async (address) => {
     const result = await endpoint._get(`${process.env.OPENSEA_API_URL}/collection/${slug}/stats`)
     return result.data;
   } catch (e) {
-    console.error(e);
+    console.error('_retrieveCollectionStats', {message: e.message, url: e.config.url});
     throw e;
   }
 };

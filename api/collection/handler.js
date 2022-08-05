@@ -6,7 +6,7 @@ const dateFormat = require('dateformat');
 const uuid = require('uuid');;
 const _ = require('lodash');
 
-
+const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 	
 module.exports.start = async event => {
     let dt, address, chain, stateMachineArn, exec;
@@ -183,42 +183,81 @@ module.exports.GetCollection = async (event) => {
       //Then grab the collections for this wallet
       const addresses = await alchemyUtils.getCollections(chain, address);
 
-      console.info('Addresses to process:', addresses.length);
+      //console.info('Addresses to process:', addresses.length);
 
       collections = [];
 
       //loop the addresses and add them to the database
       for(const addr of addresses){
 
-        const assetContract = await openSeaUtils._getAssetContract(addr.address);
-        console.log('assetContract:', assetContract);
-        const slug = assetContract.collection.slug;
+
 
         //Check if the collection exists
         let collection = await collectionUtils._getCollection(chain, addr.address);
 
-        console.log('collection', collection);
+        //console.log('collection exists:', typeof collection !== "undefined");
+
+        
 
         //If the collection doesn't already exists in the wallet
         if(typeof collection === "undefined" || collection.statusCode === 400){
 
+          const assetContract = await openSeaUtils._getAssetContract(addr.address);
+          //console.log('assetContract:', assetContract);
+          //console.log(`Delaying: ${addr.address} | `, 500);
+          await delay(500);
+          //console.log('Continuing:', addr.address);
+
+          collection = assetContract;
+          collection.chain = chain;
+          collection.address = assetContract.address;
+          
+
+          //statistics = await openSeaUtils._retrieveCollectionStats(assetContract.collection.slug);
+
+          //console.log(`Stats Delaying: ${addr.address} | `, 500);
+          //await delay(500);
+          //console.log('Stats Continuing:', addr.address);
 
           try {
 
             //Grab the wallets information
-            const metaData = await alchemyUtils.getContractMetadata(chain, addr.address);
+            // const metaData = await alchemyUtils.getContractMetadata(chain, addr.address);
 
-            console.log('metaData', metaData);
+            // console.log('metaData', metaData);
 
-            collection = metaData.contractMetadata;
-            collection.chain = chain;
-            collection.address = metaData.address;
+            // collection = metaData.contractMetadata;
+            // collection.chain = chain;
+            // collection.address = metaData.address;
+            // collection.contract = assetContract;
 
             try {
-              statistics = await openSeaUtils._retrieveCollectionStats(slug);
+              statistics = await nftPortUtils._getCollectionStats(chain, addr.address);
             } catch (s) {
               console.log(s.message);
-              statistics = {};
+              statistics = {
+                one_day_volume: 0,
+                one_day_change: 0,
+                one_day_sales: 0,
+                one_day_average_price: 0,
+                seven_day_volume: 0,
+                seven_day_change: 0,
+                seven_day_sales: 0,
+                seven_day_average_price: 0,
+                thirty_day_volume: 0,
+                thirty_day_change: 0,
+                thirty_day_sales: 0,
+                thirty_day_average_price: 0,
+                total_volume: 0,
+                total_sales: 0,
+                total_supply: 0,
+                count: 0,
+                num_owners: 0,
+                average_price: 0,
+                num_reports: 0,
+                market_cap: 0,
+                floor_price: null,
+              };
 
               //We need to look up the data elsewhere
             }
@@ -226,18 +265,18 @@ module.exports.GetCollection = async (event) => {
 
             if (typeof statistics.stats !== "undefined") {
 
-              console.log('Loaded Stats for new Collection', statistics.stats);
+              //console.log('Loaded Stats for new Collection', statistics.stats);
 
               collection.statistics = statistics.stats;
 
               //Add the collection
               await collectionUtils._addCollectionWithStats(
                 chain,
-                metaData.address,
-                metaData.contractMetadata.name,
-                metaData.contractMetadata.symbol,
-                metaData.contractMetadata.totalSupply,
-                metaData.contractMetadata.tokenType,
+                collection.address,
+                collection.collection.name,
+                collection.symbol,
+                (collection.total_supply === null ? 0 : collection.total_supply),
+                collection.schema_name,
                 collection.statistics,
                 assetContract
               );
@@ -247,11 +286,11 @@ module.exports.GetCollection = async (event) => {
               //Add the collection
               await collectionUtils._addCollection(
                 chain,
-                metaData.address,
-                metaData.contractMetadata.name,
-                metaData.contractMetadata.symbol,
-                metaData.contractMetadata.totalSupply,
-                metaData.contractMetadata.tokenType
+                collection.address,
+                collection.collection.name,
+                collection.symbol,
+                collection.total_supply,
+                collection.schema_name,
               );
 
             }
@@ -308,25 +347,59 @@ module.exports.GetCollection = async (event) => {
 
  
         } else {
+          
 
           //Does the collection have the needed data
           if (typeof collection.statistics === "undefined") {
             let statistics;
 
+            const assetContract = await openSeaUtils._getAssetContract(addr.address);
+            //console.log('assetContract:', assetContract);
+          
+            collection.contract = assetContract;
+
             try {
-              statistics = await await openSeaUtils._retrieveCollectionStats(slug);
+              //statistics = await openSeaUtils._retrieveCollectionStats(assetContract.collection.slug);
+              statistics = await nftPortUtils._getCollectionStats(chain, addr.address);
             } catch (s) {
               console.log(s.message);
-              statistics = {};
+              statistics = {
+                one_day_volume: 0,
+                one_day_change: 0,
+                one_day_sales: 0,
+                one_day_average_price: 0,
+                seven_day_volume: 0,
+                seven_day_change: 0,
+                seven_day_sales: 0,
+                seven_day_average_price: 0,
+                thirty_day_volume: 0,
+                thirty_day_change: 0,
+                thirty_day_sales: 0,
+                thirty_day_average_price: 0,
+                total_volume: 0,
+                total_sales: 0,
+                total_supply: 0,
+                count: 0,
+                num_owners: 0,
+                average_price: 0,
+                num_reports: 0,
+                market_cap: 0,
+                floor_price: null,
+              };
 
               //We need to look up the data elsewhere
             }
 
-            if (typeof statistics.statistics !== "undefined") {
+            if (typeof statistics.stats !== "undefined") {
 
-              console.log('Adding Stats for Existing Collection',statistics.statistics);
+              //console.log('Adding Stats for Existing Collection',statistics.stats);
 
-              await collectionUtils._updateCollectionFields(chain, addr.address, [{ name: 'statistics', value: statistics.statistics, name: 'contract', value: assetContract }]);
+              await collectionUtils._updateCollectionFields(
+                chain,
+                addr.address,
+                [{ name: "statistics", value: statistics.stats },
+                 { name: "contract", value: collection.contract }]
+              );
 
               collection.statistics = statistics.stats
             }
@@ -343,7 +416,7 @@ module.exports.GetCollection = async (event) => {
       }
 
       //Push the collection to the cache
-      await walletUtils._addWalletCollectionToCache(chain, address, collections);
+      //await walletUtils._addWalletCollectionToCache(chain, address, collections);
 
     }
 
