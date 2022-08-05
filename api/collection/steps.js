@@ -94,6 +94,7 @@ module.exports.loadWalletCollections = async (event) => {
         const alchemyUtils = require('../alchemy/utils');
         const rariableUtils = require('../rarible/utils');
         const walletUtils = require('../wallet/utils');
+        const openSeaUtils = require('../opensea/openSeaUtils');
 
 
         //Then grab the collections for this wallet
@@ -112,6 +113,10 @@ module.exports.loadWalletCollections = async (event) => {
             //If the collection doesn't already exists in the database
             if (typeof collection === "undefined") {
 
+                const assetContract = await openSeaUtils._getAssetContract(addr.address);
+                console.log('assetContract:', assetContract);
+                const slug = assetContract.collection.slug;
+
                 //Grab the wallets information
                 const metaData = await alchemyUtils.getContractMetadata(chain, addr.address);
 
@@ -121,7 +126,7 @@ module.exports.loadWalletCollections = async (event) => {
 
 
                 try {
-                    statistics = await nftPortUtils._getCollectionStats(chain, addr.address);
+                    statistics = await openSeaUtils._retrieveCollectionStats(slug);
                 } catch (s) {
                     console.log(`${addr.address} Failed and didn't exists for: (${metaData.contractMetadata.name})`,s.message);
                     statistics = {};
@@ -130,11 +135,11 @@ module.exports.loadWalletCollections = async (event) => {
                 }
 
 
-                if (typeof statistics.statistics !== "undefined") {
+                if (typeof statistics.stats !== "undefined") {
 
                     console.log('Loaded Stats for new Collection', metaData.contractMetadata.name);
 
-                    collection.statistics = statistics.statistics;
+                    collection.statistics = statistics.stats;
 
                     //Add the collection
                     await collectionUtils._addCollectionWithStats(
@@ -144,7 +149,8 @@ module.exports.loadWalletCollections = async (event) => {
                         metaData.contractMetadata.symbol,
                         metaData.contractMetadata.totalSupply,
                         metaData.contractMetadata.tokenType,
-                        collection.statistics
+                        collection.statistics,
+                        assetContract
                     );
 
                         enriched++;
@@ -173,11 +179,15 @@ module.exports.loadWalletCollections = async (event) => {
                 existed++;
 
                 //Does the collection have the needed data
-                if (typeof collection.statistics === "undefined") {
+                if (typeof collection.stats === "undefined") {
                     let statistics;
 
+                    const assetContract = await openSeaUtils._getAssetContract(addr.address);
+                    console.log('assetContract:', assetContract);
+                    const slug = assetContract.collection.slug;
+
                     try {
-                        statistics = await nftPortUtils._getCollectionStats(chain, addr.address);
+                        statistics = await openSeaUtils._retrieveCollectionStats(slug);
                     } catch (s) {
                         console.log(`${addr.address} Failed and needs data`,s.message);
                         statistics = {};
@@ -185,7 +195,7 @@ module.exports.loadWalletCollections = async (event) => {
                         //We need to look up the data elsewhere
                     }
 
-                    if (typeof statistics.statistics !== "undefined") {
+                    if (typeof statistics.stats !== "undefined") {
 
                         console.log('Adding Stats for Existing Collection', statistics.statistics);
 
@@ -195,9 +205,10 @@ module.exports.loadWalletCollections = async (event) => {
                           [
                             {
                               name: "statistics",
-                              value: statistics.statistics,
+                              value: statistics.stats,
                             },
                             { name: "loaded", value: true },
+                            { name: "contract", value: assetContract },
                           ]
                         );
 

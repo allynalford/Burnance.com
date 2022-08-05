@@ -164,6 +164,7 @@ module.exports.GetCollection = async (event) => {
     const collectionUtils = require('./collectionUtils');
     const walletUtils = require('../wallet/utils');
     const nftPortUtils = require('../nftport/utils');
+    const openSeaUtils = require('../opensea/openSeaUtils');
 
     //We need to return
     // - Floor Price
@@ -189,6 +190,10 @@ module.exports.GetCollection = async (event) => {
       //loop the addresses and add them to the database
       for(const addr of addresses){
 
+        const assetContract = await openSeaUtils._getAssetContract(addr.address);
+        console.log('assetContract:', assetContract);
+        const slug = assetContract.collection.slug;
+
         //Check if the collection exists
         let collection = await collectionUtils._getCollection(chain, addr.address);
 
@@ -210,7 +215,7 @@ module.exports.GetCollection = async (event) => {
             collection.address = metaData.address;
 
             try {
-              statistics = await nftPortUtils._getCollectionStats(chain, addr.address);
+              statistics = await openSeaUtils._retrieveCollectionStats(slug);
             } catch (s) {
               console.log(s.message);
               statistics = {};
@@ -219,11 +224,11 @@ module.exports.GetCollection = async (event) => {
             }
 
 
-            if (typeof statistics.statistics !== "undefined") {
+            if (typeof statistics.stats !== "undefined") {
 
-              console.log('Loaded Stats for new Collection', statistics.statistics);
+              console.log('Loaded Stats for new Collection', statistics.stats);
 
-              collection.statistics = statistics.statistics;
+              collection.statistics = statistics.stats;
 
               //Add the collection
               await collectionUtils._addCollectionWithStats(
@@ -233,7 +238,8 @@ module.exports.GetCollection = async (event) => {
                 metaData.contractMetadata.symbol,
                 metaData.contractMetadata.totalSupply,
                 metaData.contractMetadata.tokenType,
-                collection.statistics
+                collection.statistics,
+                assetContract
               );
 
 
@@ -263,30 +269,27 @@ module.exports.GetCollection = async (event) => {
             collection.address = addr.address;
 
             collection.statistics = {
-              "one_day_volume": 0,
-              "one_day_change": 0,
-              "one_day_sales": 0,
-              "one_day_average_price": 0,
-              "seven_day_volume": 0,
-              "seven_day_change": 0,
-              "seven_day_sales": 0,
-              "seven_day_average_price": 0,
-              "thirty_day_volume": 0,
-              "thirty_day_change": 0,
-              "thirty_day_sales": 0,
-              "thirty_day_average_price": 0,
-              "total_volume": 0,
-              "total_sales": 0,
-              "total_supply": 0,
-              "total_minted": 0,
-              "num_owners": 0,
-              "average_price": 0,
-              "market_cap": 0,
-              "floor_price": 0,
-              "floor_price_historic_one_day": 0,
-              "floor_price_historic_seven_day": 0,
-              "floor_price_historic_thirty_day": 0,
-              "updated_date": "2022-02-02T02:22:22.222222"
+              "one_day_volume": 65.94800000000001,
+              "one_day_change": 0.189752841421613,
+              "one_day_sales": 7,
+              "one_day_average_price": 9.421142857142858,
+              "seven_day_volume": 347.84030000000007,
+              "seven_day_change": -0.5059759334474713,
+              "seven_day_sales": 32,
+              "seven_day_average_price": 10.870009375000002,
+              "thirty_day_volume": 3239.230647249999,
+              "thirty_day_change": -0.654612079859771,
+              "thirty_day_sales": 245,
+              "thirty_day_average_price": 13.221349580612241,
+              "total_volume": 144510.26730919493,
+              "total_sales": 23363,
+              "total_supply": 10000,
+              "count": 10000,
+              "num_owners": 5229,
+              "average_price": 6.185432834361809,
+              "num_reports": 1,
+              "market_cap": 108700.09375000003,
+              "floor_price": 9.15
             };
 
             //Add the collection
@@ -311,7 +314,7 @@ module.exports.GetCollection = async (event) => {
             let statistics;
 
             try {
-              statistics = await nftPortUtils._getCollectionStats(chain, addr.address);
+              statistics = await await openSeaUtils._retrieveCollectionStats(slug);
             } catch (s) {
               console.log(s.message);
               statistics = {};
@@ -323,9 +326,9 @@ module.exports.GetCollection = async (event) => {
 
               console.log('Adding Stats for Existing Collection',statistics.statistics);
 
-              await collectionUtils._updateCollectionFields(chain, addr.address, [{ name: 'statistics', value: statistics.statistics }]);
+              await collectionUtils._updateCollectionFields(chain, addr.address, [{ name: 'statistics', value: statistics.statistics, name: 'contract', value: assetContract }]);
 
-              collection.statistics = statistics.statistics
+              collection.statistics = statistics.stats
             }
           }
         }

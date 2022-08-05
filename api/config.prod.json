@@ -22,6 +22,7 @@
 "ETHERSCAN_PRICE_API_URL" : "https://api.etherscan.io/api",
 "ETHERSCAN_API_URL" : "https://api.etherscan.io/api",
 "ETHERSCAN_BASE_URL" : "https://etherscan.io/",
+"OPENSEA_API_URL" : "https://api.opensea.io/api/v1",
 "API_KEY_TOKEN" : "WWY6WGBKZCG5U8JEY2RNTXT1YWMMER6SPN",
 "PRO_API_KEY" : "TFSZVPV8PUQ2HZWWJAI6TPSASX72HRYNWS",
 "ETHERSCAN_ABI_PARAMS" : "module=contract&action=getabi",
