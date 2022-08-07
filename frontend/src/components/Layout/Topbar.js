@@ -86,8 +86,9 @@ class Topbar extends Component {
       { id: 1, title: 'Home', link: '/' },
       { id: 2, title: 'Transactions', link: '/account' },
       { id: 3, title: 'Collections', link: '/collections' },
-      { id: 4, title: 'Batch', link: '/batch' },
-      { id: 5, title: 'Contract', link: `${process.env.REACT_APP_ETHERSCAN_BASE_URL}address/${burnanceAddr}`, external: true },
+      { id: 4, title: 'Coins', link: '/coins' },
+      { id: 5, title: 'Batch', link: '/batch' },
+      { id: 6, title: 'Contract', link: `${process.env.REACT_APP_ETHERSCAN_BASE_URL}address/${burnanceAddr}`, external: true },
     ] });
     this.detectEthereumNetwork();
   };

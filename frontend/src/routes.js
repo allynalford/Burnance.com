@@ -21,6 +21,7 @@ const Dashboard = React.lazy(() => import('./pages/Dashboard/index'));
 const Collection = React.lazy(() => import("./pages/Pages/CaseStudy/Collection"));
 const Batch = React.lazy(() => import("./pages/Pages/Batch/Cart"));
 const Account = React.lazy(() => import("./pages/Account/MyAccount"));
+const ERC20Coins = React.lazy(() => import('./pages/Coins/ERC20Coins'));
 const routes = [
   
 
@@ -43,7 +44,7 @@ const routes = [
   { path: "/test", component: Test, isWithoutLayout: true, exact: false },
   { path: "/batch", component: Batch, isTopbarDark: true },
   { path: "/account", component: Account, isTopbarDark: true },
-  
+  { path: "/coins", component: ERC20Coins, isTopbarDark: true },
 
   //Index Main
   { path: "/index", component: HomePage, isTopbarDark: true },

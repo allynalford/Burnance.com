@@ -13,7 +13,7 @@ class PageBreadcrumb extends Component {
               <Col lg="12" className="text-center">
                 <div className="page-next-level">
                   {this.props.title ? (
-                    <h4 className="title"> {this.props.title}</h4>
+                    <h1 className="title"> {this.props.title}</h1>
                   ) : null}
                   {this.props.children ? this.props.children : null}
                   <div className="page-next">

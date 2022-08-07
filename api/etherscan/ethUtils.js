@@ -212,6 +212,25 @@ module.exports.getNFTtx = async (chain, address, contractaddress, tokenId) => {
     }
 };
 
+/**
+ * returns transaction data about the purchase of the NFT
+ *
+ * @author Allyn j. Alford <Allyn@tenablylabs.com>
+ * @async
+ * @function _addressTokenBalance
+ * @param {String} address - ethereum wallet address. the string representing the address to check for balance
+ * @param {String} page - the integer page number, if pagination is enabled
+ * @param {String} offset - the number of transactions displayed per page
+ * @return {Promise<Array>} Response Array for next step to process.
+ */
+module.exports._addressTokenBalance = async (address, page, offset) => {
+    try {
+        const response = await endpoint._get(`${process.env.ETHERSCAN_API_URL}?module=account&action=addresstokenbalance&address=${address}&page=${page}&offset=${offset}apikey=${process.env.API_KEY_TOKEN}`);
+        return response.data;
+    } catch (e) {
+        console.error(e);
+    }
+};
 module.exports._addressTokenNFTBalance = async (address, page, offset) => {
     try {
         const response = await endpoint._get(`${process.env.ETHERSCAN_API_URL}?module=account&action=addresstokennftbalance&address=${address}&page=1&offset=100apikey=${process.env.API_KEY_TOKEN}`);
