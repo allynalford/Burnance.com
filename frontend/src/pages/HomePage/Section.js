@@ -253,9 +253,9 @@ class Section extends Component {
               </Col>
               <Col md={this.state.attributes.length === 0 ? '12' : '5'}>
                 <div className="section-title">
-                  <h2 className="title">Membership</h2>
+                  <h2 className="title">What we are building</h2>
                   <p className="text mb-4">
-                    Burnance Membership will provide:
+                    Burnance will provide:
                   </p>
                   <ul className="text mb-4">
                    <li>Instant liquidity on dead projects.</li>

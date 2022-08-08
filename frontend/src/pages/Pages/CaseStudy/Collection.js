@@ -275,6 +275,7 @@ class CollectionView extends Component {
       if (result.isConfirmed) {
         this.transfer(tokenId);
       } else if (result.isDenied) {
+        this.setState({transferring: false});
         this.openModal(tokenId);
       }
     });
@@ -690,10 +691,17 @@ class CollectionView extends Component {
               contentLoading: false,
             });
 
-            thisss.getEthPrice(
-              thisss.state.ethereumAddress,
-              thisss.props.match.params.address,
-            );
+            thisss
+            .recordTx(tokenId, transactionHash, 'guarantee')
+            .then(function (result) {
+              // (**)
+
+              thisss.getEthPrice(
+                thisss.state.ethereumAddress,
+                thisss.props.match.params.address,
+              );
+            })
+            .catch((err) => alert(err));
           } else {
             //alert(response.msg);
             thisss.fireMsg('Guarantee nft Transfer', response.msg, 'WARN');
@@ -717,10 +725,30 @@ class CollectionView extends Component {
       });
   };
 
-  recordTx = async (tokenId, transactionHash) => {
+  recordTx = async (tokenId, transactionHash, type) => {
     const _ = require('lodash');
     const nft = _.find(this.state.nfts, { tokenId: tokenId });
     console.log({ tokenId, nft, transactionHash });
+
+    const tx = {
+      chainAddress: nft.chain + ":" + nft.owner,
+      chain: nft.chain,
+      address: nft.owner,
+      transactionHash,
+      contractAddresses: nft.contract.address,
+      tokenId,
+      type,
+      tokenType: this.state.type,
+      valueUSD: nft.valueUSD,
+      valueETH: nft.valueETH,
+      costUSD: nft.costUSD,
+      costETH: nft.costETH,
+      ethTransPriceUSD: nft.ethTransPriceUSD
+    }
+    console.log('TX  ',tx);
+    const txResp = await endpoint._post(getChain()['eth'].addWalletSellTxApiUrl, tx);
+    console.log('txResp  ',txResp);
+
   };
 
   transfer = async (tokenId) => {
@@ -752,7 +780,7 @@ class CollectionView extends Component {
             collectionObj.remove(thisss.state.ethereumAddress, thisss.props.match.params.address);
 
             thisss
-              .recordTx(tokenId, transactionHash)
+              .recordTx(tokenId, transactionHash, 'burn')
               .then(function (result) {
                 // (**)
 

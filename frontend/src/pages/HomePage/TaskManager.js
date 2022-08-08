@@ -84,7 +84,7 @@ export default class TaskManager extends Component {
                         you and only you will have the ability to recover your
                         burned asset and flip it out for profits. This will not
                         violate your realized loss you claimed, since you are
-                        “reinvesting” for .005 on the buyback!
+                        “reinvesting” for 0.006 on the buyback!
                       </p>
                     </div>
                   </NavLink>
@@ -104,14 +104,14 @@ export default class TaskManager extends Component {
                     <div className="p-3 text-start">
                       <h5 className="title">Pay a fixed fee</h5>
                       <ul className="text tab-para mb-0">
-                          <li>On burn: 0.003 ETH</li>
-                          <li>Asset Recovery: 0.005 ETH</li>
+                          <li>On burn: 0.003 ETH / reserve month</li>
+                          <li>Asset Recovery: 0.006 ETH</li>
                       </ul>
                     </div>
                   </NavLink>
                 </NavItem>
 
-                <NavItem className="bg-light rounded-md mt-4">
+                {/* <NavItem className="bg-light rounded-md mt-4">
                   <NavLink
                     to="#"
                     className={classnames(
@@ -130,16 +130,16 @@ export default class TaskManager extends Component {
                       </p>
                     </div>
                   </NavLink>
-                </NavItem>
+                </NavItem> */}
               </ul>
             </Col>
-            <Col md={7} xs={12} className="mt-4 pt-2">
+            {/* <Col md={7} xs={12} className="mt-4 pt-2">
             <img
                     src={apps}
                     className="img-fluid mx-auto rounded-md shadow-lg d-block"
                     alt=""
                   />
-            </Col>{' '}
+            </Col>{' '} */}
           </Row>{' '}
         </Container>
       </React.Fragment>

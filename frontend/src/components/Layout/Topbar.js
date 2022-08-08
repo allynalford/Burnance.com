@@ -217,7 +217,7 @@ class Topbar extends Component {
       var diffMs = today - Christmas; // milliseconds between now & Christmas
       var diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000);
       console.debug('cache age:', diffMins + ' | ' + dateFormat(new Date(), 'isoUtcDateTime'));
-      return diffMins < 2 ? false : true;
+      return diffMins < 1 ? false : true;
     }
 
     let ethPrice = JSON.parse(sessionstorage.getItem('ethPrice'));

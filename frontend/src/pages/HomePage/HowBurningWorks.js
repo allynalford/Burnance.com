@@ -64,9 +64,9 @@ export default class HowBurningWorks extends Component {
                   >
                     <div className="p-3 text-start">
                       <h5 className="title">Identify NFT to Burn</h5>
-                      <p className="text tab-para mb-0">
+                      {/* <p className="text tab-para mb-0">
                        ......
-                      </p>
+                      </p> */}
                     </div>
                   </NavLink>
                 </NavItem>
@@ -84,9 +84,9 @@ export default class HowBurningWorks extends Component {
                   >
                     <div className="p-3 text-start">
                       <h5 className="title">Approve NFT for transfer</h5>
-                      <p className="text-muted tab-para mb-0">
+                      {/* <p className="text-muted tab-para mb-0">
                         .....
-                      </p>
+                      </p> */}
                     </div>
                   </NavLink>
                 </NavItem>
@@ -104,7 +104,7 @@ export default class HowBurningWorks extends Component {
                   >
                     <div className="p-3 text-start">
                       <h5 className="title">Execute Transfer</h5>
-                      ......
+                      
                     </div>
                   </NavLink>
                 </NavItem>
@@ -122,9 +122,9 @@ export default class HowBurningWorks extends Component {
                   >
                     <div className="p-3 text-start">
                       <h5 className="title">We pay you in ETH</h5>
-                      <p className="text-muted tab-para mb-0">
+                      {/* <p className="text-muted tab-para mb-0">
                         ......
-                      </p>
+                      </p> */}
                     </div>
                   </NavLink>
                 </NavItem>
