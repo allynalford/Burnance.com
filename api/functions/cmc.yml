@@ -1,0 +1,20 @@
+  getMetadatav2:
+    handler: coinmarketcap/handler.getMetadatav2
+    memorySize: 128 # optional, in MB, default is 1024
+    timeout: 30 # optional, in seconds, default is 6
+    events:
+      - http:
+          path: cmc/metadata/{address}
+          method: get
+          authorizer: aws_iam
+          cors: true
+  getQuotesLatestv2:
+    handler: coinmarketcap/handler.getQuotesLatestv2
+    memorySize: 128 # optional, in MB, default is 1024
+    timeout: 30 # optional, in seconds, default is 6
+    events:
+      - http:
+          path: cmc/quotes
+          method: post
+          authorizer: aws_iam
+          cors: true

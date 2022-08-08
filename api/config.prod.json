@@ -16,6 +16,8 @@
 "ALCHEMY_WSS" :"wss://mainnet.g.alchemy.com/v2/SExwOepdX3Gy9l-FZQVVITPkIf9sfzNJ",
 "OPEN" : "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",
 "KEY" : "adfb72ce9754e3cbc1e79e44a8e20804cebd3c4a347605c6a3462a8de05b8783",
+"CMC_API_URL": "https://pro-api.coinmarketcap.com/v2",
+"CMC_KEY" : "4d3f5481-29ff-45d6-b3c8-055847528c38",
 "QUICK_NODE_WSS" : "wss://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
 "QUICK_NODE_HTTP" : "https://aged-wild-sun.discover.quiknode.pro/22d04687857eddacbc7d24f70b51106bcf679686/",
 "NODE" : "wss://mainnet.infura.io/ws/v3/4168ad1b2f574ec1a6944fcb1d4d906c",

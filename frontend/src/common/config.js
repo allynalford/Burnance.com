@@ -51,6 +51,35 @@ const serverVars = {
       getIsCollectionApprovedApiUrl:
         process.env.REACT_APP_BASE_API_URL + '/collection/isapproved/',
     },
+    coins: {
+      getCMCCoinMetaDataApiUrl: process.env.REACT_APP_BASE_API_URL + '/cmc/metadata',
+      getCMCQuotesApiUrl: process.env.REACT_APP_BASE_API_URL + '/cmc/quotes',
+      deleteCoinApiUrl: process.env.REACT_APP_BASE_API_URL + '/wallet/coin/',
+      getCoinsApiUrl:  process.env.REACT_APP_BASE_API_URL + '/wallet/coins/',
+      addCoinApiUrl:  process.env.REACT_APP_BASE_API_URL + '/wallet/coin'
+
+    },
+    coinAbi: [
+      {
+        constant: true,
+        inputs: [
+          {
+            name: '_owner',
+            type: 'address',
+          },
+        ],
+        name: 'balanceOf',
+        outputs: [
+          {
+            name: 'balance',
+            type: 'uint256',
+          },
+        ],
+        payable: false,
+        stateMutability: 'view',
+        type: 'function',
+      },
+    ]
   },
 };
 
@@ -106,6 +135,34 @@ const localVars = {
       getIsCollectionApprovedApiUrl:
         process.env.REACT_APP_BASE_API_URL + '/collection/isapproved/',
     },
+    coins: {
+      getCMCCoinMetaDataApiUrl: process.env.REACT_APP_BASE_API_URL + '/cmc/metadata',
+      getCMCQuotesApiUrl: process.env.REACT_APP_BASE_API_URL + '/cmc/quotes',
+      deleteCoinApiUrl: process.env.REACT_APP_BASE_API_URL + '/wallet/coin/',
+      getCoinsApiUrl:  process.env.REACT_APP_BASE_API_URL + '/wallet/coins/',
+      addCoinApiUrl:  process.env.REACT_APP_BASE_API_URL + '/wallet/coin'
+    },
+    coinAbi: [
+      {
+        constant: true,
+        inputs: [
+          {
+            name: '_owner',
+            type: 'address',
+          },
+        ],
+        name: 'balanceOf',
+        outputs: [
+          {
+            name: 'balance',
+            type: 'uint256',
+          },
+        ],
+        payable: false,
+        stateMutability: 'view',
+        type: 'function',
+      },
+    ]
   },
 };
 
@@ -131,6 +188,13 @@ export function getChain() {
     return serverVars.chain;
   }
   return localVars.chain;
+};
+
+export function getCoins() {
+  if (process.env.REACT_APP_STAGE === 'production') {
+    return serverVars.coins;
+  }
+  return localVars.coins;
 }
 
 export function getNetwork() {

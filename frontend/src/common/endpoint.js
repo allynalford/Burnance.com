@@ -99,6 +99,15 @@ export const generateApiClient = (url, region, path, method) => {
     }
   };
 
+  export const _delete = (path) => {
+    try {
+        return _deleteApiClient(path);
+    } catch (e) {
+        console.log(e.message);
+        return {error: true, message: e.message, e: e};
+    }
+};
+
 /**
  * _get - GET request to a AWS auth URL
  * Base API URL (REACT_APP_BASE_API_URL) and REGION (REACT_APP_REGION) are pulled from environment file settings
@@ -224,6 +233,15 @@ export const _getMulti = (paths) => {
     export const _putOptions = (path, req, options) => {
         try {
             return axios.put(path, req, options);
+        } catch (e) {
+            return {error: true, message: e.message, e: e};
+        }
+    };
+
+    export const _deleteApiClient = async (path) => {
+        try {
+            const resp = generateApiClient(process.env.REACT_APP_BASE_API_URL, process.env.REACT_APP_REGION, path, 'DELETE')
+            return await resp.apigClient.invokeApi(resp.args.pathParams, resp.args.pathTemplate, resp.args.method, resp.args.additionalParams, resp.args.body);
         } catch (e) {
             return {error: true, message: e.message, e: e};
         }

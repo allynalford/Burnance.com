@@ -300,6 +300,132 @@ module.exports._getWallet = async (chain, address) => {
     }
 };
 
+
+/**
+* Add a wallet coin
+*
+* @author Allyn j. Alford <Allyn@tenablylabs.com>
+* @async
+* @function _addCoin
+* @param {String} chain - blockchain of address
+* @param {String} owner - owner ethereum wallet address
+* @param {String} contractAddress - address of coin contract
+* @return {Promise<Array>} Response Array for next step to process.
+*/
+module.exports._addCoin = async (chain, address, contractAddress, symbol, decimal, cmcid) => {
+    try {
+        const dynamo = require('../common/dynamo');
+        const dateformat = require("dateformat");
+        return await dynamo.saveItemInDB({
+            TableName: process.env.DYNAMODB_TABLE_WALLET_COIN,
+            Item: {
+                chainAddress: chain + ':' + address,
+                contractAddress,
+                symbol,
+                decimal, 
+                cmcid,
+                dt: dateformat(new Date(), "isoUtcDateTime"),
+                timestamp: new Date().getTime(),
+            },
+        });
+    } catch (e) {
+        console.error(e);
+        throw e;
+    }
+};
+
+
+
+
+
+/**
+* Returns a wallet coin
+*
+* @author Allyn j. Alford <Allyn@tenablylabs.com>
+* @async
+* @function _getCoin
+* @param {String} chain - blockchain of address
+* @param {String} owner - owner ethereum wallet address
+* @param {String} contractAddress - address of coin contract
+* @return {Promise<Array>} Response Array for next step to process.
+*/
+module.exports._getCoin = async (chain, address, contractAddress) => {
+    try {
+        const dynamo = require('../common/dynamo');
+        const wallet = await dynamo.qetFromDB({
+            TableName: process.env.DYNAMODB_TABLE_WALLET_COIN,
+            Key: {
+                chainAddress: chain + ':' + address,
+                contractAddress
+            }
+        });
+        return wallet;
+    } catch (e) {
+        console.error(e);
+        throw e;
+    }
+};
+
+/**
+* Returns Wallet coins
+*
+* @author Allyn j. Alford <Allyn@tenablylabs.com>
+* @async
+* @function _getWalletCoins
+* @param {String} chain - blockchain of address
+* @param {String} owner - owner ethereum wallet address
+* @return {Promise<Array>} Response Array of coins
+*/
+
+module.exports._getWalletCoins = async (chain, address) => {
+    try {
+        const dynamo = require('../common/dynamo');
+        const coins = await dynamo.queryDB({
+            TableName: process.env.DYNAMODB_TABLE_WALLET_COIN,
+            KeyConditionExpression: "#chainAddress = :chainAddress",
+            ExpressionAttributeNames: {
+                "#chainAddress": "chainAddress",
+            },
+            ExpressionAttributeValues: {
+                ":chainAddress": chain + ':' + address
+            },
+        });
+
+        return coins;
+    } catch (e) {
+        console.error(e.message);
+        throw e;
+    }
+};
+
+/**
+* delete a wallet coin
+*
+* @author Allyn j. Alford <Allyn@tenablylabs.com>
+* @async
+* @function _deleteCoin
+* @param {String} chain - blockchain of address
+* @param {String} owner - owner ethereum wallet address
+* @param {String} contractAddress - address of coin contract
+* @return {Promise<Array>} Response Array for next step to process.
+*/
+module.exports._deleteCoin = async (chain, address, contractAddress) => {
+    try {
+        const dynamo = require('../common/dynamo');
+        const wallet = await dynamo.deleteItemFromDB({
+            TableName: process.env.DYNAMODB_TABLE_WALLET_COIN,
+            Key: {
+                chainAddress: chain + ':' + address,
+                contractAddress,
+            }
+        });
+        return wallet;
+    } catch (e) {
+        console.error(e);
+        throw e;
+    }
+};
+
 /**
 * update wallet fields
 *

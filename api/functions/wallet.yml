@@ -104,3 +104,37 @@
           method: patch
           authorizer: aws_iam
           cors: true
+  walletDeleteCoin:
+    handler: wallet/wallet.deleteCoin
+    events:
+      - http:
+          path: wallet/coin/{chain}/{address}/{contractAddress}
+          method: delete
+          authorizer: aws_iam
+          cors: true
+  walletGetCoin:
+    handler: wallet/wallet.getCoin
+    events:
+      - http:
+          path: wallet/coin/{chain}/{address}/{contractAddress}
+          method: get
+          authorizer: aws_iam
+          cors: true
+  walletGetCoins:
+    handler: wallet/wallet.getCoins
+    events:
+      - http:
+          path: wallet/coins/{chain}/{address}
+          method: get
+          authorizer: aws_iam
+          cors: true
+  walletAddCoin:
+    handler: wallet/wallet.addCoin
+    memorySize: 128 # optional, in MB, default is 1024
+    timeout: 30 # optional, in seconds, default is 6
+    events:
+      - http:
+          path: wallet/coin
+          method: post
+          authorizer: aws_iam
+          cors: true
