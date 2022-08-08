@@ -238,7 +238,6 @@ class ERC20Coins extends Component {
     const quotesResp = await endpoint._post(
       getChain()['coins'].getCMCQuotesApiUrl,{symbols}
     );
-    console.log(quotesResp);
     return quotesResp;
   };
 
@@ -291,9 +290,14 @@ class ERC20Coins extends Component {
 
       const quotes = await this.getQuotes(symbols);
 
-      for (const coin of coins) {
+      console.log(quotes)
 
-        const quote = quotes.data[coin.symbol];
+      for (const coin of coins) {
+        console.log(coin.symbol)
+
+        const quote = quotes.data.results.data[coin.symbol];
+
+        console.log(quote)
 
         if(typeof quote !== "undefined" && typeof quote[0] !== "undefined"){
           coin.price = quote[0].quote.USD.price;
@@ -437,19 +441,26 @@ class ERC20Coins extends Component {
             <Container>
               <Row>
                 <Col md="12">
-                <Button
+                  <Button
                     name="refresh"
                     className="btn btn-info rounded"
                     style={{ marginBottom: '15px' }}
                     onClick={(e) => {
                       e.preventDefault();
-                      this.refreshWallet('ethereum', this.state.ethereumAddress);
+                      this.refreshWallet(
+                        'ethereum',
+                        this.state.ethereumAddress,
+                      );
                     }}
                   >
                     {this.state.loading === true
                       ? 'Loading Coins...'
-                      : 'Refresh Coins'}{" "}
-                      <FontAwesomeIcon icon={faRefresh} color="#E76E3C" spinPulse={this.state.loading} />
+                      : 'Refresh Coins'}{' '}
+                    <FontAwesomeIcon
+                      icon={faRefresh}
+                      color="#E76E3C"
+                      spinPulse={this.state.loading}
+                    />
                   </Button>
                 </Col>
                 <Col md="10">
@@ -514,8 +525,7 @@ class ERC20Coins extends Component {
                         name: 'Price',
                         selector: (row) => row.balance,
                         sortable: true,
-                        format: (row) =>
-                        formatter.format(row.price),
+                        format: (row) => formatter.format(row.price),
                         style: {
                           fontSize: '14px',
                           fontWeight: 600,
@@ -525,8 +535,7 @@ class ERC20Coins extends Component {
                         name: 'Volume 24h',
                         selector: (row) => row.volume_24h,
                         sortable: true,
-                        format: (row) =>
-                        formatter.format(row.volume_24h),
+                        format: (row) => formatter.format(row.volume_24h),
                         style: {
                           fontSize: '14px',
                           fontWeight: 600,
@@ -543,11 +552,7 @@ class ERC20Coins extends Component {
                             className="btn rounded btn-warning btn-sm"
                             onClick={(e) => {
                               e.preventDefault();
-                              this.deleteCoin(
-                                'ethereum',
-                                this.state.ethereumAddress,
-                                row.contractAddress,
-                              );
+                              
                             }}
                           >
                             Burn{' '}
@@ -570,11 +575,7 @@ class ERC20Coins extends Component {
                             className="btn rounded btn-success btn-sm"
                             onClick={(e) => {
                               e.preventDefault();
-                              this.deleteCoin(
-                                'ethereum',
-                                this.state.ethereumAddress,
-                                row.contractAddress,
-                              );
+                              
                             }}
                           >
                             Buy Back{' '}
