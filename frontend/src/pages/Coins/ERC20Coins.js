@@ -234,6 +234,15 @@ class ERC20Coins extends Component {
     );
   };
 
+  requestBurn = async (type) => {
+    this.fireMsg(type, 'This feature is not yet available.', 'info');
+    Event(
+      'Wallet Coins',
+      'Burn Request',
+       type
+    );
+  };
+
   getQuotes = async (symbols) => {
     const quotesResp = await endpoint._post(
       getChain()['coins'].getCMCQuotesApiUrl,{symbols}
@@ -435,7 +444,7 @@ class ERC20Coins extends Component {
           <section className="section">
             <Container>
               <Row>
-                <Col md="12">
+                <Col md="6">
                   <Button
                     name="refresh"
                     className="btn btn-info rounded"
@@ -458,9 +467,22 @@ class ERC20Coins extends Component {
                     />
                   </Button>
                 </Col>
+                {/* <Col md="6">
+                <p className="text">
+                      <Link
+                        to="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          this.openModal();
+                        }}
+                      >
+                        Import tokens
+                      </Link>
+                    </p>
+                </Col> */}
                 <Col md="10">
                   <DataTable
-                    title={'Wallet Assets'}
+                    title={'Wallet Coin Assets'}
                     customStyles={customStyles}
                     highlightOnHover
                     pointerOnHover
@@ -558,7 +580,7 @@ class ERC20Coins extends Component {
                             className="btn rounded btn-warning btn-sm"
                             onClick={(e) => {
                               e.preventDefault();
-                              
+                              this.requestBurn('Burn Coins')
                             }}
                           >
                             Burn{' '}
@@ -582,7 +604,7 @@ class ERC20Coins extends Component {
                             className="btn rounded btn-success btn-sm"
                             onClick={(e) => {
                               e.preventDefault();
-                              
+                              this.requestBurn('Buy Back Burn')
                             }}
                           >
                             Buy Back{' '}
