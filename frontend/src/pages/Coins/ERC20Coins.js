@@ -382,10 +382,10 @@ class ERC20Coins extends Component {
           walletConnected: true,
         });
 
-        this.getWallet('ethereum', window.ethereum._state.accounts[0]);
+        this.getCoins('ethereum', window.ethereum._state.accounts[0]);
       }
     } else if (typeof window.ethereum._state.accounts[0] === 'undefined') {
-      this.setState({ walletConnected: false, ethereumAddress: '' });
+      this.setState({coins: [], walletConnected: false, ethereumAddress: '' });
     }
   };
 
@@ -443,7 +443,7 @@ class ERC20Coins extends Component {
         >
           <section className="section">
             <Container>
-              <Row>
+              {(this.state.walletConnected === true ?  <Row>
                 <Col md="6">
                   <Button
                     name="refresh"
@@ -641,7 +641,7 @@ class ERC20Coins extends Component {
                     </p>
                   </div>
                 </Col>
-              </Row>
+              </Row> : null)}
             </Container>
           </section>
         </LoadingOverlay>
