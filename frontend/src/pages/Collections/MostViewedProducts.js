@@ -668,8 +668,7 @@ class MostViewedProducts extends Component {
                           </Link>
                         ),
                         sortable: true,
-                        width: '20%',
-                        grow: 2,
+                        grow: 3,
                         style: {
                           color: '#202124',
                           fontSize: '16px',
@@ -689,7 +688,8 @@ class MostViewedProducts extends Component {
                         name: 'Floor Price',
                         selector: (row) => row.FloorPrice,
                         sortable: true,
-                        format: (row) => formatter.format(row.FloorPrice),
+                        format: (row) => row.FloorPrice + ' ETH',
+                        grow: 2,
                         style: {
                           fontSize: '14px',
                           fontWeight: 600,
@@ -697,20 +697,11 @@ class MostViewedProducts extends Component {
                         when: (row) => row.FloorPrice < row.AmountInvested,
                       },
                       {
-                        name: 'Est. Value',
-                        selector: (row) => row.HoldingValue,
-                        sortable: true,
-                        format: (row) => formatter.format(row.HoldingValue),
-                        style: {
-                          fontSize: '14px',
-                          fontWeight: 600,
-                        },
-                      },
-                      {
                         name: 'Cost Basis',
                         selector: (row) => row.AmountInvested,
                         sortable: true,
                         format: (row) => formatter.format(row.AmountInvested),
+                        grow: 2,
                         style: {
                           fontSize: '14px',
                           fontWeight: 600,
@@ -732,7 +723,7 @@ class MostViewedProducts extends Component {
                         selector: (row) => row.Liquidity7D,
                         sortable: true,
                         grow: 2,
-                        format: (row) => `${row.Liquidity7D.toFixed(2)}%`,
+                        format: (row) => `${(row.Liquidity7D === null ? 0 : row.Liquidity7D.toFixed(2))}%`,
                         style: {
                           fontSize: '14px',
                           fontWeight: 600,

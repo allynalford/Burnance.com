@@ -79,7 +79,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "prod": "SET REACT_APP_STAGE=production | react-scripts start"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -97,6 +98,7 @@
     ]
   },
   "devDependencies": {
+    "dotenv": "^16.0.1",
     "gulp-sass": "^3.2.1"
   }
 }

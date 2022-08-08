@@ -7,14 +7,19 @@ const endpoint = require('../common/endpoint');
 const alchemySDK = require('@alch/alchemy-sdk');
 
 // replace with your Alchemy api key
-const baseURL = `${process.env.ALCHEMY_BASE_URL}/nft/v2/${process.env.ALCHEMY_API_KEY}`;
+const baseURL = `${process.env.ALCHEMY_BASE_API_URL}/nft/v2/${process.env.ALCHEMY_API_KEY}`;
 //const baseURL = process.env.ALCHEMY_HTTP;
 
 
 // Optional Config object, but defaults to demo api-key and eth-mainnet.
 const settings = {
   apiKey: process.env.ALCHEMY_API_KEY, // Replace with your Alchemy API Key.
-  network: (process.env.ETH_NETWORK === "rinkeby" ? alchemySDK.Network.ETH_RINKEBY : (process.env.ETH_NETWORK === "goerli" ? alchemySDK.Network.ETH_GOERLI : alchemySDK.Network.ETH_MAINNET)), // Replace with your network.
+  network:
+    process.env.ETH_NETWORK === "rinkeby"
+      ? alchemySDK.Network.ETH_RINKEBY
+      : process.env.ETH_NETWORK === "goerli"
+      ? alchemySDK.Network.ETH_GOERLI
+      : alchemySDK.Network.ETH_MAINNET, // Replace with your network.
   maxRetries: 10,
 };
 
@@ -386,7 +391,6 @@ module.exports.getNFTMetadata = async (chain, contractAddress, tokenId, tokenTyp
 */
 module.exports.getContractMetadata = async (chain, contractAddress) => {
     try {
-       console.log('URL', `${baseURL}/getContractMetadata/?contractAddress=${contractAddress}`)
         const results = await endpoint._get(`${baseURL}/getContractMetadata/?contractAddress=${contractAddress}`);
 
         // {

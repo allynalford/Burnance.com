@@ -15,7 +15,7 @@ const endpoint = require('../common/endpoint');
  */
 module.exports._getAssetContract = async (address) => {
   try {
-    const result =  await endpoint._get(`${process.env.OPENSEA_API_URL}/asset_contract/${address}`)
+    const result =  await endpoint._get(`${process.env.OPENSEA_API_URL}/asset_contract/${address}?format=json`)
     return result.data;
   } catch (e) {
     console.error('_getAssetContract', {message: e.message, url: e.config.url});

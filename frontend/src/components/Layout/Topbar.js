@@ -235,7 +235,7 @@ class Topbar extends Component {
 
     if ((typeof ethPrice === 'undefined') | (ethPrice === null)) {
       const dt = dateFormat(new Date(), 'isoUtcDateTime');
-
+      console.log(getChain()['eth'].getEthPriceApiUrl)
       ethPrice = await endpoint._get(getChain()['eth'].getEthPriceApiUrl);
       ethPrice = ethPrice.data.result;
       ethPrice.dt = dt;

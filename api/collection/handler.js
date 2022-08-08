@@ -194,7 +194,7 @@ module.exports.GetCollection = async (event) => {
 
         //Check if the collection exists
         let collection = await collectionUtils._getCollection(chain, addr.address);
-
+        
         //console.log('collection exists:', typeof collection !== "undefined");
 
         
@@ -202,15 +202,33 @@ module.exports.GetCollection = async (event) => {
         //If the collection doesn't already exists in the wallet
         if(typeof collection === "undefined" || collection.statusCode === 400){
 
-          const assetContract = await openSeaUtils._getAssetContract(addr.address);
+          //const assetContract = await openSeaUtils._getAssetContract(addr.address);
+          const assetContract = await alchemyUtils.getContractMetadata(chain, addr.address);
           //console.log('assetContract:', assetContract);
           //console.log(`Delaying: ${addr.address} | `, 500);
-          await delay(500);
+          //await delay(1500);
           //console.log('Continuing:', addr.address);
 
-          collection = assetContract;
-          collection.chain = chain;
-          collection.address = assetContract.address;
+          let contract = assetContract;
+          
+
+          if(typeof assetContract.contractMetadata !== "undefined"){
+
+            collection = assetContract.contractMetadata;
+
+            
+
+            collection.total_supply = assetContract.contractMetadata.totalSupply;
+            collection.schema_name = assetContract.contractMetadata.tokenType;
+            contract = assetContract.contractMetadata;
+            collection.contractAddress = assetContract.address;
+            
+            collection.chain = chain;
+            collection.address = assetContract.address;
+            
+
+          }
+          
           
 
           //statistics = await openSeaUtils._retrieveCollectionStats(assetContract.collection.slug);
@@ -273,12 +291,12 @@ module.exports.GetCollection = async (event) => {
               await collectionUtils._addCollectionWithStats(
                 chain,
                 collection.address,
-                collection.collection.name,
+                collection.name,
                 collection.symbol,
                 (collection.total_supply === null ? 0 : collection.total_supply),
                 collection.schema_name,
                 collection.statistics,
-                assetContract
+                contract
               );
 
 
@@ -287,7 +305,7 @@ module.exports.GetCollection = async (event) => {
               await collectionUtils._addCollection(
                 chain,
                 collection.address,
-                collection.collection.name,
+                collection.name,
                 collection.symbol,
                 collection.total_supply,
                 collection.schema_name,
@@ -302,7 +320,7 @@ module.exports.GetCollection = async (event) => {
               name: "Unknown Test Net Asset",
               symbol: "UNKN",
               totalSupply: "0",
-              tokenType: "erc721",
+              tokenType: "ERC721",
             };
             collection.chain = chain;
             collection.address = addr.address;
@@ -338,7 +356,7 @@ module.exports.GetCollection = async (event) => {
               "Unknown Test Net Asset",
               "UNKN",
               0,
-              "erc721",
+              "ERC721",
               collection.statistics
             );
 
@@ -353,10 +371,15 @@ module.exports.GetCollection = async (event) => {
           if (typeof collection.statistics === "undefined") {
             let statistics;
 
-            const assetContract = await openSeaUtils._getAssetContract(addr.address);
+            //const assetContract = await openSeaUtils._getAssetContract(addr.address);
+            const assetContract = await alchemyUtils.getContractMetadata(chain, addr.address);
             //console.log('assetContract:', assetContract);
           
             collection.contract = assetContract;
+
+            if(typeof assetContract.totalSupply !== "undefined"){
+              collection.total_supply = assetContract.totalSupply
+            }
 
             try {
               //statistics = await openSeaUtils._retrieveCollectionStats(assetContract.collection.slug);
