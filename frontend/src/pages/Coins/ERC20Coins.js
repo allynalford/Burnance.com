@@ -290,14 +290,10 @@ class ERC20Coins extends Component {
 
       const quotes = await this.getQuotes(symbols);
 
-      console.log(quotes)
-
+    
       for (const coin of coins) {
-        console.log(coin.symbol)
-
+        
         const quote = quotes.data.results.data[coin.symbol];
-
-        console.log(quote)
 
         if(typeof quote !== "undefined" && typeof quote[0] !== "undefined"){
           coin.price = quote[0].quote.USD.price;
@@ -305,19 +301,19 @@ class ERC20Coins extends Component {
           coin.volume_change_24h = quote[0].quote.USD.volume_change_24h;
           coin.num_market_pairs = quote[0].num_market_pairs;
           coin.circulating_supply = quote[0].circulating_supply;
+          coin.value = (quote[0].quote.USD.price * coin.balance);
         }else{
             coin.price = 0.0;
             coin.volume_24h = 0;
             coin.volume_change_24h = 0;
             coin.num_market_pairs = 0;
             coin.circulating_supply = 0;
-     
+            coin.value = 0;
         }
       }
 
       this.setState({ coins });
-   
-
+  
 
       if (coins.length !== 0) {
         //Cache the data
@@ -328,7 +324,6 @@ class ERC20Coins extends Component {
       //Update the table with balances
       this.setState({ coins, loading: false });
     }
-
 
   };
 
@@ -493,7 +488,7 @@ class ERC20Coins extends Component {
                             />
                           </Link>
                         ),
-                        width: '56px', // custom width for icon button
+                        width: '40px', // custom width for icon button
                         style: {
                           borderBottom: '1px solid #FFFFFF',
                           marginBottom: '-1px',
@@ -504,6 +499,7 @@ class ERC20Coins extends Component {
                         selector: (row) => row.symbol,
                         sortable: true,
                         format: (row) => row.symbol,
+                        width: '100px',
                         style: {
                           color: '#202124',
                           fontSize: '16px',
@@ -526,6 +522,17 @@ class ERC20Coins extends Component {
                         selector: (row) => row.balance,
                         sortable: true,
                         format: (row) => formatter.format(row.price),
+                        width: '90px',
+                        style: {
+                          fontSize: '14px',
+                        },
+                      },
+                      {
+                        name: 'Value',
+                        selector: (row) => row.value,
+                        sortable: true,
+                        format: (row) => formatter.format(row.value),
+                        width: '110px',
                         style: {
                           fontSize: '14px',
                           fontWeight: 600,
@@ -538,7 +545,6 @@ class ERC20Coins extends Component {
                         format: (row) => formatter.format(row.volume_24h),
                         style: {
                           fontSize: '14px',
-                          fontWeight: 600,
                         },
                       },
                       {
@@ -562,6 +568,7 @@ class ERC20Coins extends Component {
                             />
                           </Link>
                         ),
+                        width: '110px',
                         style: {
                           borderBottom: '1px solid #FFFFFF',
                           marginBottom: '-1px',
@@ -585,6 +592,7 @@ class ERC20Coins extends Component {
                             />
                           </Link>
                         ),
+                        width: '135px',
                         style: {
                           borderBottom: '1px solid #FFFFFF',
                           marginBottom: '-1px',
