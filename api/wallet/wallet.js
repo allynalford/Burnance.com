@@ -454,6 +454,7 @@ module.exports.ViewWalletCollectionNFTs = async (event) => {
       nft.contract = ownedNft.contract;
       nft.tokenId = ownedNft.tokenId;
       nft.description = ownedNft.description;
+      
 
       updatedNfts.push(nft);
     };

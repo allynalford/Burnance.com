@@ -209,7 +209,6 @@ module.exports.GetCollection = async (event) => {
           //await delay(1500);
           //console.log('Continuing:', addr.address);
 
-          let contract = assetContract;
           
 
           if(typeof assetContract.contractMetadata !== "undefined"){
@@ -220,7 +219,6 @@ module.exports.GetCollection = async (event) => {
 
             collection.total_supply = assetContract.contractMetadata.totalSupply;
             collection.schema_name = assetContract.contractMetadata.tokenType;
-            contract = assetContract.contractMetadata;
             collection.contractAddress = assetContract.address;
             
             collection.chain = chain;
@@ -295,8 +293,7 @@ module.exports.GetCollection = async (event) => {
                 collection.symbol,
                 (collection.total_supply === null ? 0 : collection.total_supply),
                 collection.schema_name,
-                collection.statistics,
-                contract
+                collection.statistics
               );
 
 
@@ -371,15 +368,6 @@ module.exports.GetCollection = async (event) => {
           if (typeof collection.statistics === "undefined") {
             let statistics;
 
-            //const assetContract = await openSeaUtils._getAssetContract(addr.address);
-            const assetContract = await alchemyUtils.getContractMetadata(chain, addr.address);
-            //console.log('assetContract:', assetContract);
-          
-            collection.contract = assetContract;
-
-            if(typeof assetContract.totalSupply !== "undefined"){
-              collection.total_supply = assetContract.totalSupply
-            }
 
             try {
               //statistics = await openSeaUtils._retrieveCollectionStats(assetContract.collection.slug);
@@ -420,8 +408,7 @@ module.exports.GetCollection = async (event) => {
               await collectionUtils._updateCollectionFields(
                 chain,
                 addr.address,
-                [{ name: "statistics", value: statistics.stats },
-                 { name: "contract", value: collection.contract }]
+                [{ name: "statistics", value: statistics.stats }]
               );
 
               collection.statistics = statistics.stats

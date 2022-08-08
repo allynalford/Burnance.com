@@ -297,6 +297,8 @@ class ERC20Coins extends Component {
       //Update the table with balances
       this.setState({ coins, loading: false });
 
+      if(symbols.length > 0){
+        
       const quotes = await this.getQuotes(symbols);
 
     
@@ -322,6 +324,7 @@ class ERC20Coins extends Component {
       }
 
       this.setState({ coins });
+      }
   
 
       if (coins.length !== 0) {

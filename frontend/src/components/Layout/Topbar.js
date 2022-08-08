@@ -55,8 +55,7 @@ class Topbar extends Component {
 
     const networkId = await web3.eth.net.getId();
 
-    console.log({networkId, thisId: getChainId()})
-
+    
         if(networkId !== getChainId()){
           const switchRequest = getNetwork().switch;
           switchRequest.params[0].chainId = Web3.utils.toHex(switchRequest.params[0].chainId);
@@ -234,12 +233,16 @@ class Topbar extends Component {
     }
 
     if ((typeof ethPrice === 'undefined') | (ethPrice === null)) {
-      const dt = dateFormat(new Date(), 'isoUtcDateTime');
-      console.log(getChain()['eth'].getEthPriceApiUrl)
-      ethPrice = await endpoint._get(getChain()['eth'].getEthPriceApiUrl);
-      ethPrice = ethPrice.data.result;
-      ethPrice.dt = dt;
-      sessionstorage.setItem('ethPrice', JSON.stringify(ethPrice));
+     //console.log(getChain()['eth'].getEthPriceApiUrl)
+      try{
+        ethPrice = await endpoint._get(getChain()['eth'].getEthPriceApiUrl);
+        ethPrice = ethPrice.data.result;
+        ethPrice.dt = dateFormat(new Date(), 'isoUtcDateTime');
+        sessionstorage.setItem('ethPrice', JSON.stringify(ethPrice));
+      }catch(e){
+        console.error(e);
+      }
+
 
     };
 

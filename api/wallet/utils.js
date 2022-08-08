@@ -543,7 +543,7 @@ module.exports._getWalletNFT = async (owner, contractAddressTokenId) => {
         const dynamo = require('../common/dynamo');
         const nft = await dynamo.queryDB({
             TableName: process.env.DYNAMODB_TABLE_WALLET_NFT,
-            IndexName: 'InstanceIdIndex',
+            IndexName: 'owner-ContractAddressTokenIdIndex',
             KeyConditionExpression: "#owner = :owner and #contractAddressTokenId = :contractAddressTokenId",
             ExpressionAttributeNames: {
                 "#owner": "owner",

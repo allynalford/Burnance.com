@@ -23,7 +23,7 @@ Collections.prototype.get = (wallet) => {
 
 Collections.prototype.set = (wallet, payload) => {
     //console.log('Collections Cache Set', wallet);
-    return storage.set(wallet, payload, 2);
+    return storage.set(wallet, payload, 10);
 };
 
 Collections.prototype.remove = (wallet) => {;

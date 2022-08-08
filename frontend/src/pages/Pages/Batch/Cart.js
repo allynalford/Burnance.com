@@ -6,7 +6,7 @@ import {initGA, PageView} from '../../../common/gaUtils';
 import DataTable from 'react-data-table-component';
 import DataTableLoader from '../../../components/DataTable';
 import Web3 from 'web3';
-import Burnance from '../../../abis/Burnance.json';
+import Burnance from '../../../abis/Burnance.v2.1.json';
 const Batch = require('../../../model/Batch');
 const Swal = require('sweetalert2');
 var storage = require('lscache');

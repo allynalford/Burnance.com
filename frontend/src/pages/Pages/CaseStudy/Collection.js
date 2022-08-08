@@ -38,6 +38,7 @@ import LoadingOverlay from 'react-loading-overlay';
 //Import Images
 import bgImg from "../../../assets/images/nfts/ac1_unfit_digital_collage_of_locally_owned_nfts_by_annie_bur.jpg";
 const Swal = require('sweetalert2');
+const ethers = require('ethers');
 const Batch = require('../../../model/Batch');
 const CollectionObj = require('../../../model/Collection');
 var sessionstorage = require('sessionstorage');
@@ -150,6 +151,14 @@ class CollectionView extends Component {
   //   await this.loadWeb3();
   //   await this.loadBlockchainData();
   // }
+
+  componentWillMount() {
+    try{
+      ethers.utils.getAddress(this.props.match.params.address);
+    }catch(e){
+      window.location.href = window.location.origin + '/collections';
+    }
+  }
 
   async init() {
     await this.loadWeb3();
@@ -390,7 +399,7 @@ class CollectionView extends Component {
 
       const collection = Collection.data.collection;
 
-      if(collection.contract.image_url !== null){
+      if(typeof collection.contract !== "undefined" && collection.contract.image_url !== null){
         this.setState({backgroundImg: collection.contract.image_url})
       }
 
@@ -434,12 +443,14 @@ class CollectionView extends Component {
           ? formatter.format(
               parseFloat(
                 Number(
-                  NFTS.data.nfts.length * collection.statistics.average_price,
+                  NFTS.data.nfts.length * collection.statistics.floor_price,
                 ) * Number(ethusd),
               ),
             )
           : formatter.format(0.0);
 
+      
+      
       this.setState({
         collection: Collection.data.collection,
         loadingCollection: false,
@@ -447,7 +458,7 @@ class CollectionView extends Component {
         loading: false,
         approving: false,
         holdingValue,
-        description: Collection.data.collection.description,
+        description: (typeof Collection.data.collection.description === "undefined" ? NFTS.data.nfts[0].description : Collection.data.collection.description),
         type: Collection.data.collection.schema_name,
         held: NFTS.data.nfts.length,
         floorPrice,
@@ -1422,10 +1433,14 @@ class CollectionView extends Component {
                         diff = 0;
                       if (typeof cases.costETH !== 'undefined') {
                         currentCost = parseFloat(
-                          cases.costETH * this.state.ethPrice.ethusd,
+                          cases.costUSD * this.state.ethPrice.ethusd,
                         );
-                        diff = currentCost - cases.costUSD;
+                        const cleanFloor = Number(this.state.floorPrice.replace("$",""))
+                        diff = ((currentCost - cases.valueUSD)) + (cleanFloor - cases.valueUSD);
                       }
+
+                   
+                      //console.log(cases.gasData.gasUSD.toFixed(4));
 
                       const exists = this.state.batch.existsInBatch(
                         this.state.batch.address,
@@ -1559,10 +1574,10 @@ class CollectionView extends Component {
                                           style={{ fontSize: '16px' }}
                                           className="text-center"
                                         >
-                                          {typeof cases.gasUSD === 'undefined'
+                                          {typeof cases.gasData === 'undefined'
                                             ? '$0.00'
                                             : formatter.format(
-                                                cases.gasUSD,
+                                                cases.gasData.gasUSD,
                                               )}{' '}
                                         </Col>
                                         <Col
@@ -1585,9 +1600,9 @@ class CollectionView extends Component {
                                     <Col md="6">
                                       <Row>
                                         <Col md="12" className="text-center h3">
-                                          {typeof cases.costUSD === 'undefined'
+                                          {typeof cases.costETH === 'undefined'
                                             ? '$0.00'
-                                            : formatter.format(cases.costUSD)}
+                                            : formatter.format(cases.costETH)}
                                         </Col>
                                         <Col md="12" className="text-center">
                                           Cost Basis
@@ -1606,9 +1621,9 @@ class CollectionView extends Component {
                                     <Col md="3" className="text-center">
                                       {typeof cases.costETH === 'undefined'
                                         ? 0.0
-                                        : numFormatter.format(cases.costETH)}
+                                        : numFormatter.format(cases.costUSD)}
                                     </Col>
-                                    <Col md="6" className="text-center h3">
+                                    <Col md="6" className="text-center h5">
                                       <span
                                         style={{
                                           color: diff <= 0 ? 'red' : 'green',
@@ -1817,7 +1832,7 @@ class CollectionView extends Component {
                                                   title,
                                                   cases.contract.address,
                                                   cases.tokenId,
-                                                  tokenType,
+                                                  this.state.collection.tokenType,
                                                   1,
                                                   imgSrc,
                                                   costUSD,

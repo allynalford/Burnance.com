@@ -78,7 +78,9 @@ class MostViewedProducts extends Component {
     this.refresh.bind(this);
     this.downloadCSV.bind(this);
     this.handleRowSelect.bind(this);
-  }
+  };
+
+
 
   handleRowSelect = ({ selectedRows }) => {
     // You can set state or dispatch with something like Redux so we can use the retrieved data
@@ -676,6 +678,11 @@ class MostViewedProducts extends Component {
                         },
                       },
                       {
+                        name: 'Type',
+                        selector: (row) => row.tokenType,
+                        sortable: true,
+                      },
+                      {
                         name: 'Held',
                         selector: (row) => row.count,
                         sortable: true,
@@ -686,9 +693,9 @@ class MostViewedProducts extends Component {
                       },
                       {
                         name: 'Floor Price',
-                        selector: (row) => row.FloorPrice,
+                        selector: (row) => (row.FloorPrice === null ? 0 : row.FloorPrice),
                         sortable: true,
-                        format: (row) => row.FloorPrice + ' ETH',
+                        format: (row) => (row.FloorPrice === null ? 0 : row.FloorPrice) + ' ETH',
                         grow: 2,
                         style: {
                           fontSize: '14px',

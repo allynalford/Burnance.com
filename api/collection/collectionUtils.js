@@ -283,7 +283,7 @@ module.exports._addCollection = async (chain, contractAddress, name, symbol, tot
 * @param {String} contractAddress - NFT Collection contract address
 * @return {Promise<Array>} Response Array for next step to process.
 */
-module.exports._addCollectionWithStats = async (chain, contractAddress, name, symbol, totalSupply, tokenType, statistics, contract) => {
+module.exports._addCollectionWithStats = async (chain, contractAddress, name, symbol, totalSupply, tokenType, statistics) => {
   try {
       const dynamo = require('../common/dynamo');
       const dateformat = require("dateformat");
@@ -297,7 +297,6 @@ module.exports._addCollectionWithStats = async (chain, contractAddress, name, sy
               totalSupply, 
               tokenType,
               statistics,
-              contract,
               dt: dateformat(new Date(), "isoUtcDateTime"),
               timestamp: new Date().getTime(),
           },
