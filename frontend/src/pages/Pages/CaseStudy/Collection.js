@@ -780,29 +780,34 @@ class CollectionView extends Component {
     console.log('TX  ',tx);
     
 
+
+    setTimeout(async function myFunc(tx) {
+      try {
+        await retryAsync(
+          async () => {
+            const lastResult = await endpoint._post(getChain()['eth'].addWalletSellTxApiUrl, tx);
+            console.log('txResp  ', lastResult);
+            return typeof lastResult.data !== "undefined";
+          },
+          {
+            delay: 7000,
+            maxTry: 5,
+            until: (lastResult) => lastResult === true,
+          }
+        );
+      } catch (err) {
+        if (isTooManyTries(err)) {
+          // Did not get 42 after 'maxTry' calls
+          console.log('isTooManyTries', err)
+        } else {
+          // something else goes wrong
+          console.log(err)
+        }
+      }
+    }, 10000, tx);
     
 
-    try {
-      await retryAsync(
-        async () => {
-          const lastResult = await endpoint._post(getChain()['eth'].addWalletSellTxApiUrl, tx);
-          console.log('txResp  ', lastResult);
-        },
-        {
-          delay: 7000,
-          maxTry: 5,
-          until: (lastResult) => lastResult.error === false,
-        }
-      );
-    } catch (err) {
-      if (isTooManyTries(err)) {
-        // Did not get 42 after 'maxTry' calls
-        console.log('isTooManyTries', err)
-      } else {
-        // something else goes wrong
-        console.log(err)
-      }
-    }
+
 
 
     return true;
