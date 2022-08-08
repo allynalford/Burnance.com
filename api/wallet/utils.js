@@ -1000,6 +1000,9 @@ module.exports._ViewWalletNFT = async (chain, address, contractAddress, tokenId)
                     console.log('gasETH: ', gasData.gasETH);
                     console.log('gasUSD: ', gasData.gasUSD);
 
+                    fields.push({ name: 'contractAddress', value: contractAddress });
+                    fields.push({ name: 'tokenId', value: tokenId });
+
 
 
                     //Calculate the cost

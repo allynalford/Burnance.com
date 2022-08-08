@@ -413,27 +413,13 @@ resources:
     #         AttributeName: contractAddressTokenId
     #         KeyType: RANGE
     #     GlobalSecondaryIndexes:
-    #       - IndexName: InstanceIdIndex
+    #       - IndexName: ownerContractAddressTokenIdIndex
     #         KeySchema:
     #           - AttributeName: owner
     #             KeyType: HASH
     #           - AttributeName: contractAddressTokenId
     #             KeyType: RANGE
-    #         Projection:
-    #           NonKeyAttributes:
-    #             - costETH 
-    #             - costUSD 
-    #             - valueUSD 
-    #             - valueETH
-    #             - gasUSD
-    #             - gasETH
-    #             - gasData
-    #             - ethTransPriceUSD
-    #             - hash
-    #             - createdatetime
-    #             - timestamp
-    #             - status
-    #           ProjectionType: 'INCLUDE'
+    #           ProjectionType: 'ALL'
     #         ProvisionedThroughput:
     #           ReadCapacityUnits: 1
     #           WriteCapacityUnits: 1      

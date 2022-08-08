@@ -5,7 +5,7 @@ import { withRouter } from "react-router";
 import {Container} from "reactstrap";
 import Badge from 'react-bootstrap/Badge'
 import {Event, initGA} from "../../common/gaUtils";
-import { getChain, getNetworkName, getNetwork, getChainId } from "../../common/config";
+import { getChain, getNetwork, getChainId } from "../../common/config";
 import dateFormat from "dateformat";
 import Web3 from 'web3';
 import Burnance from '../../abis/Burnance.v2.1.json';
@@ -55,6 +55,7 @@ class Topbar extends Component {
 
     const networkId = await web3.eth.net.getId();
 
+    console.log({networkId, thisIs: getChainId()});
     
         if(networkId !== getChainId()){
           const switchRequest = getNetwork().switch;

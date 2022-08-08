@@ -1811,11 +1811,11 @@ class CollectionView extends Component {
                                               'undefined'
                                                 ? cases.costUSD
                                                 : 0;
-                                            const tokenType =
-                                              typeof cases.tokenType !==
-                                              'undefined'
-                                                ? cases.tokenType
-                                                : 'ERC721';
+                                            // const tokenType =
+                                            //   typeof cases.tokenType !==
+                                            //   'undefined'
+                                            //     ? cases.tokenType
+                                            //     : 'ERC721';
 
                                             const imgSrc =
                                               (typeof cases.media ===
