@@ -14,7 +14,7 @@ const baseURL = `${process.env.ALCHEMY_BASE_URL}/nft/v2/${process.env.ALCHEMY_AP
 // Optional Config object, but defaults to demo api-key and eth-mainnet.
 const settings = {
   apiKey: process.env.ALCHEMY_API_KEY, // Replace with your Alchemy API Key.
-  network: (process.env.ETH_NETWORK === "rinkeby" ? alchemySDK.Network.ETH_RINKEBY : (process.env.ETH_NETWORK === "goerli" ? alchemySDK.Network.ETH_GOERLI : Network.ETH_MAINNET)), // Replace with your network.
+  network: (process.env.ETH_NETWORK === "rinkeby" ? alchemySDK.Network.ETH_RINKEBY : (process.env.ETH_NETWORK === "goerli" ? alchemySDK.Network.ETH_GOERLI : alchemySDK.Network.ETH_MAINNET)), // Replace with your network.
   maxRetries: 10,
 };
 
