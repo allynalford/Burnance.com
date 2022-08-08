@@ -495,6 +495,7 @@ module.exports._eth_getTransactionReceipt = async (txhash) => {
         return response.data;
     } catch (e) {
         console.error(e);
+        throw e;
     }
 };
 

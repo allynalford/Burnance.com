@@ -43,9 +43,13 @@ function WalletTransaction(chain, address, transactionHash, type, contractaddres
     try {
         const _ = require('lodash');
         const transactions = await etherscan._tokenNftTx(this.contractaddress, this.address);
+        console.log('transactions', transactions);
+        
+        console.log('hash', {hash:this.transactionHash});
         const tx = _.find(transactions.result, {hash:this.transactionHash});
+        console.log('tx', tx);
         //const transaction = await etherscan._eth_getTransactionByHash(tx.hash);
-
+        
         this.to = tx.to;
         this.timeStamp = tx.timeStamp;
         this.tokenName = tx.tokenName;
@@ -74,11 +78,16 @@ function WalletTransaction(chain, address, transactionHash, type, contractaddres
  WalletTransaction.prototype.loadGasData = async function() {
     log.options.tags = ['log', '<<level>>'];
     try {
-        const pupUtils = require('../pup/utils');
-        const gasData = await pupUtils.getGasData(this.transactionHash);
+        //const pupUtils = require('../pup/utils');
+        //const gasData = await pupUtils.getGasData(this.transactionHash);
+        const gasData = await etherscan._eth_getTransactionValueAndGasByHash(this.transactionHash, this.ethTransPriceUSD);
+       
+        //console.log(gasData);
 
-        this.transferGasETH = gasData.txFee;
-        this.transferValueETH = gasData.value;
+
+        this.transferGasETH = gasData.gasETH;
+        this.transferValueETH = gasData.valueETH;
+        this.closingPrice = gasData.price;
     } catch (e) {
         console.error(e);
         log.error(e);

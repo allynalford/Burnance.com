@@ -35,12 +35,14 @@ import {
   faUsersRectangle,
 } from '@fortawesome/free-solid-svg-icons';
 import LoadingOverlay from 'react-loading-overlay';
+import { retryAsync, isTooManyTries } from "ts-retry";
 //Import Images
 import bgImg from "../../../assets/images/nfts/ac1_unfit_digital_collage_of_locally_owned_nfts_by_annie_bur.jpg";
 const Swal = require('sweetalert2');
 const ethers = require('ethers');
 const Batch = require('../../../model/Batch');
 const CollectionObj = require('../../../model/Collection');
+
 var sessionstorage = require('sessionstorage');
 var endpoint = require('../../../common/endpoint');
 // Create our number formatter.
@@ -684,24 +686,53 @@ class CollectionView extends Component {
             collectionObj.remove(thisss.state.ethereumAddress, thisss.props.match.params.address);
 
 
-            thisss.setState({
-              transferring: false,
-              guaranteeMonths: 1,
-              approving: false,
-              contentLoading: false,
-            });
 
-            thisss
-            .recordTx(tokenId, transactionHash, 'guarantee')
-            .then(function (result) {
-              // (**)
 
-              thisss.getEthPrice(
-                thisss.state.ethereumAddress,
-                thisss.props.match.params.address,
-              );
-            })
-            .catch((err) => alert(err));
+            // thisss
+            // .recordTx(tokenId, transactionHash, 'guarantee')
+            // .then(function (result) {
+            //   // (**)
+
+            //   thisss.getEthPrice(
+            //     thisss.state.ethereumAddress,
+            //     thisss.props.match.params.address,
+            //   );
+            // })
+            // .catch((err) => alert(err));
+
+            thisss.recordTx(tokenId, transactionHash, 'guarantee').then(function (result) {
+                console.log('Transaction Logged', result);
+                thisss.setState({
+                  transferring: false,
+                  guaranteeMonths: 1,
+                  approving: false,
+                  contentLoading: false,
+                });
+  
+                thisss.getEthPrice(
+                  thisss.state.ethereumAddress,
+                  thisss.props.match.params.address,
+                );
+              }).catch((err) => {
+                alert(err);
+                console.error(err);
+                thisss.setState({
+                  transferring: false,
+                  guaranteeMonths: 1,
+                  approving: false,
+                  contentLoading: false,
+                });
+  
+                thisss.getEthPrice(
+                  thisss.state.ethereumAddress,
+                  thisss.props.match.params.address,
+                );
+              });
+
+
+
+
+
           } else {
             //alert(response.msg);
             thisss.fireMsg('Guarantee nft Transfer', response.msg, 'WARN');
@@ -727,28 +758,54 @@ class CollectionView extends Component {
 
   recordTx = async (tokenId, transactionHash, type) => {
     const _ = require('lodash');
-    const nft = _.find(this.state.nfts, { tokenId: tokenId });
-    console.log({ tokenId, nft, transactionHash });
+    let nft = _.find(this.state.nfts, { tokenId: tokenId });
+    console.log(nft);
+
 
     const tx = {
-      chainAddress: nft.chain + ":" + nft.owner,
-      chain: nft.chain,
-      address: nft.owner,
+      chainAddress: (typeof nft.chain === "undefined" ? 'ethereum' + this.state.ethereumAddress : nft.chain + ":" + nft.owner),
+      chain: (typeof nft.chain === "undefined" ? 'ethereum' : nft.chain),
+      address: (typeof nft.owner === "undefined" ? this.state.ethereumAddress : nft.owner),
       transactionHash,
       contractAddresses: nft.contract.address,
-      tokenId,
+      tokenID: tokenId,
       type,
       tokenType: this.state.type,
-      valueUSD: nft.valueUSD,
-      valueETH: nft.valueETH,
-      costUSD: nft.costUSD,
-      costETH: nft.costETH,
-      ethTransPriceUSD: nft.ethTransPriceUSD
+      valueUSD: (typeof nft.valueUSD === "undefined" ? 0 : nft.valueUSD),
+      valueETH: (typeof nft.valueETH === "undefined" ? 0 : nft.valueETH),
+      costUSD: (typeof nft.costUSD === "undefined" ? 0 : nft.costUSD),
+      costETH: (typeof nft.costETH === "undefined" ? 0 : nft.costETH),
+      ethTransPriceUSD: (typeof nft.ethTransPriceUSD === "undefined" ? 0 : nft.ethTransPriceUSD)
     }
     console.log('TX  ',tx);
-    const txResp = await endpoint._post(getChain()['eth'].addWalletSellTxApiUrl, tx);
-    console.log('txResp  ',txResp);
+    
 
+    
+
+    try {
+      await retryAsync(
+        async () => {
+          const lastResult = await endpoint._post(getChain()['eth'].addWalletSellTxApiUrl, tx);
+          console.log('txResp  ', lastResult);
+        },
+        {
+          delay: 7000,
+          maxTry: 5,
+          until: (lastResult) => lastResult.error === false,
+        }
+      );
+    } catch (err) {
+      if (isTooManyTries(err)) {
+        // Did not get 42 after 'maxTry' calls
+        console.log('isTooManyTries', err)
+      } else {
+        // something else goes wrong
+        console.log(err)
+      }
+    }
+
+
+    return true;
   };
 
   transfer = async (tokenId) => {
@@ -779,23 +836,39 @@ class CollectionView extends Component {
             const collectionObj = new CollectionObj(thisss.state.ethereumAddress, thisss.props.match.params.address);
             collectionObj.remove(thisss.state.ethereumAddress, thisss.props.match.params.address);
 
-            thisss
-              .recordTx(tokenId, transactionHash, 'burn')
-              .then(function (result) {
-                // (**)
 
+            
+
+            thisss.recordTx(tokenId, transactionHash, 'burn').then(function (result) {
+                  console.log('Transfer Transaction Logged', result);
+                  thisss.setState({
+                    transferring: false,
+                    approving: false,
+                    contentLoading: false,
+                  });
+    
+                  thisss.getEthPrice(
+                    thisss.state.ethereumAddress,
+                    thisss.props.match.params.address,
+                  );
+              }).catch((err) => {
+                alert(err);
+                console.error(err);
+                thisss.setState({
+                  transferring: false,
+                  approving: false,
+                  contentLoading: false,
+                });
+  
                 thisss.getEthPrice(
                   thisss.state.ethereumAddress,
                   thisss.props.match.params.address,
                 );
-              })
-              .catch((err) => alert(err));
+              });
 
-            thisss.setState({
-              transferring: false,
-              approving: false,
-              contentLoading: false,
-            });
+ 
+
+
           } else {
             //alert(response.msg);
             thisss.fireMsg('NFT Transfer', response.msg, 'WARN');
