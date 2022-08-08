@@ -5,7 +5,7 @@ import { withRouter } from "react-router";
 import {Container} from "reactstrap";
 import Badge from 'react-bootstrap/Badge'
 import {Event, initGA} from "../../common/gaUtils";
-import { getChain, getNetworkName, getNetwork } from "../../common/config";
+import { getChain, getNetworkName, getNetwork, getChainId } from "../../common/config";
 import dateFormat from "dateformat";
 import Web3 from 'web3';
 import Burnance from '../../abis/Burnance.v2.1.json';
@@ -53,15 +53,21 @@ class Topbar extends Component {
   detectEthereumNetwork = async () => {
     const web3 = window.web3;
 
-    //const networkId = await web3.eth.net.getId();
+    const networkId = await web3.eth.net.getId();
 
-    web3.eth.net.getNetworkType().then(async (netName) => {
-        if(netName !== getNetworkName()){
+        if(networkId !== getChainId()){
           const switchRequest = getNetwork().switch;
           switchRequest.params[0].chainId = Web3.utils.toHex(switchRequest.params[0].chainId);
           await web3.currentProvider.request(switchRequest);
         };
-    });
+
+    // web3.eth.net.getNetworkType().then(async (netName) => {
+    //     if(netName !== getNetworkName()){
+    //       const switchRequest = getNetwork().switch;
+    //       switchRequest.params[0].chainId = Web3.utils.toHex(switchRequest.params[0].chainId);
+    //       await web3.currentProvider.request(switchRequest);
+    //     };
+    // });
 }
 
   async loadWeb3() {

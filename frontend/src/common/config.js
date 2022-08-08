@@ -210,3 +210,10 @@ export function getNetworkName() {
   }
   return localVars.networkName;
 }
+
+export function getChainId() {
+  if (process.env.REACT_APP_STAGE === 'production') {
+    return serverVars.chainId;
+  }
+  return localVars.chainId;
+}
