@@ -459,7 +459,7 @@ class CollectionView extends Component {
         approving: false,
         holdingValue,
         description: (typeof Collection.data.collection.description === "undefined" ? NFTS.data.nfts[0].description : Collection.data.collection.description),
-        type: Collection.data.collection.schema_name,
+        type: Collection.data.collection.tokenType,
         held: NFTS.data.nfts.length,
         floorPrice,
         avgPrice,
@@ -546,12 +546,14 @@ class CollectionView extends Component {
     const address = this.props.match.params.address;
     const type = this.state.type;
 
+    console.log(type);
+
     if (type === 'ERC721') {
       ERC721(address)
         .methods.setApprovalForAll(this.state.burnanceAddr, true)
         .send({ from: this.state.account })
         .on('transactionHash', (transactionHash) => {
-          //console.log('transactionHash(ERC721)', transactionHash);
+          console.log('transactionHash(ERC721)', transactionHash);
 
           thisss.waitForReceipt(transactionHash, function (response) {
             if (response.status) {
@@ -769,7 +771,7 @@ class CollectionView extends Component {
           } else {
             //alert(response.msg);
             thisss.fireMsg('NFT Transfer', response.msg, 'WARN');
-            thisss.setState({ transferring: false, contentLoading: false });
+            thisss.setState({ transferring: false, contentLoading: false, approving: false });
           }
         });
       })
@@ -777,7 +779,7 @@ class CollectionView extends Component {
         const title = error.message.split(':')[0];
         const msg = error.message.split(':')[1];
         thisss.fireMsg(title, msg, 'WARN');
-        thisss.setState({ transferring: false, contentLoading: false  });
+        thisss.setState({ transferring: false, contentLoading: false, approving: false  });
         console.warn(error.message);
         console.error(error);
       });

@@ -55,7 +55,7 @@ class Topbar extends Component {
 
     const networkId = await web3.eth.net.getId();
 
-    console.log({networkId, thisIs: getChainId()});
+    //console.log({networkId, thisIs: getChainId()});
     
         if(networkId !== getChainId()){
           const switchRequest = getNetwork().switch;
