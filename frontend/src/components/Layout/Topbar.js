@@ -54,8 +54,8 @@ class Topbar extends Component {
     const web3 = window.web3;
 
     const networkId = await web3.eth.net.getId();
-    console.log(process.env.REACT_APP_STAGE);
-    console.log({networkId, thisIs: getChainId()});
+    //console.log(process.env.REACT_APP_STAGE);
+    //console.log({networkId, thisIs: getChainId()});
     
         if(networkId !== getChainId()){
           const switchRequest = getNetwork().switch;
@@ -234,7 +234,7 @@ class Topbar extends Component {
     }
 
     if ((typeof ethPrice === 'undefined') | (ethPrice === null)) {
-     console.log(getChain()['eth'].getEthPriceApiUrl)
+     //console.log(getChain()['eth'].getEthPriceApiUrl)
       try{
         ethPrice = await endpoint._get(getChain()['eth'].getEthPriceApiUrl);
         ethPrice = ethPrice.data.result;

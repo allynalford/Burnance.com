@@ -394,7 +394,7 @@ class CollectionView extends Component {
         Collection = gets[0];
         NFTS = gets[1];
 
-        console.log('Called Service', { Collection, NFTS });
+        //console.log('Called Service', { Collection, NFTS });
       }
 
       

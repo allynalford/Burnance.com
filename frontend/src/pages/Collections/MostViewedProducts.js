@@ -210,7 +210,7 @@ class MostViewedProducts extends Component {
             `/ethereum/${ethereumAddress}`,
         );
 
-        console.log('Collections',Collections);
+        //console.log('Collections',Collections);
         
 
         //Loop the collections and add a id column
