@@ -34,11 +34,11 @@ class Index extends Component {
     return (
       <React.Fragment>
         <Helmet>
-          <title>Burnance NFT and Coin Liquidity</title>
-          <meta property="og:title" content="NFT and ERC20 Liquidity" />
-          <meta name="keywords" content="NFT, NFT Liquidity, Liquidity,Ethereum, ETH, ERC-721, ERC-20, ERC-1155, burner, burn, burn rewards" />
+          <title>A website that provides liquidity for owners of worthless NFTs and ERC20 tokens</title>
+          <meta property="og:title" content="A website that provides liquidity for owners of worthless NFTs and ERC20 tokens" />
+          <meta name="keywords" content="taxes, crypto tokens, liquidity for owners, ERC20 tokens, NFT, NFT Liquidity, Liquidity,Ethereum, ETH, ERC-721, ERC-20, ERC-1155, burner, burn, burn rewards" />
           <meta name="description" content="Burn your Sh!t NFTs and get paid in (ETH) Ethereum" />
-          <meta property="og:description" content="Burn your Sh!t NFTs and get paid in (ETH) Ethereum" />
+          <meta property="og:description" content="The one stop shop for those looking to unload their worthless NFTs and ERC20 tokens!" />
           <meta name="twitter:title" content="Burnance | NFT Collection Liquidity Provider" />
         </Helmet>
         <Section />
