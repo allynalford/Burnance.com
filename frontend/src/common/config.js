@@ -56,8 +56,8 @@ const serverVars = {
       getCMCQuotesApiUrl: process.env.REACT_APP_BASE_API_URL + '/cmc/quotes',
       deleteCoinApiUrl: process.env.REACT_APP_BASE_API_URL + '/wallet/coin/',
       getCoinsApiUrl:  process.env.REACT_APP_BASE_API_URL + '/wallet/coins/',
-      addCoinApiUrl:  process.env.REACT_APP_BASE_API_URL + '/wallet/coin'
-
+      addCoinApiUrl:  process.env.REACT_APP_BASE_API_URL + '/wallet/coin',
+      getAllowanceApiUrl: process.env.REACT_APP_BASE_API_URL + '/wallet/coin/allowance/'
     },
     coinAbi: [
       {
@@ -140,7 +140,8 @@ const localVars = {
       getCMCQuotesApiUrl: process.env.REACT_APP_BASE_API_URL + '/cmc/quotes',
       deleteCoinApiUrl: process.env.REACT_APP_BASE_API_URL + '/wallet/coin/',
       getCoinsApiUrl:  process.env.REACT_APP_BASE_API_URL + '/wallet/coins/',
-      addCoinApiUrl:  process.env.REACT_APP_BASE_API_URL + '/wallet/coin'
+      addCoinApiUrl:  process.env.REACT_APP_BASE_API_URL + '/wallet/coin',
+      getAllowanceApiUrl: process.env.REACT_APP_BASE_API_URL + '/wallet/coin/allowance/'
     },
     coinAbi: [
       {

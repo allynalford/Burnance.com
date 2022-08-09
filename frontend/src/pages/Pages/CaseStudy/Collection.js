@@ -315,8 +315,6 @@ class CollectionView extends Component {
     );
   }
 
-
-
   scrollNavigation = () => {
     var doc = document.documentElement;
     var top = (window.pageYOffset || doc.scrollTop) - (doc.clientTop || 0);

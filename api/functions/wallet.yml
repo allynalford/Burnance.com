@@ -128,6 +128,14 @@
           method: get
           authorizer: aws_iam
           cors: true
+  walletCoinAllowance:
+    handler: wallet/coins.allowance
+    events:
+      - http:
+          path: wallet/coin/allowance/{chain}/{tokenAddress}/{owner}/{contractAddress}
+          method: get
+          authorizer: aws_iam
+          cors: true
   walletAddCoin:
     handler: wallet/wallet.addCoin
     memorySize: 128 # optional, in MB, default is 1024
