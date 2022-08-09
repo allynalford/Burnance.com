@@ -10,6 +10,7 @@
 "NFT_PORT_BASE_API_URL" : "hhttps://api.nftport.xyz/v0",
 "NFT_PORT_API_KEY" : "147977c7-878b-49d5-b28f-7cc9df50d283",
 "ETH_NETWORK" : "mainnet",
+"ETH_NETWORK_ID" : 1,
 "ALCHEMY_API_KEY" : "SExwOepdX3Gy9l-FZQVVITPkIf9sfzNJ",
 "ALCHEMY_BASE_API_URL" : "https://eth-mainnet.g.alchemy.com",
 "ALCHEMY_BASE_URL" : "https://mainnet.alchemyapi.io",

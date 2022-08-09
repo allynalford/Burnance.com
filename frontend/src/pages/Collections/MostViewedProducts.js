@@ -35,7 +35,7 @@ var formatter = new Intl.NumberFormat('en-US', {
   //minimumFractionDigits: 0, // (this suffices for whole numbers, but will print 2500.10 as $2,500.1)
   //maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
 });
-
+var numFormatter = new Intl.NumberFormat('en-US', { maximumSignificantDigits: 6 })
 var _collections = [];
 
   const override: CSSProperties = {
@@ -499,137 +499,6 @@ class MostViewedProducts extends Component {
         </div>
         <section className="section">
           <Container>
-            <Row className="justify-content-center">
-              <Col md="4">
-                <div
-                  key={1}
-                  className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
-                >
-                  {/* <img
-                  src={work1}
-                  className="avatar avatar-ex-sm"
-                  alt=""
-                /> */}
-                  <div className="flex-1 content ms-3">
-                    <BasicPopperToolTip
-                      title={'Est Holding Value'}
-                      text={
-                        "Holding value is calculated as: number of NFTs held * avg sale price of NFT's in the collection"
-                      }
-                    />
-
-                    {this.state.loading === true ? (
-                      <RingLoader
-                        color={'#ff914d'}
-                        loading={this.state.loading}
-                        cssOverride={override}
-                        size={50}
-                      />
-                    ) : (
-                      <p className="text h3 mb-0">
-                        {formatter.format(this.state.EstHoldingValue)}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </Col>
-              <Col md="4">
-                <div
-                  key={1}
-                  className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
-                >
-                  {/* <img
-                  src={work1}
-                  className="avatar avatar-ex-sm"
-                  alt=""
-                /> */}
-                  <div className="flex-1 content ms-3">
-                    <BasicPopperToolTip
-                      title={'Est Holding Cost'}
-                      text={'Est Holding Cost data not yet available.'}
-                    />
-                    <p className="text h3 mb-0">--</p>
-                  </div>
-                </div>
-              </Col>
-              <Col md="4">
-                <div
-                  key={1}
-                  className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
-                >
-                  {/* <img
-                  src={work1}
-                  className="avatar avatar-ex-sm"
-                  alt=""
-                /> */}
-                  <div className="flex-1 content ms-3">
-                    <BasicPopperToolTip
-                      title={'Liquidity (7D)'}
-                      text={
-                        'Liquidity is calculated as: 7 day sales / The number of NFT holders * 100%'
-                      }
-                    />
-
-                    {this.state.loading === true ? (
-                      <RingLoader
-                        color={'#ff914d'}
-                        loading={this.state.loading}
-                        cssOverride={override}
-                        size={50}
-                      />
-                    ) : (
-                      <p className="text h3 mb-0">{this.state.Liquidity7D}%</p>
-                    )}
-                  </div>
-                </div>
-              </Col>
-              <Col md="6">
-                <div
-                  key={1}
-                  className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
-                >
-                  {/* <img
-                  src={work1}
-                  className="avatar avatar-ex-sm"
-                  alt=""
-                /> */}
-                  <div className="flex-1 content ms-3">
-                    <BasicPopperToolTip
-                      title={'PnL'}
-                      text={
-                        'PnL calculated based on NFTs held. This data is not yet available.'
-                      }
-                    />
-                    <p className="text h3 mb-0">
-                      {formatter.format(this.state.PNL)}
-                    </p>
-                  </div>
-                </div>
-              </Col>
-              <Col md="6">
-                <div
-                  key={1}
-                  className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
-                >
-                  {/* <img
-                  src={work1}
-                  className="avatar avatar-ex-sm"
-                  alt=""
-                /> */}
-                  <div className="flex-1 content ms-3">
-                    <BasicPopperToolTip
-                      title="Realized PnL"
-                      text={
-                        'PnL calculated based on NFTs sold. This data is not yet available.'
-                      }
-                    />
-                    <p className="text h3 mb-0">
-                      {formatter.format(this.state.realizedPNL)}
-                    </p>
-                  </div>
-                </div>
-              </Col>
-            </Row>
             {this.state.walletConnected === false ? (
               ''
             ) : (
@@ -701,21 +570,50 @@ class MostViewedProducts extends Component {
                           </Link>
                         ),
                         sortable: true,
-                        grow: 3,
+                        grow: 2,
                         style: {
                           color: '#202124',
                           fontSize: '16px',
                           fontWeight: 600,
                         },
                       },
-                      {
-                        name: 'Type',
-                        selector: (row) => row.primary_asset_contracts[0].schema_name,
-                        sortable: true,
-                      },
+                      // {
+                      //   name: 'Type',
+                      //   selector: (row) => row.primary_asset_contracts[0].schema_name,
+                      //   sortable: true,
+                      // },
                       {
                         name: 'Held',
                         selector: (row) => row.owned_asset_count,
+                        sortable: true,
+                        style: {
+                          fontSize: '14px',
+                          fontWeight: 600,
+                        },
+                      },
+                      {
+                        name: '7D Vol',
+                        selector: (row) => row.stats.seven_day_volume,
+                        sortable: true,
+                        format: (row) => numFormatter.format(row.stats.seven_day_volume),
+                        style: {
+                          fontSize: '14px',
+                          fontWeight: 600,
+                        },
+                      },
+                      {
+                        name: '30D Vol',
+                        selector: (row) => row.stats.thirty_day_volume,
+                        sortable: true,
+                        format: (row) => numFormatter.format(row.stats.thirty_day_volume),
+                        style: {
+                          fontSize: '14px',
+                          fontWeight: 600,
+                        },
+                      },
+                      {
+                        name: '30 Sales',
+                        selector: (row) => row.stats.thirty_day_sales,
                         sortable: true,
                         style: {
                           fontSize: '14px',
@@ -733,33 +631,32 @@ class MostViewedProducts extends Component {
                           fontWeight: 600,
                         },
                       },
-                      {
-                        name: 'Cost Basis',
-                        selector: (row) => row.AmountInvested,
-                        sortable: true,
-                        format: (row) => formatter.format(row.AmountInvested),
-                        grow: 2,
-                        style: {
-                          fontSize: '14px',
-                          fontWeight: 600,
-                        },
-                      },
-                      {
-                        name: 'PnL',
-                        selector: (row) => row.pnl,
-                        sortable: true,
-                        format: (row) => formatter.format(row.pnl),
-                        style: {
-                          fontSize: '14px',
-                          fontWeight: 600,
-                        },
-                        when: (row) => row.pnl < 0,
-                      },
+                      // {
+                      //   name: 'Cost Basis',
+                      //   selector: (row) => row.AmountInvested,
+                      //   sortable: true,
+                      //   format: (row) => formatter.format(row.AmountInvested),
+                      //   grow: 2,
+                      //   style: {
+                      //     fontSize: '14px',
+                      //     fontWeight: 600,
+                      //   },
+                      // },
+                      // {
+                      //   name: 'PnL',
+                      //   selector: (row) => row.pnl,
+                      //   sortable: true,
+                      //   format: (row) => formatter.format(row.pnl),
+                      //   style: {
+                      //     fontSize: '14px',
+                      //     fontWeight: 600,
+                      //   },
+                      //   when: (row) => row.pnl < 0,
+                      // },
                       {
                         name: 'Liquidity (1D)',
                         selector: (row) => row.Liquidity7D,
                         sortable: true,
-                        grow: 2,
                         format: (row) => `${(row.Liquidity7D === null ? 0 : row.Liquidity7D.toFixed(2))}%`,
                         style: {
                           fontSize: '14px',

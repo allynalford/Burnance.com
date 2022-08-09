@@ -20,7 +20,7 @@ Collection.prototype.get = (wallet, address) => {
 }
 
 Collection.prototype.set = (wallet, address, payload) => {
-    return storage.set(wallet+':'+address, payload);
+    return storage.set(wallet+':'+address, payload, 2);
 };
 
 Collection.prototype.remove = (wallet, address) => {;

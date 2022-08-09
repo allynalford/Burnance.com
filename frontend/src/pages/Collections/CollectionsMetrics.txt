@@ -1,0 +1,131 @@
+          <Row className="justify-content-center">
+              <Col md="4">
+                <div
+                  key={1}
+                  className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
+                >
+                  {/* <img
+                  src={work1}
+                  className="avatar avatar-ex-sm"
+                  alt=""
+                /> */}
+                  <div className="flex-1 content ms-3">
+                    <BasicPopperToolTip
+                      title={'Est Holding Value'}
+                      text={
+                        "Holding value is calculated as: number of NFTs held * avg sale price of NFT's in the collection"
+                      }
+                    />
+
+                    {this.state.loading === true ? (
+                      <RingLoader
+                        color={'#ff914d'}
+                        loading={this.state.loading}
+                        cssOverride={override}
+                        size={50}
+                      />
+                    ) : (
+                      <p className="text h3 mb-0">
+                        {formatter.format(this.state.EstHoldingValue)}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </Col>
+              <Col md="4">
+                <div
+                  key={1}
+                  className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
+                >
+                  {/* <img
+                  src={work1}
+                  className="avatar avatar-ex-sm"
+                  alt=""
+                /> */}
+                  <div className="flex-1 content ms-3">
+                    <BasicPopperToolTip
+                      title={'Est Holding Cost'}
+                      text={'Est Holding Cost data not yet available.'}
+                    />
+                    <p className="text h3 mb-0">--</p>
+                  </div>
+                </div>
+              </Col>
+              <Col md="4">
+                <div
+                  key={1}
+                  className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
+                >
+                  {/* <img
+                  src={work1}
+                  className="avatar avatar-ex-sm"
+                  alt=""
+                /> */}
+                  <div className="flex-1 content ms-3">
+                    <BasicPopperToolTip
+                      title={'Liquidity (7D)'}
+                      text={
+                        'Liquidity is calculated as: 7 day sales / The number of NFT holders * 100%'
+                      }
+                    />
+
+                    {this.state.loading === true ? (
+                      <RingLoader
+                        color={'#ff914d'}
+                        loading={this.state.loading}
+                        cssOverride={override}
+                        size={50}
+                      />
+                    ) : (
+                      <p className="text h3 mb-0">{this.state.Liquidity7D}%</p>
+                    )}
+                  </div>
+                </div>
+              </Col>
+              <Col md="6">
+                <div
+                  key={1}
+                  className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
+                >
+                  {/* <img
+                  src={work1}
+                  className="avatar avatar-ex-sm"
+                  alt=""
+                /> */}
+                  <div className="flex-1 content ms-3">
+                    <BasicPopperToolTip
+                      title={'PnL'}
+                      text={
+                        'PnL calculated based on NFTs held. This data is not yet available.'
+                      }
+                    />
+                    <p className="text h3 mb-0">
+                      {formatter.format(this.state.PNL)}
+                    </p>
+                  </div>
+                </div>
+              </Col>
+              <Col md="6">
+                <div
+                  key={1}
+                  className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
+                >
+                  {/* <img
+                  src={work1}
+                  className="avatar avatar-ex-sm"
+                  alt=""
+                /> */}
+                  <div className="flex-1 content ms-3">
+                    <BasicPopperToolTip
+                      title="Realized PnL"
+                      text={
+                        'PnL calculated based on NFTs sold. This data is not yet available.'
+                      }
+                    />
+                    <p className="text h3 mb-0">
+                      {formatter.format(this.state.realizedPNL)}
+                    </p>
+                  </div>
+                </div>
+              </Col>
+            </Row>

@@ -286,6 +286,7 @@ class MyAccount extends Component {
 getPromissoryList = async(address) => {
   this.setState({ loading:true });
   const guarantees = await endpoint._get(getChain()['eth'].viewWalletGuarenteeSellTxApiUrl + `/ethereum/${address}`)
+  console.log(guarantees);
   this.setState({ guarantees: guarantees.data.transactions, loading:false });
 };
 

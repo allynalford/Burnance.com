@@ -135,7 +135,7 @@ module.exports.getGuaranteesTxs = async event => {
         const wallet = await etherScan._createWallet(process.env.KEY, provider);
 
         // initiating a new Contract with the contractAddress, ABI and wallet
-        let contract = await etherScan._getContract(Burnance.networks[4].address, Burnance.abi, wallet);
+        let contract = await etherScan._getContract(Burnance.networks[process.env.ETH_NETWORK_ID].address, Burnance.abi, wallet);
 
         const guarantees = await contract.getGuarantees(address);
 

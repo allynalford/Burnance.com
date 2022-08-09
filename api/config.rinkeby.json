@@ -13,6 +13,7 @@
 "NFT_PORT_BASE_API_URL" : "https://stoplight.io/mocks/nftport/nftport/5393499/v0",
 "NFT_PORT_API_KEY" : "147977c7-878b-49d5-b28f-7cc9df50d283",
 "ETH_NETWORK" : "rinkeby",
+"ETH_NETWORK_ID" : 4,
 "ALCHEMY_BASE_API_URL" : "https://eth-rinkeby.g.alchemy.com",
 "ALCHEMY_API_KEY" : "tE71kIxqJuuWQmw8vQa1XSI1hz3PGi--",
 "ALCHEMY_BASE_URL" : "https://eth-rinkeby.alchemyapi.io",

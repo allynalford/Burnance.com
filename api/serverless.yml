@@ -27,6 +27,7 @@ provider:
     NFT_PORT_BASE_API_URL: ${file(config.${self:provider.stage}.json):NFT_PORT_BASE_API_URL}
     NFT_PORT_API_KEY: ${file(config.${self:provider.stage}.json):NFT_PORT_API_KEY}
     ETH_NETWORK: ${file(config.${self:provider.stage}.json):ETH_NETWORK}
+    ETH_NETWORK_ID: ${file(config.${self:provider.stage}.json):ETH_NETWORK_ID}
     ALCHEMY_API_KEY: ${file(config.${self:provider.stage}.json):ALCHEMY_API_KEY}
     ALCHEMY_BASE_URL: ${file(config.${self:provider.stage}.json):ALCHEMY_BASE_URL}
     ALCHEMY_BASE_API_URL: ${file(config.${self:provider.stage}.json):ALCHEMY_BASE_API_URL}

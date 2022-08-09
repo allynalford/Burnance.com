@@ -50,12 +50,11 @@ module.exports._getAssetContract = async (address) => {
  * @param {String} slug - OpenSea slug name
  * @return {Promise<Array>} Response Array for next step to process.
  */
- module.exports._retrieveCollectionStats = async (owner, address) => {
+ module.exports._retrieveCollectionStats = async (slug) => {
   try {
-    const result = await endpoint._get(`${process.env.OPENSEA_API_URL}/collections?asset_owner=${owner}&offset=0&limit=300`)
-    const _ = require('lodash');
-    const collection =  _.find(result.data, ['primary_asset_contracts.address', address]);
-    return collection.stats;
+    const result = await endpoint._get(`${process.env.OPENSEA_API_URL}/collection/${slug}`)
+    
+    return result.data.collection;
   } catch (e) {
     console.error('_retrieveCollectionStats', {message: e.message, url: e.config.url});
     throw e;

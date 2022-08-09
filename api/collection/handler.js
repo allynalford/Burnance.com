@@ -177,258 +177,258 @@ module.exports.GetCollection = async (event) => {
     //var collections = await walletUtils._getWalletCollectionFromCache(chain, address);
     var collections = await openSeaUtils._getCollections(address);
     
-    if(typeof collections === "undefined"){
+    // if(typeof collections === "undefined"){
 
-      const alchemyUtils = require('../alchemy/utils');
-      //Then grab the collections for this wallet
-      const addresses = await alchemyUtils.getCollections(chain, address);
+    //   const alchemyUtils = require('../alchemy/utils');
+    //   //Then grab the collections for this wallet
+    //   const addresses = await alchemyUtils.getCollections(chain, address);
 
-      //console.info('Addresses to process:', addresses.length);
+    //   //console.info('Addresses to process:', addresses.length);
 
-      collections = [];
+    //   collections = [];
 
-      //loop the addresses and add them to the database
-      for(const addr of addresses){
+    //   //loop the addresses and add them to the database
+    //   for(const addr of addresses){
 
 
 
-        //Check if the collection exists
-        let collection = await collectionUtils._getCollection(chain, addr.address);
+    //     //Check if the collection exists
+    //     let collection = await collectionUtils._getCollection(chain, addr.address);
         
-        //console.log('collection exists:', typeof collection !== "undefined");
+    //     //console.log('collection exists:', typeof collection !== "undefined");
 
         
 
-        //If the collection doesn't already exists in the wallet
-        if(typeof collection === "undefined" || collection.statusCode === 400){
+    //     //If the collection doesn't already exists in the wallet
+    //     if(typeof collection === "undefined" || collection.statusCode === 400){
 
-          //const assetContract = await openSeaUtils._getAssetContract(addr.address);
-          const assetContract = await alchemyUtils.getContractMetadata(chain, addr.address);
-          //console.log('assetContract:', assetContract);
-          //console.log(`Delaying: ${addr.address} | `, 500);
-          //await delay(1500);
-          //console.log('Continuing:', addr.address);
+    //       //const assetContract = await openSeaUtils._getAssetContract(addr.address);
+    //       const assetContract = await alchemyUtils.getContractMetadata(chain, addr.address);
+    //       //console.log('assetContract:', assetContract);
+    //       //console.log(`Delaying: ${addr.address} | `, 500);
+    //       //await delay(1500);
+    //       //console.log('Continuing:', addr.address);
 
           
 
-          if(typeof assetContract.contractMetadata !== "undefined"){
+    //       if(typeof assetContract.contractMetadata !== "undefined"){
 
-            collection = assetContract.contractMetadata;
+    //         collection = assetContract.contractMetadata;
 
             
 
-            collection.total_supply = assetContract.contractMetadata.totalSupply;
-            collection.schema_name = assetContract.contractMetadata.tokenType;
-            collection.contractAddress = assetContract.address;
+    //         collection.total_supply = assetContract.contractMetadata.totalSupply;
+    //         collection.schema_name = assetContract.contractMetadata.tokenType;
+    //         collection.contractAddress = assetContract.address;
             
-            collection.chain = chain;
-            collection.address = assetContract.address;
+    //         collection.chain = chain;
+    //         collection.address = assetContract.address;
             
 
-          }
+    //       }
           
           
 
-          //statistics = await openSeaUtils._retrieveCollectionStats(assetContract.collection.slug);
+    //       //statistics = await openSeaUtils._retrieveCollectionStats(assetContract.collection.slug);
 
-          //console.log(`Stats Delaying: ${addr.address} | `, 500);
-          //await delay(500);
-          //console.log('Stats Continuing:', addr.address);
+    //       //console.log(`Stats Delaying: ${addr.address} | `, 500);
+    //       //await delay(500);
+    //       //console.log('Stats Continuing:', addr.address);
 
-          try {
+    //       try {
 
-            //Grab the wallets information
-            // const metaData = await alchemyUtils.getContractMetadata(chain, addr.address);
+    //         //Grab the wallets information
+    //         // const metaData = await alchemyUtils.getContractMetadata(chain, addr.address);
 
-            // console.log('metaData', metaData);
+    //         // console.log('metaData', metaData);
 
-            // collection = metaData.contractMetadata;
-            // collection.chain = chain;
-            // collection.address = metaData.address;
-            // collection.contract = assetContract;
+    //         // collection = metaData.contractMetadata;
+    //         // collection.chain = chain;
+    //         // collection.address = metaData.address;
+    //         // collection.contract = assetContract;
 
-            try {
-              statistics = await nftPortUtils._getCollectionStats(chain, addr.address);
-            } catch (s) {
-              console.log(s.message);
-              statistics = {
-                one_day_volume: 0,
-                one_day_change: 0,
-                one_day_sales: 0,
-                one_day_average_price: 0,
-                seven_day_volume: 0,
-                seven_day_change: 0,
-                seven_day_sales: 0,
-                seven_day_average_price: 0,
-                thirty_day_volume: 0,
-                thirty_day_change: 0,
-                thirty_day_sales: 0,
-                thirty_day_average_price: 0,
-                total_volume: 0,
-                total_sales: 0,
-                total_supply: 0,
-                count: 0,
-                num_owners: 0,
-                average_price: 0,
-                num_reports: 0,
-                market_cap: 0,
-                floor_price: null,
-              };
+    //         try {
+    //           statistics = await nftPortUtils._getCollectionStats(chain, addr.address);
+    //         } catch (s) {
+    //           console.log(s.message);
+    //           statistics = {
+    //             one_day_volume: 0,
+    //             one_day_change: 0,
+    //             one_day_sales: 0,
+    //             one_day_average_price: 0,
+    //             seven_day_volume: 0,
+    //             seven_day_change: 0,
+    //             seven_day_sales: 0,
+    //             seven_day_average_price: 0,
+    //             thirty_day_volume: 0,
+    //             thirty_day_change: 0,
+    //             thirty_day_sales: 0,
+    //             thirty_day_average_price: 0,
+    //             total_volume: 0,
+    //             total_sales: 0,
+    //             total_supply: 0,
+    //             count: 0,
+    //             num_owners: 0,
+    //             average_price: 0,
+    //             num_reports: 0,
+    //             market_cap: 0,
+    //             floor_price: null,
+    //           };
 
-              //We need to look up the data elsewhere
-            }
-
-
-            if (typeof statistics.stats !== "undefined") {
-
-              //console.log('Loaded Stats for new Collection', statistics.stats);
-
-              collection.statistics = statistics.stats;
-
-              //Add the collection
-              await collectionUtils._addCollectionWithStats(
-                chain,
-                collection.address,
-                collection.name,
-                collection.symbol,
-                (collection.total_supply === null ? 0 : collection.total_supply),
-                collection.schema_name,
-                collection.statistics
-              );
+    //           //We need to look up the data elsewhere
+    //         }
 
 
-            } else {
-              //Add the collection
-              await collectionUtils._addCollection(
-                chain,
-                collection.address,
-                collection.name,
-                collection.symbol,
-                collection.total_supply,
-                collection.schema_name,
-              );
+    //         if (typeof statistics.stats !== "undefined") {
 
-            }
+    //           //console.log('Loaded Stats for new Collection', statistics.stats);
 
-          } catch (e) {
-              console.log(e.message);
+    //           collection.statistics = statistics.stats;
 
-            collection = {
-              name: "Unknown Test Net Asset",
-              symbol: "UNKN",
-              totalSupply: "0",
-              tokenType: "ERC721",
-            };
-            collection.chain = chain;
-            collection.address = addr.address;
+    //           //Add the collection
+    //           await collectionUtils._addCollectionWithStats(
+    //             chain,
+    //             collection.address,
+    //             collection.name,
+    //             collection.symbol,
+    //             (collection.total_supply === null ? 0 : collection.total_supply),
+    //             collection.schema_name,
+    //             collection.statistics
+    //           );
 
-            collection.statistics = {
-              "one_day_volume": 65.94800000000001,
-              "one_day_change": 0.189752841421613,
-              "one_day_sales": 7,
-              "one_day_average_price": 9.421142857142858,
-              "seven_day_volume": 347.84030000000007,
-              "seven_day_change": -0.5059759334474713,
-              "seven_day_sales": 32,
-              "seven_day_average_price": 10.870009375000002,
-              "thirty_day_volume": 3239.230647249999,
-              "thirty_day_change": -0.654612079859771,
-              "thirty_day_sales": 245,
-              "thirty_day_average_price": 13.221349580612241,
-              "total_volume": 144510.26730919493,
-              "total_sales": 23363,
-              "total_supply": 10000,
-              "count": 10000,
-              "num_owners": 5229,
-              "average_price": 6.185432834361809,
-              "num_reports": 1,
-              "market_cap": 108700.09375000003,
-              "floor_price": 9.15
-            };
 
-            //Add the collection
-            await collectionUtils._addTestNetCollectionWithStats(
-              chain,
-              addr.address,
-              "Unknown Test Net Asset",
-              "UNKN",
-              0,
-              "ERC721",
-              collection.statistics
-            );
+    //         } else {
+    //           //Add the collection
+    //           await collectionUtils._addCollection(
+    //             chain,
+    //             collection.address,
+    //             collection.name,
+    //             collection.symbol,
+    //             collection.total_supply,
+    //             collection.schema_name,
+    //           );
 
-          }
+    //         }
+
+    //       } catch (e) {
+    //           console.log(e.message);
+
+    //         collection = {
+    //           name: "Unknown Test Net Asset",
+    //           symbol: "UNKN",
+    //           totalSupply: "0",
+    //           tokenType: "ERC721",
+    //         };
+    //         collection.chain = chain;
+    //         collection.address = addr.address;
+
+    //         collection.statistics = {
+    //           "one_day_volume": 65.94800000000001,
+    //           "one_day_change": 0.189752841421613,
+    //           "one_day_sales": 7,
+    //           "one_day_average_price": 9.421142857142858,
+    //           "seven_day_volume": 347.84030000000007,
+    //           "seven_day_change": -0.5059759334474713,
+    //           "seven_day_sales": 32,
+    //           "seven_day_average_price": 10.870009375000002,
+    //           "thirty_day_volume": 3239.230647249999,
+    //           "thirty_day_change": -0.654612079859771,
+    //           "thirty_day_sales": 245,
+    //           "thirty_day_average_price": 13.221349580612241,
+    //           "total_volume": 144510.26730919493,
+    //           "total_sales": 23363,
+    //           "total_supply": 10000,
+    //           "count": 10000,
+    //           "num_owners": 5229,
+    //           "average_price": 6.185432834361809,
+    //           "num_reports": 1,
+    //           "market_cap": 108700.09375000003,
+    //           "floor_price": 9.15
+    //         };
+
+    //         //Add the collection
+    //         await collectionUtils._addTestNetCollectionWithStats(
+    //           chain,
+    //           addr.address,
+    //           "Unknown Test Net Asset",
+    //           "UNKN",
+    //           0,
+    //           "ERC721",
+    //           collection.statistics
+    //         );
+
+    //       }
 
 
  
-        } else {
+    //     } else {
           
 
-          //Does the collection have the needed data
-          if (typeof collection.statistics === "undefined") {
-            let statistics;
+    //       //Does the collection have the needed data
+    //       if (typeof collection.statistics === "undefined") {
+    //         let statistics;
 
 
-            try {
-              //statistics = await openSeaUtils._retrieveCollectionStats(assetContract.collection.slug);
-              statistics = await nftPortUtils._getCollectionStats(chain, addr.address);
-            } catch (s) {
-              console.log(s.message);
-              statistics = {
-                one_day_volume: 0,
-                one_day_change: 0,
-                one_day_sales: 0,
-                one_day_average_price: 0,
-                seven_day_volume: 0,
-                seven_day_change: 0,
-                seven_day_sales: 0,
-                seven_day_average_price: 0,
-                thirty_day_volume: 0,
-                thirty_day_change: 0,
-                thirty_day_sales: 0,
-                thirty_day_average_price: 0,
-                total_volume: 0,
-                total_sales: 0,
-                total_supply: 0,
-                count: 0,
-                num_owners: 0,
-                average_price: 0,
-                num_reports: 0,
-                market_cap: 0,
-                floor_price: null,
-              };
+    //         try {
+    //           //statistics = await openSeaUtils._retrieveCollectionStats(assetContract.collection.slug);
+    //           statistics = await nftPortUtils._getCollectionStats(chain, addr.address);
+    //         } catch (s) {
+    //           console.log(s.message);
+    //           statistics = {
+    //             one_day_volume: 0,
+    //             one_day_change: 0,
+    //             one_day_sales: 0,
+    //             one_day_average_price: 0,
+    //             seven_day_volume: 0,
+    //             seven_day_change: 0,
+    //             seven_day_sales: 0,
+    //             seven_day_average_price: 0,
+    //             thirty_day_volume: 0,
+    //             thirty_day_change: 0,
+    //             thirty_day_sales: 0,
+    //             thirty_day_average_price: 0,
+    //             total_volume: 0,
+    //             total_sales: 0,
+    //             total_supply: 0,
+    //             count: 0,
+    //             num_owners: 0,
+    //             average_price: 0,
+    //             num_reports: 0,
+    //             market_cap: 0,
+    //             floor_price: null,
+    //           };
 
-              //We need to look up the data elsewhere
-            }
+    //           //We need to look up the data elsewhere
+    //         }
 
-            if (typeof statistics.stats !== "undefined") {
+    //         if (typeof statistics.stats !== "undefined") {
 
-              //console.log('Adding Stats for Existing Collection',statistics.stats);
+    //           //console.log('Adding Stats for Existing Collection',statistics.stats);
 
-              await collectionUtils._updateCollectionFields(
-                chain,
-                addr.address,
-                [{ name: "statistics", value: statistics.stats }]
-              );
+    //           await collectionUtils._updateCollectionFields(
+    //             chain,
+    //             addr.address,
+    //             [{ name: "statistics", value: statistics.stats }]
+    //           );
 
-              collection.statistics = statistics.stats
-            }
-          }
-        }
+    //           collection.statistics = statistics.stats
+    //         }
+    //       }
+    //     }
 
 
       
 
-        collection.count = addr.count;
+    //     collection.count = addr.count;
 
-        //Add the collection
-        collections.push(collection);
-      }
+    //     //Add the collection
+    //     collections.push(collection);
+    //   }
 
-      //Push the collection to the cache
-      //await walletUtils._addWalletCollectionToCache(chain, address, collections);
+    //   //Push the collection to the cache
+    //   //await walletUtils._addWalletCollectionToCache(chain, address, collections);
 
-    }
+    // }
 
     // for (const collection of collections) {
 
@@ -460,6 +460,11 @@ module.exports.GetCollection = async (event) => {
 
     for (const collection of collections) {
 
+      const collectionUpdatedStats  = await openSeaUtils._retrieveCollectionStats(collection.slug);
+   
+      //The second call has better stats
+      collection.stats = collectionUpdatedStats.stats;
+
       //We need to return
       // - Floor Price
       // - Holding Value: HELD * Floor Price or HELD * avg price
@@ -469,6 +474,8 @@ module.exports.GetCollection = async (event) => {
       //   Liquidity = Sales / The number of NFTs * 100%
 
       if (typeof collection.stats !== "undefined") {
+
+
 
         collection.HoldingValue = (collection.owned_asset_count * collection.stats.floor_price);
         collection.FloorPrice = collection.stats.floor_price;
@@ -886,6 +893,11 @@ module.exports.ViewCollection = async (event) => {
     //Grab the collection
     //const collection = await collectionUtils._getCollection(chain, contractAddress);
     const collection = await openSeaUtils._getCollection(address, contractAddress);
+
+    const collectionUpdatedStats  = await openSeaUtils._retrieveCollectionStats(collection.slug);
+   
+    //The second call has better stats
+    collection.stats = collectionUpdatedStats.stats;
     //Grab the NFTs for the collection
     // const nfts = await alchemyUtils.getNFTsByContract(chain, address, [contractAddress]);
 

@@ -407,39 +407,46 @@ class CollectionView extends Component {
 
 
 
-      const floorPrice =
-        typeof collection.stats !== 'undefined'
-          ? formatter.format(
-              parseFloat(
-                Number(collection.stats.floor_price) * Number(ethusd),
-              ),
-            )
-          : formatter.format(0.0);
-      const marketCap =
-        typeof collection.stats !== 'undefined'
-          ? formatter.format(
-              parseFloat(
-                Number(collection.stats.market_cap) * Number(ethusd),
-              ),
-            )
-          : formatter.format(0.0);
-      const avgPrice =
-        typeof collection.stats !== 'undefined'
-          ? formatter.format(
-              parseFloat(
-                Number(collection.stats.average_price) * Number(ethusd),
-              ),
-            )
-          : formatter.format(0.0);
-      const thirtyDayVolume =
-        typeof collection.stats !== 'undefined'
-          ? formatter.format(
-              parseFloat(
-                Number(collection.stats.thirty_day_volume) *
-                  Number(ethusd),
-              ),
-            )
-          : formatter.format(0.0);
+      // const floorPrice =
+      //   typeof collection.stats !== 'undefined'
+      //     ? formatter.format(
+      //         parseFloat(
+      //           Number(collection.stats.floor_price) * Number(ethusd),
+      //         ),
+      //       )
+      //     : formatter.format(0.0);
+
+      const floorPrice = numFormatter.format(collection.stats.floor_price);
+      // const marketCap =
+      //   typeof collection.stats !== 'undefined'
+      //     ? formatter.format(
+      //         parseFloat(
+      //           Number(collection.stats.market_cap) * Number(ethusd),
+      //         ),
+      //       )
+      //     : formatter.format(0.0);
+
+          const marketCap = numFormatter.format(collection.stats.market_cap);
+      // const avgPrice =
+      //   typeof collection.stats !== 'undefined'
+      //     ? formatter.format(
+      //         parseFloat(
+      //           Number(collection.stats.average_price) * Number(ethusd),
+      //         ),
+      //       )
+      //     : formatter.format(0.0);
+      const avgPrice = numFormatter.format(collection.stats.average_price);
+      // const thirtyDayVolume =
+      //   typeof collection.stats !== 'undefined'
+      //     ? formatter.format(
+      //         parseFloat(
+      //           Number(collection.stats.thirty_day_volume) *
+      //             Number(ethusd),
+      //         ),
+      //       )
+      //     : formatter.format(0.0);
+
+      const thirtyDayVolume = numFormatter.format(collection.stats.thirty_day_volume);
       const holdingValue =
         typeof collection.stats !== 'undefined'
           ? formatter.format(
@@ -1001,7 +1008,7 @@ class CollectionView extends Component {
                       <BasicPopperToolTip
                         title="Floor Price"
                         text={
-                          'The real-time lowest listing price of NFTs in the collection in the market'
+                          'The lowest listing price of NFTs in the collection on the market'
                         }
                       />
                       {this.state.loading === true ? (
@@ -1012,7 +1019,7 @@ class CollectionView extends Component {
                           size={50}
                         />
                       ) : (
-                        <p className="text h3 mb-0">{this.state.floorPrice}</p>
+                        <p className="text h3 mb-0">{(this.state.floorPrice === 0 ? '< 0.001' : numFormatter.format(this.state.floorPrice))}</p>
                       )}
                     </div>
                   </div>
