@@ -245,9 +245,9 @@ class About extends Component {
             <Col lg={6} md={12} className="mt-4 mt-lg-0 pt- pt-lg-0">
               <div className="ms-lg-4">
                 <div className="section-title mb-4 pb-2">
-                  <h3 className="title mb-4">What’s an NFT?</h3>
+                  <h3 className="title mb-4">What is an NFT</h3>
                   <p className="text para-desc mb-0">
-                    Non-fungible tokens, or NFTs, are a kind of cryptocurrency
+                    NFT meaning, Non-fungible tokens, or NFTs, are a kind of cryptocurrency
                     that can be traded over the internet. NFTs are generated and
                     traded in cryptocurrency, which is digital cash with an
                     encrypted key often in the form of a random string of
@@ -255,7 +255,7 @@ class About extends Component {
                     marketplace for digital assets with even companies creating
                     their own NFTs as part of their marketing mix. Besides these
                     NFTs allow users to store, control, and protect information
-                    related to their identity. Creators can also receive
+                    related to their identity. So the most expensive NFT, Creators can also receive
                     royalties from their NFTs and receive a percentage of future
                     sales of their NFTs.
                   </p>

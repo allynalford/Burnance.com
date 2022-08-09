@@ -245,8 +245,8 @@ contract Burnance is ReentrancyGuard, Pausable, Ownable, ERC1155Holder {
             contractAddress: _tokenContract,
             owner: user,
             tokenId: _tokenId,
-            expireTime: block.timestamp + _monthsReserved * 60, // 1 month == 60 seconds on testnet
-            // expireTime: block.timestamp + _monthsReserved * 30 days, // USE THIS ON MAINNET 
+            //expireTime: block.timestamp + _monthsReserved * 60, // 1 month == 60 seconds on testnet
+            expireTime: block.timestamp + _monthsReserved * 30 days, // USE THIS ON MAINNET 
             id: id
         });
 
