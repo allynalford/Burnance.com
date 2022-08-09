@@ -394,58 +394,58 @@ class CollectionView extends Component {
         Collection = gets[0];
         NFTS = gets[1];
 
-        //console.log('Called Service', { Collection, NFTS });
+        console.log('Called Service', { Collection, NFTS });
       }
 
       
 
       const collection = Collection.data.collection;
 
-      if(typeof collection.contract !== "undefined" && collection.contract.image_url !== null){
-        this.setState({backgroundImg: collection.contract.image_url})
+      if(collection.banner_image_url !== null){
+        this.setState({backgroundImg: collection.banner_image_url})
       }
 
 
 
       const floorPrice =
-        typeof collection.statistics !== 'undefined'
+        typeof collection.stats !== 'undefined'
           ? formatter.format(
               parseFloat(
-                Number(collection.statistics.floor_price) * Number(ethusd),
+                Number(collection.stats.floor_price) * Number(ethusd),
               ),
             )
           : formatter.format(0.0);
       const marketCap =
-        typeof collection.statistics !== 'undefined'
+        typeof collection.stats !== 'undefined'
           ? formatter.format(
               parseFloat(
-                Number(collection.statistics.market_cap) * Number(ethusd),
+                Number(collection.stats.market_cap) * Number(ethusd),
               ),
             )
           : formatter.format(0.0);
       const avgPrice =
-        typeof collection.statistics !== 'undefined'
+        typeof collection.stats !== 'undefined'
           ? formatter.format(
               parseFloat(
-                Number(collection.statistics.average_price) * Number(ethusd),
+                Number(collection.stats.average_price) * Number(ethusd),
               ),
             )
           : formatter.format(0.0);
       const thirtyDayVolume =
-        typeof collection.statistics !== 'undefined'
+        typeof collection.stats !== 'undefined'
           ? formatter.format(
               parseFloat(
-                Number(collection.statistics.thirty_day_volume) *
+                Number(collection.stats.thirty_day_volume) *
                   Number(ethusd),
               ),
             )
           : formatter.format(0.0);
       const holdingValue =
-        typeof collection.statistics !== 'undefined'
+        typeof collection.stats !== 'undefined'
           ? formatter.format(
               parseFloat(
                 Number(
-                  NFTS.data.nfts.length * collection.statistics.floor_price,
+                  NFTS.data.nfts.length * collection.stats.floor_price,
                 ) * Number(ethusd),
               ),
             )
@@ -468,37 +468,37 @@ class CollectionView extends Component {
         marketCap,
         thirtyDayVolume,
         totalSupply:
-          typeof collection.statistics !== 'undefined'
-            ? collection.statistics.total_supply
+          typeof collection.stats !== 'undefined'
+            ? collection.stats.total_supply
             : '-',
         owners:
-          typeof collection.statistics !== 'undefined'
-            ? collection.statistics.num_owners
+          typeof collection.stats !== 'undefined'
+            ? collection.stats.num_owners
             : '-',
         liquidity1d:
-          typeof collection.statistics !== 'undefined'
+          typeof collection.stats !== 'undefined'
             ? (
-                (collection.statistics.one_day_sales /
-                  (collection.statistics.total_supply -
-                    collection.statistics.num_owners)) *
+                (collection.stats.one_day_sales /
+                  (collection.stats.total_supply -
+                    collection.stats.num_owners)) *
                 100
               ).toFixed(2)
             : 0.0,
         liquidity7d:
-          typeof collection.statistics !== 'undefined'
+          typeof collection.stats !== 'undefined'
             ? (
-                (collection.statistics.seven_day_sales /
-                  (collection.statistics.total_supply -
-                    collection.statistics.num_owners)) *
+                (collection.stats.seven_day_sales /
+                  (collection.stats.total_supply -
+                    collection.stats.num_owners)) *
                 100
               ).toFixed(2)
             : 0.0,
         liquidity30d:
-          typeof collection.statistics !== 'undefined'
+          typeof collection.stats !== 'undefined'
             ? (
-                (collection.statistics.thirty_day_sales /
-                  (collection.statistics.total_supply -
-                    collection.statistics.num_owners)) *
+                (collection.stats.thirty_day_sales /
+                  (collection.stats.total_supply -
+                    collection.stats.num_owners)) *
                 100
               ).toFixed(2)
             : 0.0,

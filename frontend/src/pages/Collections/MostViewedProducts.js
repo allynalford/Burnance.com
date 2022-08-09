@@ -672,7 +672,7 @@ class MostViewedProducts extends Component {
                     columns={[
                       {
                         cell: (row) => (
-                          <Link to={`/collection/${row.contractAddress}`}>
+                          <Link to={`/collection/${row.primary_asset_contracts[0].address}`}>
                             {(row.image_url !== null ? <img src={row.image_url} width="50px" height={'50px'} alt={'t'} /> : <Icon style={{ fill: '#43a047' }} />)}
                           </Link>
                         ),
@@ -685,7 +685,7 @@ class MostViewedProducts extends Component {
                       {
                         name: 'Collection',
                         selector: (row) => (
-                          <Link to={`/collection/${row.contractAddress}`}>
+                          <Link to={`/collection/${row.primary_asset_contracts[0].address}`}>
                             {row.name}
                           </Link>
                         ),
