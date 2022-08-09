@@ -202,11 +202,15 @@ class MostViewedProducts extends Component {
       
       let Collections = _CollectionsCache.get(ethereumAddress);
 
+      let EstHoldingValue = 0, SevenDaySales = 0, NumOwners = 0, totalSupply = 0;
+
       if ((typeof Collections === 'undefined') | (Collections === null)) {
         Collections = await endpoint._get(
           getChain()['eth'].getWalletCollectionsApiUrl +
             `/ethereum/${ethereumAddress}`,
         );
+
+        console.log('Collections',Collections);
         
 
         //Loop the collections and add a id column
@@ -214,6 +218,12 @@ class MostViewedProducts extends Component {
         for(const collection of Collections.data.collections){
           collection.id = id;
           collections.push(collection);
+          SevenDaySales = SevenDaySales + collection.stats.seven_day_sales;
+          NumOwners = NumOwners + collection.stats.num_owners;
+          totalSupply = totalSupply + collection.stats.total_supply;
+
+          EstHoldingValue = EstHoldingValue + (Number(collection.stats.floor_price) * Number(collection.owned_asset_count));
+
           id++;
         }
         Collections = collections;
@@ -221,10 +231,9 @@ class MostViewedProducts extends Component {
       }
 
 
-      let EstHoldingValue = 0, SevenDaySales = 0, NumOwners = 0, totalSupply = 0;
- 
-
-      EstHoldingValue = parseFloat(Number(EstHoldingValue) * Number(ethusd));
+     
+      
+      
       
       //console.log(collections)
       //Liquidity = Sales / The number of NFTs * 100%
@@ -664,7 +673,7 @@ class MostViewedProducts extends Component {
                       {
                         cell: (row) => (
                           <Link to={`/collection/${row.contractAddress}`}>
-                            <Icon style={{ fill: '#43a047' }} />
+                            {(row.image_url !== null ? <img src={row.image_url} width="50px" height={'50px'} alt={'t'} /> : <Icon style={{ fill: '#43a047' }} />)}
                           </Link>
                         ),
                         width: '56px', // custom width for icon button
@@ -690,12 +699,12 @@ class MostViewedProducts extends Component {
                       },
                       {
                         name: 'Type',
-                        selector: (row) => row.tokenType,
+                        selector: (row) => row.primary_asset_contracts[0].schema_name,
                         sortable: true,
                       },
                       {
                         name: 'Held',
-                        selector: (row) => row.count,
+                        selector: (row) => row.owned_asset_count,
                         sortable: true,
                         style: {
                           fontSize: '14px',
