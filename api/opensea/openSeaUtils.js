@@ -94,7 +94,6 @@ module.exports._getAssetContract = async (address) => {
   try {
     const result = await endpoint._get(`${process.env.OPENSEA_API_URL}/collections?asset_owner=${owner}&offset=0&limit=300`)
     const _ = require('lodash');
-    console.log(result.data)
     const collection =  _.find(result.data, ['primary_asset_contracts[0].address', address]);
     return collection;
   } catch (e) {
