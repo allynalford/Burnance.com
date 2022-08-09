@@ -458,7 +458,7 @@ class CollectionView extends Component {
             )
           : formatter.format(0.0);
 
-      
+      document.title = Collection.data.collection.name + ' | Burnance NFT Collection';
       
       this.setState({
         collection: Collection.data.collection,
