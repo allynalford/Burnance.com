@@ -635,7 +635,7 @@ class MostViewedProducts extends Component {
                         },
                       },
                       {
-                        name: '30 Sales',
+                        name: 'Sales 30D ',
                         selector: (row) => row.stats.thirty_day_sales,
                         sortable: true,
                         format: (row) => numFormatter.format(row.stats.thirty_day_sales),

@@ -294,7 +294,7 @@ class ERC20Coins extends Component {
 
     let coins = _CoinsCache.get('ethereum', address);
 
-    console.log('Cache', coins !== null)
+    //console.log('Cache', coins !== null)
     //If the cache is empty, pull the data
     if (coins === null) {
       const coinsResp = await endpoint._get(
@@ -415,7 +415,7 @@ class ERC20Coins extends Component {
   getCoinAllowance = async (chain, tokenAddress, owner, contractAddress) => {
     const allowanceResp = await endpoint._get(
       getChain()['coins'].getAllowanceApiUrl + `${chain}/${tokenAddress}/${owner}/${contractAddress}`);
-      console.log({chain, tokenAddress, owner, contractAddress});
+      //console.log({chain, tokenAddress, owner, contractAddress});
       const ethers = require('ethers');
       const web3 = window.web3;
       //const selectedTokenAllowance = web3.utils.hexToNumber(allowanceResp.data.allowance)
@@ -423,7 +423,7 @@ class ERC20Coins extends Component {
       const allowance = web3.utils.fromWei(selectedTokenAllowance, 'ether');
 
      
-      console.log('allowance | selectedTokenAllowance', {allowance, selectedTokenAllowance});
+      //console.log('allowance | selectedTokenAllowance', {allowance, selectedTokenAllowance});
 
       this.setState({
         selectedTokenAllowance: allowance,

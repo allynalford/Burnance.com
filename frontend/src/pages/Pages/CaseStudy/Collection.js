@@ -468,7 +468,7 @@ class CollectionView extends Component {
         approving: false,
         holdingValue,
         description: (typeof Collection.data.collection.description === "undefined" ? NFTS.data.nfts[0].description : Collection.data.collection.description),
-        type: Collection.data.collection.tokenType,
+        type: Collection.data.collection.primary_asset_contracts[0].schema_name,
         held: NFTS.data.nfts.length,
         floorPrice,
         avgPrice,
@@ -929,16 +929,33 @@ class CollectionView extends Component {
       <React.Fragment>
         <Helmet>
           <title>Burnance NFT Collection Liquidity</title>
-          <meta property="og:title" content="Burnance NFT Collection Liquidity" />
-          <meta name="keywords" content="Burnance NFT, Collection Liquidity, NFT, NFT Liquidity, Liquidity,Ethereum, ETH, ERC-721, ERC-20, ERC-1155, burner, burn, burn rewards" />
-          <meta name="description" content="Burn your Sh!t NFTs and get paid in (ETH) Ethereum" />
-          <meta property="og:description" content="Burn your Sh!t NFTs and get paid in (ETH) Ethereum" />
-          <meta name="twitter:title" content="Burnance NFT Collection Liquidity" />
+          <meta
+            property="og:title"
+            content="Burnance NFT Collection Liquidity"
+          />
+          <meta
+            name="keywords"
+            content="Burnance NFT, Collection Liquidity, NFT, NFT Liquidity, Liquidity,Ethereum, ETH, ERC-721, ERC-20, ERC-1155, burner, burn, burn rewards"
+          />
+          <meta
+            name="description"
+            content="Burn your Sh!t NFTs and get paid in (ETH) Ethereum"
+          />
+          <meta
+            property="og:description"
+            content="Burn your Sh!t NFTs and get paid in (ETH) Ethereum"
+          />
+          <meta
+            name="twitter:title"
+            content="Burnance NFT Collection Liquidity"
+          />
         </Helmet>
         {/* breadcrumb */}
         <section
           className="bg-half d-table w-100"
-          style={{ background: `url(${this.state.backgroundImg}) center center` }}
+          style={{
+            background: `url(${this.state.backgroundImg}) center center`,
+          }}
         >
           <div className="bg-overlay"></div>
           <div className="container">
@@ -1019,7 +1036,11 @@ class CollectionView extends Component {
                           size={50}
                         />
                       ) : (
-                        <p className="text h3 mb-0">{(this.state.floorPrice === 0 ? '< 0.001' : numFormatter.format(this.state.floorPrice))}</p>
+                        <p className="text h3 mb-0">
+                          {this.state.floorPrice === 0
+                            ? '< 0.001'
+                            : numFormatter.format(this.state.floorPrice)}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -1337,19 +1358,24 @@ class CollectionView extends Component {
                     </div>
                   </div>
                 </Col>
-                <Col md="12">
-                  <p className="text mb-0" style={{ marginTop: '25px' }}>
-                    {this.state.description}
-                  </p>
-                </Col>
                 {this.state.loading === false ? (
                   <Col md="12">
                     <p className="text mb-0" style={{ marginTop: '25px' }}>
-                      Approval the collection to burn an NFT from the
-                      collection. Refresh the collection to view updates.
+                      Approve the collection to burn an NFT from the collection,
+                      Refresh the collection to view updates. View your batch to
+                      complete a batch transfer.
                     </p>
                     <Link
                       to="#"
+                      data-toggle="tooltip"
+                      data-placement="top"
+                      title={
+                        this.state.collectionApproved === true
+                          ? 'Collection is approved '
+                          : this.state.loading === true
+                          ? 'Currently loading the collection'
+                          : 'Approve the collection for sells'
+                      }
                       className="btn mouse-down"
                       style={{
                         marginRight: '10px',
@@ -1391,6 +1417,13 @@ class CollectionView extends Component {
                     </Link>
                     <Link
                       to="#"
+                      data-toggle="tooltip"
+                      data-placement="top"
+                      title={
+                        this.state.loading === true
+                          ? `Currently loading the collection... `
+                          : `Refresh the collection information`
+                      }
                       className="btn mouse-down"
                       style={{
                         marginRight: '10px',
@@ -1428,6 +1461,9 @@ class CollectionView extends Component {
                     </Link>
                     <Link
                       to="/batch"
+                      data-toggle="tooltip"
+                      data-placement="top"
+                      title={`Batch currently has contains ${this.state.batchSize} items`}
                       className="btn mouse-down btn-info"
                       style={{
                         backgroundColor: '#939393',
@@ -1435,11 +1471,73 @@ class CollectionView extends Component {
                       }}
                     >
                       View Batch: {this.state.batchSize}{' '}
-                      <FontAwesomeIcon
-                        size="lg"
-                        icon={faBasketShopping}
-                      />
+                      <FontAwesomeIcon size="lg" icon={faBasketShopping} />
                     </Link>
+                  </Col>
+                ) : (
+                  ''
+                )}
+
+                {this.state.loading === false ? (
+                  <Col md="12">
+                  
+
+                    <div className="p-4">
+                      <blockquote className="blockquote p-3 mb-0">
+                        <p className="text mb-0 fst-italic">
+                          {this.state.description}
+                        </p>
+                        <p className="text mb-0" style={{ marginTop: '25px' }}>
+                  <b>Verification Status:</b>{'  '}
+                      {this.state.collection.safelist_request_status ===
+                      'not_requested'
+                        ? <Link to="#" className="badge badge-link bg-warning">
+                        Not Requested
+                      </Link>
+                        : this.state.collection.safelist_request_status ===
+                          'requested'
+                        ? <Link to="#" className="badge badge-link bg-info">
+                        Requested
+                      </Link>
+                        : this.state.collection.safelist_request_status ===
+                          'approved'
+                        ? <Link to="#" className="badge badge-link bg-success">
+                        Approved
+                      </Link>: <Link to="#" className="badge badge-link bg-primary">
+                        Verified
+                      </Link>}
+                  </p> 
+                      </blockquote>
+                    </div>
+                    {this.state.collection.featured === true ? (
+                      <Link to="#" className="badge badge-link bg-success">
+                        Featured
+                      </Link>
+                    ) : (
+                      ''
+                    )}{' '}
+                    {this.state.collection.hidden === true ? (
+                      <Link
+                        style={{ marginLeft: '5px' }}
+                        to="#"
+                        className="badge badge-link bg-danger"
+                      >
+                        Collection Hidden
+                      </Link>
+                    ) : (
+                      ''
+                    )}{' '}
+                    {this.state.collection.is_nsfw === true ? (
+                      <Link
+                        style={{ marginLeft: '5px' }}
+                        to="#"
+                        className="badge badge-link bg-warning"
+                      >
+                        NSFW
+                      </Link>
+                    ) : (
+                      ''
+                    )}
                   </Col>
                 ) : (
                   ''
@@ -1557,11 +1655,15 @@ class CollectionView extends Component {
                         currentCost = parseFloat(
                           cases.costUSD * this.state.ethPrice.ethusd,
                         );
-                        const cleanFloor = Number(this.state.floorPrice.replace("$",""))
-                        diff = ((currentCost - cases.valueUSD)) + (cleanFloor - cases.valueUSD);
+                        const cleanFloor = Number(
+                          this.state.floorPrice.replace('$', ''),
+                        );
+                        diff =
+                          currentCost -
+                          cases.valueUSD +
+                          (cleanFloor - cases.valueUSD);
                       }
 
-                   
                       //console.log(cases.gasData.gasUSD.toFixed(4));
 
                       const exists = this.state.batch.existsInBatch(
@@ -1954,7 +2056,8 @@ class CollectionView extends Component {
                                                   title,
                                                   cases.contract.address,
                                                   cases.tokenId,
-                                                  this.state.collection.tokenType,
+                                                  this.state.collection
+                                                    .tokenType,
                                                   1,
                                                   imgSrc,
                                                   costUSD,
