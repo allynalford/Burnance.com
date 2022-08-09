@@ -216,7 +216,12 @@ class MostViewedProducts extends Component {
         //Loop the collections and add a id column
         let id = 1, collections = [];
         for(const collection of Collections.data.collections){
+
+         if(typeof collection.primary_asset_contracts[0] !== "undefined"){
+
           collection.id = id;
+          collection.address = collection.primary_asset_contracts[0].address;
+          collection.FloorPrice = collection.stats.floor_price;
           collections.push(collection);
           SevenDaySales = SevenDaySales + collection.stats.seven_day_sales;
           NumOwners = NumOwners + collection.stats.num_owners;
@@ -224,6 +229,11 @@ class MostViewedProducts extends Component {
 
           EstHoldingValue = EstHoldingValue + (Number(collection.stats.floor_price) * Number(collection.owned_asset_count));
 
+
+         }else{
+          Collections.data.collections.splice(id - 1, 1);
+         }
+        
           id++;
         }
         Collections = collections;
@@ -672,20 +682,21 @@ class MostViewedProducts extends Component {
                     columns={[
                       {
                         cell: (row) => (
-                          <Link to={`/collection/${row.primary_asset_contracts[0].address}`}>
+                          <Link to={`/collection/${row.address}`}>
                             {(row.image_url !== null ? <img src={row.image_url} width="50px" height={'50px'} alt={'t'} /> : <Icon style={{ fill: '#43a047' }} />)}
                           </Link>
                         ),
                         width: '56px', // custom width for icon button
                         style: {
                           borderBottom: '1px solid #FFFFFF',
-                          marginBottom: '-1px',
+                          marginBottom: '5px',
+                          border: '2px'
                         },
                       },
                       {
                         name: 'Collection',
                         selector: (row) => (
-                          <Link to={`/collection/${row.primary_asset_contracts[0].address}`}>
+                          <Link to={`/collection/${row.address}`}>
                             {row.name}
                           </Link>
                         ),
@@ -713,15 +724,14 @@ class MostViewedProducts extends Component {
                       },
                       {
                         name: 'Floor Price',
-                        selector: (row) => (row.FloorPrice === null ? 0 : row.FloorPrice),
+                        selector: (row) => (row.stats.floor_price === null ? 0 : row.stats.floor_price),
                         sortable: true,
-                        format: (row) => (row.FloorPrice === null ? 0 : row.FloorPrice) + ' ETH',
+                        format: (row) => (row.stats.floor_price === null ? 0 : row.stats.floor_price) + ' ETH',
                         grow: 2,
                         style: {
                           fontSize: '14px',
                           fontWeight: 600,
                         },
-                        when: (row) => row.FloorPrice < row.AmountInvested,
                       },
                       {
                         name: 'Cost Basis',
