@@ -6,6 +6,18 @@
             http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
 <url>
   <loc>https://www.burnance.io</loc>
-  <lastmod>2022-07-14T19:30:50+00:00</lastmod>
+  <lastmod>2022-08-08T19:30:50+00:00</lastmod>
+</url>
+<url>
+  <loc>https://www.burnance.io/collections</loc>
+  <lastmod>2022-08-08T19:30:50+00:00</lastmod>
+</url>
+<url>
+  <loc>https://www.burnance.io/coins</loc>
+  <lastmod>2022-08-08T19:30:50+00:00</lastmod>
+</url>
+<url>
+  <loc>https://www.burnance.io/account</loc>
+  <lastmod>2022-08-08T19:30:50+00:00</lastmod>
 </url>
 </urlset>

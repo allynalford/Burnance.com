@@ -14,6 +14,7 @@ import {
   Input,
   Table
 } from 'reactstrap';
+import {Helmet} from "react-helmet";
 import { Link, withRouter } from 'react-router-dom';
 import BasicPopperToolTip from '../../../components/BasicPopperToolTip';
 import FadeIn from 'react-fade-in';
@@ -179,7 +180,7 @@ class CollectionView extends Component {
       document.body.classList = '';
       document.getElementById('top-menu').classList.add('nav-light');
       window.addEventListener('scroll', this.scrollNavigation, true);
-
+      document.title = "Liquidity for your NFT Collection";
       //Start GA
       initGA();
       PageView();
@@ -919,6 +920,14 @@ class CollectionView extends Component {
   render() {
     return (
       <React.Fragment>
+        <Helmet>
+          <title>Burnance NFT Collection Liquidity</title>
+          <meta property="og:title" content="Burnance NFT Collection Liquidity" />
+          <meta name="keywords" content="Burnance NFT, Collection Liquidity, NFT, NFT Liquidity, Liquidity,Ethereum, ETH, ERC-721, ERC-20, ERC-1155, burner, burn, burn rewards" />
+          <meta name="description" content="Burn your Sh!t NFTs and get paid in (ETH) Ethereum" />
+          <meta property="og:description" content="Burn your Sh!t NFTs and get paid in (ETH) Ethereum" />
+          <meta name="twitter:title" content="Burnance NFT Collection Liquidity" />
+        </Helmet>
         {/* breadcrumb */}
         <section
           className="bg-half d-table w-100"

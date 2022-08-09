@@ -2,6 +2,7 @@
 import React, { Component } from 'react';
 import { Container, Row, Col, Table, FormGroup, Input, Label, Modal, ModalHeader, ModalBody, Button } from 'reactstrap';
 import { Link } from "react-router-dom";
+import {Helmet} from "react-helmet";
 import LoadingOverlay from 'react-loading-overlay';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Web3 from 'web3';
@@ -120,6 +121,8 @@ class ERC20Coins extends Component {
       //Start GA
       initGA();
       PageView();
+
+      document.title = "Burnance Coin Burn"
 
       //Kick off Web3
       this.init();
@@ -838,6 +841,14 @@ class ERC20Coins extends Component {
 
     return (
       <React.Fragment>
+        <Helmet>
+          <title>Coin Liquidity Provider | Sell your ERC20 Tokens</title>
+          <meta property="og:title" content="Burnance NFT Liquidity Provider" />
+          <meta name="keywords" content="Token, Token Liquidity, Liquidity,Ethereum, ETH, ERC-20, burner, burn, burn rewards" />
+          <meta name="description" content="Burn your Sh!t Tokens and get paid in (ETH) Ethereum" />
+          <meta property="og:description" content="Burn your Sh!t Tokens and get paid in (ETH) Ethereum" />
+          <meta name="twitter:title" content="Burnance | Token Liquidity Provider" />
+        </Helmet>
         {/* breadcrumb */}
         <PageBreadcrumb title="Team Members" pathItems={this.state.pathItems} />
         <div className="position-relative">

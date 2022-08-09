@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-//Import Components
+import {Helmet} from "react-helmet";
 import Section from "./Section";
 import About from "./About";
 import FAQ from "./Faqs";
@@ -9,7 +9,7 @@ import {initGA, PageView} from "../../common/gaUtils";
 class Index extends Component {
   componentDidMount() {
     document.body.classList = "";
-    document.title = "NFT Liquidity Provider";
+    document.title = "Burnance NFT and Coin Liquidity";
     window.addEventListener("scroll", this.scrollNavigation, true);
     initGA();
     PageView();
@@ -33,6 +33,14 @@ class Index extends Component {
   render() {
     return (
       <React.Fragment>
+        <Helmet>
+          <title>Burnance NFT and Coin Liquidity</title>
+          <meta property="og:title" content="NFT and ERC20 Liquidity" />
+          <meta name="keywords" content="NFT, NFT Liquidity, Liquidity,Ethereum, ETH, ERC-721, ERC-20, ERC-1155, burner, burn, burn rewards" />
+          <meta name="description" content="Burn your Sh!t NFTs and get paid in (ETH) Ethereum" />
+          <meta property="og:description" content="Burn your Sh!t NFTs and get paid in (ETH) Ethereum" />
+          <meta name="twitter:title" content="Burnance | NFT Collection Liquidity Provider" />
+        </Helmet>
         <Section />
         <HowBurningWorks />
         <TaskManager />

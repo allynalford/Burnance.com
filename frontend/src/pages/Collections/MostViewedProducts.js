@@ -9,6 +9,7 @@ import {
   ModalFooter,
   Button,
 } from 'reactstrap';
+import {Helmet} from "react-helmet";
 import { getChain } from '../../common/config';
 import Icon from '@material-ui/icons/Apps';
 import { Link } from 'react-router-dom';
@@ -145,6 +146,8 @@ class MostViewedProducts extends Component {
   componentDidMount() {
     document.body.classList = '';
     window.addEventListener('scroll', this.scrollNavigation, true);
+
+    document.title = "Burnance NFT Collection Liquidity";
 
     if (window.ethereum) {
 
@@ -315,6 +318,14 @@ class MostViewedProducts extends Component {
      
     return (
       <React.Fragment>
+        <Helmet>
+          <title>NFT Collection | Burnance NFT Liquidity</title>
+          <meta property="og:title" content="Burnance NFT Liquidity Provider" />
+          <meta name="keywords" content="NFT, NFT Liquidity, Liquidity,Ethereum, ETH, ERC-721, ERC-20, ERC-1155, burner, burn, burn rewards" />
+          <meta name="description" content="Burn your Sh!t NFTs and get paid in (ETH) Ethereum" />
+          <meta property="og:description" content="Burn your Sh!t NFTs and get paid in (ETH) Ethereum" />
+          <meta name="twitter:title" content="Burnance | NFT Collection Liquidity Provider" />
+        </Helmet>
         <Modal
           isOpen={this.state.isOpen}
           role="dialog"
