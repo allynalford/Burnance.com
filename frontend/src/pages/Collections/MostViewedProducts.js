@@ -586,6 +586,29 @@ class MostViewedProducts extends Component {
                         name: 'Held',
                         selector: (row) => row.owned_asset_count,
                         sortable: true,
+                        width: '90px',
+                        style: {
+                          fontSize: '14px',
+                          fontWeight: 600,
+                        },
+                      },
+                      {
+                        name: 'Floor',
+                        selector: (row) => (row.stats.floor_price === null ? 0 : row.stats.floor_price),
+                        sortable: true,
+                        width: '100px',
+                        format: (row) => (row.stats.floor_price === null ? 0 : row.stats.floor_price),
+                        style: {
+                          fontSize: '14px',
+                          fontWeight: 600,
+                        },
+                      },
+                      {
+                        name: 'Liquidity (1D)',
+                        selector: (row) => row.Liquidity7D,
+                        sortable: true,
+                        width: '170px',
+                        format: (row) => `${(row.Liquidity7D === null ? 0 : row.Liquidity7D.toFixed(2))}%`,
                         style: {
                           fontSize: '14px',
                           fontWeight: 600,
@@ -615,22 +638,13 @@ class MostViewedProducts extends Component {
                         name: '30 Sales',
                         selector: (row) => row.stats.thirty_day_sales,
                         sortable: true,
+                        format: (row) => numFormatter.format(row.stats.thirty_day_sales),
                         style: {
                           fontSize: '14px',
                           fontWeight: 600,
                         },
                       },
-                      {
-                        name: 'Floor Price',
-                        selector: (row) => (row.stats.floor_price === null ? 0 : row.stats.floor_price),
-                        sortable: true,
-                        format: (row) => (row.stats.floor_price === null ? 0 : row.stats.floor_price) + ' ETH',
-                        grow: 2,
-                        style: {
-                          fontSize: '14px',
-                          fontWeight: 600,
-                        },
-                      },
+
                       // {
                       //   name: 'Cost Basis',
                       //   selector: (row) => row.AmountInvested,
@@ -653,16 +667,7 @@ class MostViewedProducts extends Component {
                       //   },
                       //   when: (row) => row.pnl < 0,
                       // },
-                      {
-                        name: 'Liquidity (1D)',
-                        selector: (row) => row.Liquidity7D,
-                        sortable: true,
-                        format: (row) => `${(row.Liquidity7D === null ? 0 : row.Liquidity7D.toFixed(2))}%`,
-                        style: {
-                          fontSize: '14px',
-                          fontWeight: 600,
-                        },
-                      },
+
                     ]}
                     data={this.state.collections}
                     pagination
