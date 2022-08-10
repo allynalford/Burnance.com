@@ -13,7 +13,7 @@ const ethers = require('ethers');
 var endpoint = require('../../common/endpoint');
 var sessionstorage = require('sessionstorage');
 var USD = new Intl.NumberFormat('en-US', {style: 'currency',currency: 'USD'});
-var WEI = new Intl.NumberFormat('en-US', { maximumSignificantDigits: 6 })
+var WEI = new Intl.NumberFormat('en-US', { maximumSignificantDigits: 2 })
 
 
 class Topbar extends Component {
