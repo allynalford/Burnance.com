@@ -9,6 +9,7 @@ import { getChain, getNetwork, getChainId } from "../../common/config";
 import dateFormat from "dateformat";
 import Web3 from 'web3';
 import Burnance from '../../abis/Burnance.v2.1.json';
+import BurnanceERC20 from '../../abis/Burnance.ERC20.json';
 const ethers = require('ethers');
 var endpoint = require('../../common/endpoint');
 var sessionstorage = require('sessionstorage');
@@ -90,13 +91,33 @@ class Topbar extends Component {
     const web3 = window.web3;
     const networkId = await web3.eth.net.getId();
     const burnanceAddr = await Burnance.networks[networkId].address;
+    const burnanceERC20Addr = await BurnanceERC20.networks[networkId].address;
+
     this.setState({ navLinks: [
       { id: 1, title: 'Home', link: '/' },
-      { id: 2, title: 'Transactions', link: '/account' },
-      { id: 3, title: 'Collections', link: '/collections' },
-      { id: 4, title: 'Coins', link: '/coins' },
-      { id: 5, title: 'Batch', link: '/batch' },
-      { id: 6, title: 'Contract', link: `${process.env.REACT_APP_ETHERSCAN_BASE_URL}address/${burnanceAddr}`, external: true },
+      {
+        id: 2,
+        title: "Wallet",
+        link: "/account",
+        isOpenSubMenu: false,
+        child: [
+          { title: "Collections", link: "/collections" },
+          { title: "Coins", link: "/coins" },
+          { title: 'Transactions', link: '/account' },
+          { title: 'Batch', link: '/batch' },
+        ],
+      },
+      {
+        id: 3,
+        title: "Contracts",
+        link: "/account",
+        isOpenSubMenu: false,
+        child: [
+          { title: "ERC721/1155 Contract", link: `${process.env.REACT_APP_ETHERSCAN_BASE_URL}address/${burnanceAddr}`, external: true },
+          { title: "ERC20 Contract", link: `${process.env.REACT_APP_ETHERSCAN_BASE_URL}address/${burnanceERC20Addr}`, external: true },
+        ],
+      },
+      { id: 4, title: 'The Furnace🔥', link: 'https://opensea.io/BurnanceFurnace', external: true},
     ] });
     this.detectEthereumNetwork();
   };
@@ -383,7 +404,8 @@ class Topbar extends Component {
             <div className="buy-button">
             <Badge bg="#00AA55" style={{marginRight: '5px',  backgroundColor: '#00AA55'}} 
                    className="badge-outline text h6" pill> 
-            {WEI.format(this.state.gasPrice)}{' '}<i className="mdi mdi-fuel h6" style={{color: '#F22613'}}> </i>
+            {WEI.format(this.state.gasPrice)}{' '}⛽
+            {/* <i className="mdi mdi-fuel h6" style={{color: '#F22613'}}> </i> */}
             </Badge>
             <Badge style={{marginRight: '20px', backgroundColor: '#4183D7'}} 
                    className="badge-outline text h6" pill> 
@@ -620,11 +642,18 @@ class Topbar extends Component {
                                 </ul>
                               </li>
                             ) : (
-                              <li key={childKey}>
-                                <Link to={childArray.link}>
-                                  {childArray.title}
-                                </Link>
-                              </li>
+                                <li key={childKey}>
+                                  {typeof childArray.external !== 'undefined' &&
+                                    childArray.external === true ? (
+                                    <a href={childArray.link} target="_new">
+                                      {childArray.title}
+                                    </a>
+                                  ) : (
+                                    <Link to={childArray.link}>
+                                      {childArray.title}
+                                    </Link>
+                                  )}
+                                </li>
                             ),
                           )}
                         </ul>

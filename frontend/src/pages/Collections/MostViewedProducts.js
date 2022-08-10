@@ -1,4 +1,4 @@
-import React, { Component, CSSProperties } from 'react';
+import React, { Component } from 'react';
 import {
   Container,
   Row,
@@ -15,8 +15,8 @@ import Icon from '@material-ui/icons/Apps';
 import { Link } from 'react-router-dom';
 import DataTableLoader from '../../components/DataTable';
 import bgImg from "../../assets/images/nfts/ac1_unfit_digital_collage_of_locally_owned_nfts_by_annie_bur.jpg";
-import BasicPopperToolTip from "../../components/BasicPopperToolTip";
-import RingLoader from "react-spinners/RingLoader";
+//import BasicPopperToolTip from "../../components/BasicPopperToolTip";
+//import RingLoader from "react-spinners/RingLoader";
 import DataTable from 'react-data-table-component';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUsersRectangle } from '@fortawesome/free-solid-svg-icons';
@@ -27,22 +27,17 @@ const Swal = require('sweetalert2');
 const exportUtils = require('../../common/exportUtils');
 const CollectionsCache = require('../../model/Collections');
 // Create our number formatter.
-var formatter = new Intl.NumberFormat('en-US', {
-  style: 'currency',
-  currency: 'USD',
+// var formatter = new Intl.NumberFormat('en-US', {
+//   style: 'currency',
+//   currency: 'USD',
 
-  // These options are needed to round to whole numbers if that's what you want.
-  //minimumFractionDigits: 0, // (this suffices for whole numbers, but will print 2500.10 as $2,500.1)
-  //maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
-});
+//   // These options are needed to round to whole numbers if that's what you want.
+//   //minimumFractionDigits: 0, // (this suffices for whole numbers, but will print 2500.10 as $2,500.1)
+//   //maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
+// });
 var numFormatter = new Intl.NumberFormat('en-US', { maximumSignificantDigits: 6 })
 var _collections = [];
 
-  const override: CSSProperties = {
-    display: "block",
-    margin: "0 auto",
-    borderColor: "red",
-  };
   
 class MostViewedProducts extends Component {
   constructor(props) {
@@ -464,56 +459,12 @@ class MostViewedProducts extends Component {
             </Button>
           </ModalFooter>
         </Modal>
-        <section
-          className="bg-half d-table w-100"
-          style={{ background: `url(${bgImg}) center center` }}
-        >
-          <div className="bg-overlay"></div>
-          <div className="container">
-            <div className="row justify-content-center">
-              <div className="col-lg-12 text-center">
-                <div className="page-next-level">
-                  <h1 className="title text-white title-dark">
-                    Wallet NFT Collections
-                  </h1>
-                  <div className="page-next">
-                    <nav aria-label="breadcrumb" className="d-inline-block">
-                      <ul className="breadcrumb bg-white rounded shadow mb-0">
-                        <li className="breadcrumb-item">
-                          <Link to="/">Burnance</Link>
-                        </li>
-                        <li className="breadcrumb-item">
-                          <Link to="/collections">Collections</Link>
-                        </li>
-                      </ul>
-                    </nav>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-        <div className="position-relative">
-          <div className="shape overflow-hidden text-white">
-            <svg
-              viewBox="0 0 2880 48"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M0 48H1437.5H2880V0H2160C1442.5 52 720 0 720 0H0V48Z"
-                fill="currentColor"
-              ></path>
-            </svg>
-          </div>
-        </div>
         <section className="section">
           <Container>
             {this.state.walletConnected === false ? (
-              ''
-            ) : (
+              '') : (
               <Row>
-                <Col xs={12} style={{ marginTop: '25px' }}>
+                <Col xs={12}>
                   <Button
                     name="refresh"
                     className="btn btn-info rounded"
