@@ -210,14 +210,29 @@ class MostViewedProducts extends Component {
             `/ethereum/${ethereumAddress}`,
         );
 
-        //console.log('Collections',Collections);
+        console.log('Collections',Collections);
+        console.log('Collections Length: ',Collections.data.collections.length);
         
 
         //Loop the collections and add a id column
         let id = 1, collections = [];
+
+
         for(const collection of Collections.data.collections){
 
+          if(collection.name === "Loopy Cups"){
+            console.log('Its Right Here... Before primary_asset_contracts')
+          }else{
+            console.log('Checking', collection.name)
+          }
+
          if(typeof collection.primary_asset_contracts[0] !== "undefined"){
+
+          if(collection.name === "Loopy Cups"){
+            console.log('Its Right Here...')
+          }else{
+            console.log('Including', collection.name)
+          }
 
           collection.id = id;
           collection.address = collection.primary_asset_contracts[0].address;
@@ -231,6 +246,7 @@ class MostViewedProducts extends Component {
 
 
          }else{
+          console.log('excluding', collection.name)
           Collections.data.collections.splice(id - 1, 1);
          }
         
@@ -238,7 +254,11 @@ class MostViewedProducts extends Component {
         }
         Collections = collections;
         _CollectionsCache.set(ethereumAddress, Collections);
+
+        console.log('Index: ',id)
       }
+
+      
 
 
      

@@ -70,7 +70,7 @@ module.exports.start = async event => {
     }
 };
 
-module.exports.startWalletLoad = async event => {
+ module.exports.startWalletLoad = async event => {
   let req, dt, address, chain, stateMachineArn;
   let AWS, stepfunctions, alchemyUtils;
   try{
@@ -480,7 +480,7 @@ module.exports.ViewWalletCollectionNFTs = async (event) => {
 };
 
 module.exports.updateEmail = async (event) => {
-  let req, dt, chain, address, email;
+  let req, dt, chain, address, email, name;
   try {
     req = JSON.parse(event.body);
     dt = dateFormat(new Date(), "isoUtcDateTime");
@@ -488,10 +488,12 @@ module.exports.updateEmail = async (event) => {
     chain = req.chain;
     address = req.address;
     email = req.email;
+    name = req.name;
 
     if (typeof chain === "undefined") throw new Error("chain is undefined");
     if (typeof address === "undefined") throw new Error("address is undefined");
     if (typeof email === "undefined") throw new Error("email is undefined");
+    if (typeof name === "undefined") throw new Error("name is undefined");
 
   } catch (e) {
     console.error(e);

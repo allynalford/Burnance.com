@@ -10,6 +10,7 @@ import {
   TabPane,
   Form,
   Label,
+  Button
 } from "reactstrap";
 import { Link } from "react-router-dom";
 import classnames from "classnames";
@@ -65,6 +66,7 @@ class MyAccount extends Component {
     this.loadBlockchainData.bind(this);
     this.loadWeb3.bind(this);
     this.fireMsg.bind(this);
+    this.signAndVerify.bind(this);
   }
   toggleTab(tab) {
     if (this.state.activeTab !== tab) {
@@ -94,7 +96,7 @@ class MyAccount extends Component {
     });
   }
 
-  async init() {
+  init = async () => {
     await this.loadWeb3();
     await this.loadBlockchainData();
   }
@@ -134,7 +136,7 @@ class MyAccount extends Component {
     window.removeEventListener("scroll", this.scrollNavigation, true);
   };
 
-  async loadWeb3() {
+  loadWeb3 = async () =>{
     if (window.ethereum) {
       window.web3 = new Web3(window.ethereum);
       await window.ethereum.request({ method: 'eth_requestAccounts' });
@@ -148,7 +150,7 @@ class MyAccount extends Component {
     }
   }
 
-  async loadBlockchainData() {
+  loadBlockchainData= async () => {
     const web3 = window.web3;
     const accounts = await web3.eth.getAccounts();
     this.setState({ account: accounts[0] });
@@ -256,7 +258,7 @@ class MyAccount extends Component {
       });
   };
 
-  async waitForReceipt(hash, cb) {
+  waitForReceipt = async (hash, cb) =>{
     const web3 = window.web3;
     const thiss = this;
     web3.eth.getTransactionReceipt(hash, function (err, receipt) {
@@ -284,11 +286,69 @@ class MyAccount extends Component {
   }
 
 getPromissoryList = async(address) => {
+
+  const thisss = this;
+
   this.setState({ loading:true });
-  const guarantees = await endpoint._get(getChain()['eth'].viewWalletGuarenteeSellTxApiUrl + `/ethereum/${address}`)
-  console.log(guarantees);
-  this.setState({ guarantees: guarantees.data.transactions, loading:false });
+
+  endpoint._get(getChain()['eth'].viewWalletGuarenteeSellTxApiUrl + `/ethereum/${address}`).then(function(guarantees) { // (***)
+   thisss.setState({ guarantees: guarantees.data.transactions });
+
+    return guarantees;
+  
+  }).then(function(result) {
+    thisss.setState({ loading:false });
+  });
+  
+  
 };
+
+saveEmailAndDisplayName = async(address) => {
+
+  const thisss = this;
+
+  this.setState({ loading:true });
+
+  endpoint._get(getChain()['eth'].viewWalletGuarenteeSellTxApiUrl + `/ethereum/${address}`).then(function(guarantees) { // (***)
+   thisss.setState({ guarantees: guarantees.data.transactions });
+
+    return guarantees;
+  
+  }).then(function(result) {
+    thisss.setState({ loading:false });
+  });
+  
+  
+};
+
+signAndVerify = async (message) =>{
+  //We need ethers for this
+  const ethers = require("ethers");
+  //Use this module to verify the signature
+  const { verifyMessage } = require('@ambire/signature-validator');
+  //Request accounts from MetaMask
+  await window.ethereum.request({method: 'eth_requestAccounts'});
+  //Use MetaMask as the provider
+  const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+  //Pull the accounts
+  await provider.send("eth_requestAccounts", []);
+  //Get a signer
+  const signer = provider.getSigner();
+  //Grab the address
+  const address = await signer.getAddress();
+  //Request the user sign the message
+  const signature = await signer.signMessage(message);
+  //Validate the message signature
+  const isValidSig = await verifyMessage({
+    signer: address,
+    message,
+    signature,
+    provider,
+});
+  console.info('is the sig valid: ', isValidSig);
+
+  return isValidSig;
+}
 
   render() {
     const customStyles = {
@@ -380,7 +440,7 @@ getPromissoryList = async(address) => {
                       </div>
                     </NavLink>
                   </NavItem> */}
-
+{/* 
                   <NavItem className="mt-2">
                     <NavLink
                       className={classnames(
@@ -399,7 +459,7 @@ getPromissoryList = async(address) => {
                         </h6>
                       </div>
                     </NavLink>
-                  </NavItem>
+                  </NavItem> */}
                   <NavItem className="mt-2">
                     <NavLink
                       className={classnames(
@@ -419,7 +479,7 @@ getPromissoryList = async(address) => {
                       </div>
                     </NavLink>
                   </NavItem>
-                  <NavItem className="mt-2">
+                  {/* <NavItem className="mt-2">
                     <NavLink
                       className={classnames(
                         { active: this.state.activeTab === "4" },
@@ -437,7 +497,7 @@ getPromissoryList = async(address) => {
                         </h6>
                       </div>
                     </NavLink>
-                  </NavItem>
+                  </NavItem> */}
 
                   {/* <NavItem className="mt-2">
                     <NavLink
@@ -631,26 +691,26 @@ getPromissoryList = async(address) => {
                           fontWeight: 600,
                         },
                       },
-                      {
-                        name: 'Cost',
-                        selector: (row) => row.transferValueETH,
-                        sortable: true,
-                        format: (row) => row.transferValueETH + ' ETH',
-                        style: {
-                          fontSize: '14px',
-                          fontWeight: 600,
-                        },
-                      },
-                      {
-                        name: 'Fee',
-                        selector: (row) => row.transferGasETH,
-                        sortable: true,
-                        format: (row) => row.transferGasETH + ' wei',
-                        style: {
-                          fontSize: '14px',
-                          fontWeight: 600,
-                        },
-                      },
+                      // {
+                      //   name: 'Cost',
+                      //   selector: (row) => row.transferValueETH,
+                      //   sortable: true,
+                      //   format: (row) => row.transferValueETH + ' ETH',
+                      //   style: {
+                      //     fontSize: '14px',
+                      //     fontWeight: 600,
+                      //   },
+                      // },
+                      // {
+                      //   name: 'Fee',
+                      //   selector: (row) => row.transferGasETH,
+                      //   sortable: true,
+                      //   format: (row) => row.transferGasETH + ' wei',
+                      //   style: {
+                      //     fontSize: '14px',
+                      //     fontWeight: 600,
+                      //   },
+                      // },
                       {
                         name: 'Exp Date',
                         selector: (row) => row.expireTime,
@@ -851,9 +911,9 @@ getPromissoryList = async(address) => {
                         </Col>
 
                         <div className="col-lg-12 mt-2 mb-0">
-                          <button className="btn btn-primary">
+                          <Button className="btn btn-primary">
                             Save Changes
-                          </button>
+                          </Button>
                         </div>
                       </Row>
                     </Form>
