@@ -13,6 +13,7 @@
     "@fortawesome/free-solid-svg-icons": "^6.1.2",
     "@fortawesome/react-fontawesome": "^0.2.0",
     "@iconscout/react-unicons": "^1.1.6",
+    "@x2y2-io/sdk": "^0.1.5",
     "aos": "^2.3.4",
     "availity-reactstrap-validation": "^2.7.1",
     "aws-api-gateway-client": "^0.3.7",

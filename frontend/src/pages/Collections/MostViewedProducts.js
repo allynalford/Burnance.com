@@ -14,7 +14,7 @@ import { getChain } from '../../common/config';
 import Icon from '@material-ui/icons/Apps';
 import { Link } from 'react-router-dom';
 import DataTableLoader from '../../components/DataTable';
-import bgImg from "../../assets/images/nfts/ac1_unfit_digital_collage_of_locally_owned_nfts_by_annie_bur.jpg";
+//import bgImg from "../../assets/images/nfts/ac1_unfit_digital_collage_of_locally_owned_nfts_by_annie_bur.jpg";
 //import BasicPopperToolTip from "../../components/BasicPopperToolTip";
 //import RingLoader from "react-spinners/RingLoader";
 import DataTable from 'react-data-table-component';
