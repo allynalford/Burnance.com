@@ -1694,6 +1694,7 @@ class CollectionView extends Component {
                                 }
                                 className="img-fluid rounded work-image"
                                 alt={cases.description}
+                                
                               />
 
                               <CardBody>

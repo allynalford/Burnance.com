@@ -114,6 +114,7 @@ class Topbar extends Component {
         isOpenSubMenu: false,
         child: [
           { title: "ERC721/1155 Contract", link: `${process.env.REACT_APP_ETHERSCAN_BASE_URL}address/${burnanceAddr}`, external: true },
+          { title: "Exp. Transaction", link: `https://etherscan.io/tx/0x5c68bc463df68446c9dd54af80eb3ceef2fe86fcdedcd3ab454ccb629ec09f9a`, external: true },
           { title: "ERC20 Contract", link: `${process.env.REACT_APP_ETHERSCAN_BASE_URL}address/${burnanceERC20Addr}`, external: true },
         ],
       },

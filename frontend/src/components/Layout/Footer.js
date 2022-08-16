@@ -15,12 +15,15 @@ class Footer extends Component {
     super(props);
     this.state = {
       grid1: [
-        { title: "Contact us", link: "https://www.tenably.app/contact-us", external: true },
-        { title: "Services", link: "https://www.tenably.app/shopify", external: true },
-        { title: "Blog", link: "https://www.tenably.app/blog", external: true },
+        { title: "Collections", link: "/collections" },
+        { title: "Coins", link: "/coins" },
+        { title: 'Transactions', link: '/account' },
+        { title: 'Batch', link: '/batch' },
       ],
       grid2: [
-        { title: "Terms of Services", link: "https://www.tenably.app/terms-of-service", external: true },
+        { title: "ERC721/1155 Contract", link: `https://www.etherscan.io/address/0x5Dbd2Cdb75EDf046Ab08Eced4DCA1dDAB3C66aC4`, external: true },
+        { title: "Exp. Transaction", link: `https://etherscan.io/tx/0x5c68bc463df68446c9dd54af80eb3ceef2fe86fcdedcd3ab454ccb629ec09f9a`, external: true },
+        { title: "ERC20 Contract", link: `https://www.etherscan.io/address/0xeC159e7c5237305BcA43f82A948F0111d361551b`, external: true },
       ],
     };
   }
@@ -115,7 +118,7 @@ class Footer extends Component {
                 </p>
               </Col>
 
-              {/* <Col
+              <Col
                 lg="2"
                 md="4"
                 xs="12"
@@ -151,7 +154,7 @@ class Footer extends Component {
                     </li>
                   ))}
                 </ul>
-              </Col> */}
+              </Col>
 
               {/* <Col
                 lg="3"
