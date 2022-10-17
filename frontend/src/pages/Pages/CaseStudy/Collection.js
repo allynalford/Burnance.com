@@ -1632,45 +1632,15 @@ class CollectionView extends Component {
                                       HR
                                     </Link>
                                   )}
-                                  {/* <Link
-                                  to="#"
-                                  onClick={ e =>{
-                                    e.preventDefault();
-                                    window.open(`https://opensea.io/assets/${this.state.collection.chain}/${cases.contract.address}/${cases.tokenId}`);
-                                  }}
-                                >
-                                  <img
-                                      alt="OpenSea listing"
-                                      align="right"
-                                      width="25"
-                                      height="25"
-                                      src="https://storage.googleapis.com/opensea-static/Logomark/Logomark-Blue.png"
-                                    />
-                                </Link>
-                                &nbsp;&nbsp;&nbsp;
-                                <Link
-                                  to="#"
-                                  onClick={ e =>{
-                                    e.preventDefault();
-                                    window.open(`https://opensea.io/assets/${this.state.collection.chain}/${cases.contract.address}/${cases.tokenId}`);
-                                  }}
-                                >
-                                  <img
-                                      align="right"
-                                      width="25"
-                                      height="25"
-                                      src="https://etherscan.io/images/brandassets/etherscan-logo-circle.png"
-                                    />
-                                </Link> */}
                                   <h5 className="mt-3">
                                     <Link
-                                      to="page-case-detail"
+                                      to="#"
                                       className="text-dark title"
                                     >
                                       {title}
                                     </Link>
                                   </h5>
-                                  <Row>
+                                  {/* <Row>
                                     <Col md="6">
                                       <Row>
                                         <Col
@@ -1724,7 +1694,7 @@ class CollectionView extends Component {
                                         </Col>
                                       </Row>
                                     </Col>
-                                  </Row>
+                                  </Row> */}
                                   <hr />
                                   <Row>
                                     <Col md="12">
@@ -1760,6 +1730,8 @@ class CollectionView extends Component {
                                       P / L
                                     </Col>
                                   </Row>
+                                  
+                                  {/* 
                                   <hr />
                                   <Row>
                                     <Col md="12">
@@ -1790,7 +1762,7 @@ class CollectionView extends Component {
                                     >
                                       Current
                                     </Col>
-                                  </Row>
+                                  </Row> */}
 
                                   <hr />
 
