@@ -210,21 +210,24 @@ class MostViewedProducts extends Component {
             `/ethereum/${ethereumAddress}`,
         );
 
-        console.log('Collections',Collections);
+        //console.log('Collections',Collections);
         
 
         //Loop the collections and add a id column
         let id = 1, collections = [];
-        for(const collection of Collections.data.collections){
-          collection.id = id;
-          collections.push(collection);
-          SevenDaySales = SevenDaySales + collection.stats.seven_day_sales;
-          NumOwners = NumOwners + collection.stats.num_owners;
-          totalSupply = totalSupply + collection.stats.total_supply;
 
-          EstHoldingValue = EstHoldingValue + (Number(collection.stats.floor_price) * Number(collection.owned_asset_count));
-
-          id++;
+        if(typeof Collections.data !== "undefined"){
+          for(const collection of Collections.data.collections){
+            collection.id = id;
+            collections.push(collection);
+            SevenDaySales = SevenDaySales + collection.stats.seven_day_sales;
+            NumOwners = NumOwners + collection.stats.num_owners;
+            totalSupply = totalSupply + collection.stats.total_supply;
+  
+            EstHoldingValue = EstHoldingValue + (Number(collection.stats.floor_price) * Number(collection.owned_asset_count));
+  
+            id++;
+          }
         }
         Collections = collections;
         _CollectionsCache.set(ethereumAddress, Collections);

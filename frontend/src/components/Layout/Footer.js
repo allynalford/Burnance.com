@@ -60,11 +60,12 @@ class Footer extends Component {
                       />
                     </a>
                   </li>
+                */}
                   <li className="list-inline-item me-1">
                     <a
-                      aria-label="Tenably Labs instagram"
+                      aria-label="Takin Shots instagram"
                       target={'_new'}
-                      href="https://www.instagram.com/tenablylabs/"
+                      href="https://www.instagram.com/takinshots1/"
                       className="rounded"
                     >
                       <FeatherIcon
@@ -72,10 +73,10 @@ class Footer extends Component {
                         className="fea icon-sm fea-social"
                       />
                     </a>
-                  </li> */}
+                  </li>
                   <li className="list-inline-item me-1">
                     <a
-                      aria-label="burnance twitter"
+                      aria-label="Takin Shots twitter"
                       target={'_new'}
                       href="https://twitter.com/TakinShots_"
                       className="rounded"
@@ -202,7 +203,7 @@ class Footer extends Component {
             <Row className="align-items-center">
               <Col sm="6">
                 <div className="text-sm-start">
-                  <p className="mb-0">2022 Takin Shots</p>
+                  <p className="mb-0">COPYRIGHT © 2022 TAKINSHOTS - ALL RIGHTS RESERVED.</p>
                 </div>
               </Col>
             </Row>

@@ -386,6 +386,8 @@ class CollectionView extends Component {
           ]);
         }
 
+        //console.log(gets);
+
         collectionObj.set(ethereumAddress, contractAddress, {
           collection: gets[0],
           nfts: gets[1],
@@ -406,52 +408,81 @@ class CollectionView extends Component {
       }
 
 
-
       const floorPrice =
-        typeof collection.statistics !== 'undefined'
+        typeof collection.stats !== 'undefined'
           ? formatter.format(
               parseFloat(
-                Number(collection.statistics.floor_price) * Number(ethusd),
+                Number(collection.stats.floor_price) * Number(ethusd),
               ),
             )
           : formatter.format(0.0);
       const marketCap =
-        typeof collection.statistics !== 'undefined'
+        typeof collection.stats !== 'undefined'
           ? formatter.format(
               parseFloat(
-                Number(collection.statistics.market_cap) * Number(ethusd),
+                Number(collection.stats.market_cap) * Number(ethusd),
               ),
             )
           : formatter.format(0.0);
+
+
       const avgPrice =
-        typeof collection.statistics !== 'undefined'
+        typeof collection.stats !== 'undefined'
           ? formatter.format(
               parseFloat(
-                Number(collection.statistics.average_price) * Number(ethusd),
+                Number(collection.stats.average_price) * Number(ethusd),
               ),
             )
           : formatter.format(0.0);
+
+
+          console.log(parseFloat(
+            Number(collection.stats.thirty_day_volume) *
+              Number(ethusd),
+          ))
+
       const thirtyDayVolume =
         typeof collection.statistics !== 'undefined'
           ? formatter.format(
               parseFloat(
-                Number(collection.statistics.thirty_day_volume) *
+                Number(collection.stats.thirty_day_volume) *
                   Number(ethusd),
               ),
             )
           : formatter.format(0.0);
+
       const holdingValue =
-        typeof collection.statistics !== 'undefined'
+        typeof collection.stats !== 'undefined'
           ? formatter.format(
               parseFloat(
                 Number(
-                  NFTS.data.nfts.length * collection.statistics.floor_price,
+                  NFTS.data.nfts.length * collection.stats.floor_price,
                 ) * Number(ethusd),
               ),
             )
           : formatter.format(0.0);
 
       
+          //Loop the NFTs to get totalCost
+          let totalCostUSD = 0;
+          let ethPrice = JSON.parse(sessionstorage.getItem('ethPrice'));
+          for(const nft of NFTS.data.nfts){
+            const currentCost = parseFloat(
+              nft.costUSD * ethPrice.ethusd
+            );
+            totalCostUSD = currentCost + totalCostUSD;
+          }
+
+          //P&L
+      const bagPNL = formatter.format(
+        parseFloat(
+          (Number(NFTS.data.nfts.length * collection.stats.floor_price) *
+        Number(ethusd)) - totalCostUSD,
+        ),
+      )
+      
+
+
       
       this.setState({
         collection: Collection.data.collection,
@@ -459,7 +490,9 @@ class CollectionView extends Component {
         nfts: NFTS.data.nfts,
         loading: false,
         approving: false,
+        bagPNL,
         holdingValue,
+        totalCostUSD,
         description: (typeof Collection.data.collection.description === "undefined" ? NFTS.data.nfts[0].description : Collection.data.collection.description),
         type: Collection.data.collection.tokenType,
         held: NFTS.data.nfts.length,
@@ -468,40 +501,44 @@ class CollectionView extends Component {
         marketCap,
         thirtyDayVolume,
         totalSupply:
-          typeof collection.statistics !== 'undefined'
-            ? collection.statistics.total_supply
+          typeof collection.stats !== 'undefined'
+            ? collection.stats.total_supply
             : '-',
         owners:
-          typeof collection.statistics !== 'undefined'
-            ? collection.statistics.num_owners
+          typeof collection.stats !== 'undefined'
+            ? collection.stats.num_owners
             : '-',
         liquidity1d:
-          typeof collection.statistics !== 'undefined'
+          typeof collection.stats !== 'undefined'
             ? (
-                (collection.statistics.one_day_sales /
-                  (collection.statistics.total_supply -
-                    collection.statistics.num_owners)) *
+                (collection.stats.one_day_sales /
+                  (collection.stats.total_supply -
+                    collection.stats.num_owners)) *
                 100
               ).toFixed(2)
             : 0.0,
         liquidity7d:
-          typeof collection.statistics !== 'undefined'
+          typeof collection.stats !== 'undefined'
             ? (
-                (collection.statistics.seven_day_sales /
-                  (collection.statistics.total_supply -
-                    collection.statistics.num_owners)) *
+                (collection.stats.seven_day_sales /
+                  (collection.stats.total_supply -
+                    collection.stats.num_owners)) *
                 100
               ).toFixed(2)
             : 0.0,
         liquidity30d:
-          typeof collection.statistics !== 'undefined'
+          typeof collection.stats !== 'undefined'
             ? (
-                (collection.statistics.thirty_day_sales /
-                  (collection.statistics.total_supply -
-                    collection.statistics.num_owners)) *
+                (collection.stats.thirty_day_sales /
+                  (collection.stats.total_supply -
+                    collection.stats.num_owners)) *
                 100
               ).toFixed(2)
             : 0.0,
+        percentHeld:
+            typeof collection.stats !== 'undefined'
+              ? ((100 * NFTS.data.nfts.length) / collection.stats.total_supply).toFixed(3)
+              : 0,
       });
     } catch (e) {
       console.error(e);
@@ -946,7 +983,7 @@ class CollectionView extends Component {
                     <nav aria-label="breadcrumb" className="d-inline-block">
                       <ul className="breadcrumb bg-white rounded shadow mb-0">
                         <li className="breadcrumb-item">
-                          <Link to="/">Burnance</Link>
+                          <Link to="/">Takin Shots</Link>
                         </li>
                         <li className="breadcrumb-item">
                           <Link to="/collections">Collections</Link>
@@ -992,11 +1029,6 @@ class CollectionView extends Component {
                     key={1}
                     className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
                   >
-                    {/* <img
-                  src={work1}
-                  className="avatar avatar-ex-sm"
-                  alt=""
-                /> */}
                     <div className="flex-1 content ms-3">
                       <BasicPopperToolTip
                         title="Floor Price"
@@ -1022,11 +1054,6 @@ class CollectionView extends Component {
                     key={1}
                     className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
                   >
-                    {/* <img
-                  src={work1}
-                  className="avatar avatar-ex-sm"
-                  alt=""
-                /> */}
                     <div className="flex-1 content ms-3">
                       <BasicPopperToolTip
                         title="Market Cap"
@@ -1052,11 +1079,6 @@ class CollectionView extends Component {
                     key={1}
                     className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
                   >
-                    {/* <img
-                  src={work1}
-                  className="avatar avatar-ex-sm"
-                  alt=""
-                /> */}
                     <div className="flex-1 content ms-3">
                       <BasicPopperToolTip
                         title="30 Day Volume"
@@ -1084,13 +1106,30 @@ class CollectionView extends Component {
                     key={1}
                     className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
                   >
-                    {/* <img
-                  src={work1}
-                  className="avatar avatar-ex-sm"
-                  alt=""
-                /> */}
-                    {/* The liquidity rate measures the relative liquidity of each collection. 
-                Liquidity = Sales / The number of NFTs * 100% */}
+                    <div className="flex-1 content ms-3">
+                      <BasicPopperToolTip
+                        title="Bag PnL"
+                        text={
+                          'Market capitalization is calculated as the sum of each NFT valued at the greater of its last traded price and the floor price of the collection, respectively.'
+                        }
+                      />
+                      {this.state.loading === true ? (
+                        <RingLoader
+                          color={'#ff914d'}
+                          loading={this.state.loadingCollection}
+                          cssOverride={override}
+                          size={50}
+                        />
+                      ) : (
+                        <p className="text h3 mb-0">
+                          {this.state.bagPNL}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </Col>
+                {/*
+                <Col><div>
                     <div className="flex-1 content ms-3">
                       <BasicPopperToolTip
                         title="Liquidity (1D)"
@@ -1119,13 +1158,6 @@ class CollectionView extends Component {
                     key={1}
                     className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
                   >
-                    {/* <img
-                  src={work1}
-                  className="avatar avatar-ex-sm"
-                  alt=""
-                /> */}
-                    {/* The liquidity rate measures the relative liquidity of each collection. 
-                Liquidity = Sales / The number of NFTs * 100% */}
                     <div className="flex-1 content ms-3">
                       <BasicPopperToolTip
                         title="Liquidity (7D)"
@@ -1154,13 +1186,6 @@ class CollectionView extends Component {
                     key={1}
                     className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
                   >
-                    {/* <img
-                  src={work1}
-                  className="avatar avatar-ex-sm"
-                  alt=""
-                /> */}
-                    {/* The liquidity rate measures the relative liquidity of each collection. 
-                Liquidity = Sales / The number of NFTs * 100% */}
                     <div className="flex-1 content ms-3">
                       <BasicPopperToolTip
                         title="Liquidity (30D)"
@@ -1182,17 +1207,13 @@ class CollectionView extends Component {
                       )}
                     </div>
                   </div>
-                </Col>
+                </Col> 
+                */}
                 <Col md="3">
                   <div
                     key={1}
                     className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
                   >
-                    {/* <img
-                  src={work1}
-                  className="avatar avatar-ex-sm"
-                  alt=""
-                /> */}
                     <div className="flex-1 content ms-3">
                       <BasicPopperToolTip
                         title="Avg. Price"
@@ -1224,8 +1245,8 @@ class CollectionView extends Component {
                 /> */}
                     <div className="flex-1 content ms-3">
                       <BasicPopperToolTip
-                        title="Holding Value"
-                        text={'Test Tool tip text: Sales (7D)'}
+                        title="Bag Value"
+                        text={'your "bag value"'}
                       />
 
                       {this.state.loading === true ? (
@@ -1238,6 +1259,34 @@ class CollectionView extends Component {
                       ) : (
                         <p className="text h3 mb-0">
                           {this.state.holdingValue}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </Col>
+                <Col md="3">
+                  <div
+                    key={1}
+                    className="d-flex key-feature align-items-center p-3 rounded shadow mt-4"
+                  >
+                    <div className="flex-1 content ms-3">
+                      <BasicPopperToolTip
+                        title="%Held"
+                        text={
+                          "Percentage of this collection held in wallet"
+                        }
+                      />
+
+                      {this.state.loading === true ? (
+                        <RingLoader
+                          color={'#ff914d'}
+                          loading={this.state.loadingCollection}
+                          cssOverride={override}
+                          size={50}
+                        />
+                      ) : (
+                        <p className="text h3 mb-0">
+                          {numFormatter.format(this.state.percentHeld)}
                         </p>
                       )}
                     </div>
