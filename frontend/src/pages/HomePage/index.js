@@ -34,12 +34,12 @@ class Index extends Component {
     return (
       <React.Fragment>
         <Helmet>
-          <title>A website that provides liquidity for owners of worthless NFTs and ERC20 tokens</title>
-          <meta property="og:title" content="A website that provides liquidity for owners of worthless NFTs and ERC20 tokens" />
+          <title>NFTs, Crypto, Stocks, and MORE</title>
+          <meta property="og:title" content="NFTs, Crypto, Stocks, and MORE" />
           <meta name="keywords" content="taxes, crypto tokens, liquidity for owners, ERC20 tokens, NFT, NFT Liquidity, Liquidity,Ethereum, ETH, ERC-721, ERC-20, ERC-1155, burner, burn, burn rewards" />
-          <meta name="description" content="Burn your Sh!t NFTs and get paid in (ETH) Ethereum" />
-          <meta property="og:description" content="The one stop shop for those looking to unload their worthless NFTs and ERC20 tokens!" />
-          <meta name="twitter:title" content="Takin Shots" />
+          <meta name="description" content="Screw a fancy website, we will worry about that later." />
+          <meta property="og:description" content="Screw a fancy website, we will worry about that later." />
+          <meta name="twitter:title" content="Takin Shots - NFTs, Crypto, Stocks, and MORE" />
         </Helmet>
         <Section />
       </React.Fragment>
