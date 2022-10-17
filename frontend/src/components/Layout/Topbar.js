@@ -54,8 +54,8 @@ class Topbar extends Component {
     const web3 = window.web3;
 
     const networkId = await web3.eth.net.getId();
-    console.log(process.env.REACT_APP_STAGE);
-    console.log({networkId, thisIs: getChainId()});
+    //console.log(process.env.REACT_APP_STAGE);
+    //console.log({networkId, thisIs: getChainId()});
     
         if(networkId !== getChainId()){
           const switchRequest = getNetwork().switch;
@@ -88,17 +88,21 @@ class Topbar extends Component {
 
   async loadBlockchainData() {
     const web3 = window.web3;
-    const networkId = await web3.eth.net.getId();
-    const burnanceAddr = await Burnance.networks[networkId].address;
-    this.setState({ navLinks: [
-      { id: 1, title: 'Home', link: '/' },
-      { id: 2, title: 'Transactions', link: '/account' },
-      { id: 3, title: 'Collections', link: '/collections' },
-      { id: 4, title: 'Coins', link: '/coins' },
-      { id: 5, title: 'Batch', link: '/batch' },
-      { id: 6, title: 'Contract', link: `${process.env.REACT_APP_ETHERSCAN_BASE_URL}address/${burnanceAddr}`, external: true },
-    ] });
-    this.detectEthereumNetwork();
+    try{
+      const networkId = await web3.eth.net.getId();
+      const burnanceAddr = await Burnance.networks[networkId].address;
+      this.setState({ navLinks: [
+        { id: 1, title: 'Home', link: '/' },
+        { id: 2, title: 'Transactions', link: '/account' },
+        { id: 3, title: 'Collections', link: '/collections' },
+        { id: 4, title: 'Coins', link: '/coins' },
+        { id: 5, title: 'Batch', link: '/batch' },
+        { id: 6, title: 'Contract', link: `${process.env.REACT_APP_ETHERSCAN_BASE_URL}address/${burnanceAddr}`, external: true },
+      ] });
+      this.detectEthereumNetwork();
+    }catch(e){
+      console.error(e);
+    }
   };
 
   async init() {

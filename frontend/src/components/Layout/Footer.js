@@ -8,19 +8,19 @@ import FeatherIcon from "feather-icons-react";
 
 
 //Import Images
-import logodark from "../../assets/images/burnance_logo.png";
+import logodark from "../../assets/images/takinshots/1.png";
 
 class Footer extends Component {
   constructor(props) {
     super(props);
     this.state = {
       grid1: [
-        { title: "Contact us", link: "https://www.tenably.app/contact-us", external: true },
-        { title: "Services", link: "https://www.tenably.app/shopify", external: true },
-        { title: "Blog", link: "https://www.tenably.app/blog", external: true },
+        { title: "Contact us", link: "", external: true },
+        { title: "Services", link: "", external: true },
+        { title: "Blog", link: "", external: true },
       ],
       grid2: [
-        { title: "Terms of Services", link: "https://www.tenably.app/terms-of-service", external: true },
+        { title: "Terms of Services", link: "", external: true },
       ],
     };
   }
@@ -77,7 +77,7 @@ class Footer extends Component {
                     <a
                       aria-label="burnance twitter"
                       target={'_new'}
-                      href="https://twitter.com/burnance_"
+                      href="https://twitter.com/TakinShots_"
                       className="rounded"
                     >
                       <FeatherIcon
@@ -110,7 +110,7 @@ class Footer extends Component {
                   particular circumstance or fact situation.
                 </p>
                 <p>
-                  Burnance does not provide tax, legal or accounting advice. You
+                  Takin Shots does not provide tax, legal or accounting advice. You
                   should consult your own tax, legal and accounting advisors.
                 </p>
               </Col>
@@ -202,7 +202,7 @@ class Footer extends Component {
             <Row className="align-items-center">
               <Col sm="6">
                 <div className="text-sm-start">
-                  <p className="mb-0">2022 Burnance</p>
+                  <p className="mb-0">2022 Takin Shots</p>
                 </div>
               </Col>
             </Row>
