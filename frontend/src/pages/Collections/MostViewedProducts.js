@@ -685,7 +685,7 @@ class MostViewedProducts extends Component {
                       {
                         name: 'Collection',
                         selector: (row) => (
-                          <Link to={`/collection/${row.contractAddress}`}>
+                          <Link to={`/collection/${row.primary_asset_contracts[0].address}`}>
                             {row.name}
                           </Link>
                         ),
