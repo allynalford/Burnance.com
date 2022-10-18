@@ -219,10 +219,20 @@ class MostViewedProducts extends Component {
         if(typeof Collections.data !== "undefined"){
           for(const collection of Collections.data.collections){
             collection.id = id;
+
+            try{
+              collection.contractAddress = collection.primary_asset_contracts[0].address
+              collection.schema_name = collection.primary_asset_contracts[0].schema_name
+            }catch(e){
+              console.warn(e);
+            }
+            
+
             collections.push(collection);
             SevenDaySales = SevenDaySales + collection.stats.seven_day_sales;
             NumOwners = NumOwners + collection.stats.num_owners;
             totalSupply = totalSupply + collection.stats.total_supply;
+            
   
             EstHoldingValue = EstHoldingValue + (Number(collection.stats.floor_price) * Number(collection.owned_asset_count));
   
@@ -331,12 +341,12 @@ class MostViewedProducts extends Component {
     return (
       <React.Fragment>
         <Helmet>
-          <title>NFT Collection | Burnance NFT Liquidity</title>
-          <meta property="og:title" content="Burnance NFT Liquidity Provider" />
+          <title>NFT Collection | Takin Shots</title>
+          <meta property="og:title" content="Takin Shots NFT Collections List" />
           <meta name="keywords" content="NFT, NFT Liquidity, Liquidity,Ethereum, ETH, ERC-721, ERC-20, ERC-1155, burner, burn, burn rewards" />
           <meta name="description" content="Burn your Sh!t NFTs and get paid in (ETH) Ethereum" />
           <meta property="og:description" content="Burn your Sh!t NFTs and get paid in (ETH) Ethereum" />
-          <meta name="twitter:title" content="Burnance | NFT Collection Liquidity Provider" />
+          <meta name="twitter:title" content="Takin Shots | NFT Collection Liquidity Provider" />
         </Helmet>
         <Modal
           isOpen={this.state.isOpen}
@@ -463,7 +473,7 @@ class MostViewedProducts extends Component {
                     <nav aria-label="breadcrumb" className="d-inline-block">
                       <ul className="breadcrumb bg-white rounded shadow mb-0">
                         <li className="breadcrumb-item">
-                          <Link to="/">Burnance</Link>
+                          <Link to="/">Takin Shots</Link>
                         </li>
                         <li className="breadcrumb-item">
                           <Link to="/collections">Collections</Link>
@@ -688,7 +698,7 @@ class MostViewedProducts extends Component {
                       {
                         name: 'Collection',
                         selector: (row) => (
-                          <Link to={`/collection/${row.primary_asset_contracts[0].address}`}>
+                          <Link to={`/collection/${row.contractAddress}`}>
                             {row.name}
                           </Link>
                         ),
@@ -702,7 +712,7 @@ class MostViewedProducts extends Component {
                       },
                       {
                         name: 'Type',
-                        selector: (row) => row.primary_asset_contracts[0].schema_name,
+                        selector: (row) => row.schema_name,
                         sortable: true,
                       },
                       {

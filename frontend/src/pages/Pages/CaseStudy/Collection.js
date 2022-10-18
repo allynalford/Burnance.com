@@ -436,13 +436,9 @@ class CollectionView extends Component {
           : formatter.format(0.0);
 
 
-          console.log(parseFloat(
-            Number(collection.stats.thirty_day_volume) *
-              Number(ethusd),
-          ))
 
       const thirtyDayVolume =
-        typeof collection.statistics !== 'undefined'
+        typeof collection.stats !== 'undefined'
           ? formatter.format(
               parseFloat(
                 Number(collection.stats.thirty_day_volume) *
@@ -1216,7 +1212,7 @@ class CollectionView extends Component {
                   >
                     <div className="flex-1 content ms-3">
                       <BasicPopperToolTip
-                        title="Avg. Price"
+                        title="Avg. Per NFT"
                         text={'Test Tool tip text: Sales (7D)'}
                       />
 
@@ -1271,7 +1267,7 @@ class CollectionView extends Component {
                   >
                     <div className="flex-1 content ms-3">
                       <BasicPopperToolTip
-                        title="%Held"
+                        title="% of Project Held"
                         text={
                           "Percentage of this collection held in wallet"
                         }
