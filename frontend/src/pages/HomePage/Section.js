@@ -153,7 +153,7 @@ class Section extends Component {
                         as you can tell I am far from a developer, but have my
                         kickass team who is great- we will use them later. I’m
                         also fully doxxed, you can see on my social medias
-                        (IG:@nickalbs twitter:@nickalbs1)- you want to know more
+                        (IG: <a href="https://www.instagram.com/nickalbs/" target="_new">@nickalbs</a> twitter: <a href="https://twitter.com/nickalbs1" target="_new">@nickalbs1</a>)- you want to know more
                         just DM me!
                       </p>
                       <h3 className="title">The How:</h3>
