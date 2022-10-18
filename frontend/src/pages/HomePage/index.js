@@ -1,10 +1,6 @@
 import React, { Component } from "react";
 import {Helmet} from "react-helmet";
 import Section from "./Section";
-import About from "./About";
-import FAQ from "./Faqs";
-import TaskManager from "./TaskManager";
-import HowBurningWorks from "./HowBurningWorks";
 import {initGA, PageView} from "../../common/gaUtils";
 class Index extends Component {
   componentDidMount() {
